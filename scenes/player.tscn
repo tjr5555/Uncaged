@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://nngadheagxwr"]
 
-[ext_resource type="Script" uid="uid://bae8m5iup5xgh" path="res://scripts/player.gd" id="1_g2els"]
+[ext_resource type="Script" uid="uid://bxh5f1rgkf8ug" path="res://scenes/player.gd" id="1_g2els"]
 [ext_resource type="Texture2D" uid="uid://tcenjagh32p2" path="res://sprites/icon.svg" id="2_qhqgy"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_lnspb"]
@@ -19,5 +19,6 @@ texture = ExtResource("2_qhqgy")
 shape = SubResource("CapsuleShape2D_lnspb")
 
 [node name="Camera" type="Camera2D" parent="." unique_id=802923576]
+zoom = Vector2(0.83, 0.83)
 position_smoothing_enabled = true
 position_smoothing_speed = 3.0
