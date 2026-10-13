@@ -50,7 +50,7 @@ func _physics_process(delta: float) -> void:
 	
 	if is_on_wall() and incoming_speed_x > 50.0 and Input.is_action_pressed("augment"):
 		print("is on wall")
-		velocity.y += incoming_speed_x/1.5 * -1
+		velocity.y = incoming_speed_x/1.5 * -1
 		velocity.x = 0 
 		dashes = 2
 	# Get horizontal input direction and handle movement/friction
@@ -70,8 +70,8 @@ func _physics_process(delta: float) -> void:
 
 	if Input.is_action_just_pressed("Dash") and dashes > 0:
 		dashes -= 1
-		velocity.x = dash_power * 1.4 * dir
-		velocity.y = dash_power * ydir
+		velocity.x += dash_power * 1.4 * dir
+		velocity.y += dash_power * ydir
 
 
 	# Handle jump / flap
