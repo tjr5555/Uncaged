@@ -11,9 +11,17 @@ config_version=5
 [application]
 
 config/name="Uncaged"
-run/main_scene="uid://dm63dvgwexm6t"
+run/main_scene="uid://ctkeo8unuwel4"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://sprites/icon.svg"
+
+[audio]
+
+buses/default_bus_layout="uid://cnkeu3qng0i68"
+
+[autoload]
+
+SignalBus="*uid://gli1ua1u8qh6"
 
 [display]
 

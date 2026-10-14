@@ -1,0 +1,47 @@
+[gd_scene format=3 uid="uid://ctkeo8unuwel4"]
+
+[ext_resource type="Script" uid="uid://xvtl324oanf" path="res://scenes/main_menu.gd" id="1_ekxnf"]
+[ext_resource type="FontFile" uid="uid://bmhi2eusdxqlj" path="res://fonts/Elms_Sans/static/ElmsSans-BoldItalic.ttf" id="1_l6cm7"]
+[ext_resource type="FontFile" uid="uid://31a0pllxp1ya" path="res://fonts/Play/Play-Bold.ttf" id="3_bqqt6"]
+
+[sub_resource type="Gradient" id="Gradient_ekxnf"]
+offsets = PackedFloat32Array(0.090361446, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0.4946891, 0.51696414, 0.53586715, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_d8fr4"]
+gradient = SubResource("Gradient_ekxnf")
+width = 256
+height = 256
+fill_from = Vector2(0.06521739, 0.26956522)
+fill_to = Vector2(0, 1)
+
+[node name="main_menu" type="Node2D" unique_id=1397864842]
+script = ExtResource("1_ekxnf")
+
+[node name="backRect" type="TextureRect" parent="." unique_id=1169001038]
+offset_right = 1920.0
+offset_bottom = 1080.0
+texture = SubResource("GradientTexture2D_d8fr4")
+metadata/_edit_lock_ = true
+
+[node name="enterButton" type="Button" parent="." unique_id=930286790]
+offset_left = 720.0
+offset_top = 810.0
+offset_right = 1200.0
+offset_bottom = 930.0
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("1_l6cm7")
+theme_override_font_sizes/font_size = 84
+text = "Enter"
+
+[node name="headerLabel" type="Label" parent="." unique_id=1785602283]
+offset_right = 1920.0
+offset_bottom = 180.0
+theme_override_constants/outline_size = 15
+theme_override_fonts/font = ExtResource("3_bqqt6")
+theme_override_font_sizes/font_size = 250
+text = "Uncaged"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[connection signal="pressed" from="enterButton" to="." method="_on_enter_button_pressed"]
