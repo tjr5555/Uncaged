@@ -2,30 +2,32 @@ extends CharacterBody2D
 
 enum Mode { GROUND, FLY }
 
-const SPEED = 600.0
-const JUMP_VELOCITY = -500.0
-const JUMP_CUT = 0.45
-const JUMP_BUFFER = 0.12
-const COYOTE_TIME = 0.4
-const HOP_VELOCITY = -220.0
-const HOP_INTERVAL = 0.12
+
+
+var SPEED = 600.0
+var JUMP_VELOCITY = -500.0
+var JUMP_CUT = 0.45
+var JUMP_BUFFER = 0.12
+var COYOTE_TIME = 0.4
+var HOP_VELOCITY = -220.0
+var HOP_INTERVAL = 0.12
 const BASE_GRAVITY = 1200.0
 const DIVE_GRAVITY = 2400.0
 const GLIDING_GRAVITY = 200.0
 const INCREASED_GRAVITY = 1800.0
 const AIR_FRICTION = 1500.0
 const FRICTION = 3000.0
-const DASH_POWER = 1000.0
-const HOLD_DURATION = 0.3
-const WALL_SLIDE_SPEED = 120.0
-const WALL_JUMP_PUSH = 550.0
-const WALL_JUMP_HEIGHT = -520.0
-const WALL_JUMP_LOCK = 0.18
+var DASH_POWER = 1000.0
+var HOLD_DURATION = 0.3
+var WALL_SLIDE_SPEED = 120.0
+var WALL_JUMP_PUSH = 550.0
+var WALL_JUMP_HEIGHT = -520.0
+var WALL_JUMP_LOCK = 0.18
 
-const FLY_CCW_ACTION = "ui_left"
-const FLY_CW_ACTION = "ui_right"
-const FLY_BOOST_ACTION = "ui_up"
-const FLY_BRAKE_ACTION = "ui_down"
+var FLY_CCW_ACTION = "ui_left"
+var FLY_CW_ACTION = "ui_right"
+var FLY_BOOST_ACTION = "ui_up"
+var FLY_BRAKE_ACTION = "ui_down"
 
 const FLY_ENTER_SPEED = 800.0
 const FLY_MIN_SPEED = 450.0
@@ -157,6 +159,7 @@ func _ground_physics(delta: float) -> void:
 			current_dir = 1 if wall_normal.x > 0.0 else -1
 			bird.flip_h = current_dir < 0
 			flaps = 1
+			dashes = 2
 			coyote_timer = 0.0
 			jump_buffer_timer = 0.0
 			jumped = true

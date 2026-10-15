@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://ctkeo8unuwel4"]
 
-[ext_resource type="Script" uid="uid://xvtl324oanf" path="res://scenes/main_menu.gd" id="1_ekxnf"]
+[ext_resource type="Script" uid="uid://xvtl324oanf" path="res://scripts/main_menu.gd" id="1_ekxnf"]
 [ext_resource type="FontFile" uid="uid://bmhi2eusdxqlj" path="res://fonts/Elms_Sans/static/ElmsSans-BoldItalic.ttf" id="1_l6cm7"]
 [ext_resource type="FontFile" uid="uid://31a0pllxp1ya" path="res://fonts/Play/Play-Bold.ttf" id="3_bqqt6"]
 
