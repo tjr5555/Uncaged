@@ -168,10 +168,9 @@ script = ExtResource("1_rpqff")
 [node name="AnimationSprite" type="AnimatedSprite2D" parent="." unique_id=1603189986]
 sprite_frames = SubResource("SpriteFrames_ivn8x")
 animation = &"pop"
-frame = 20
-frame_progress = 1.0
 
 [node name="Collision" type="CollisionShape2D" parent="." unique_id=2110445835]
+visible = false
 shape = SubResource("CapsuleShape2D_d8fr4")
 
 [connection signal="area_entered" from="." to="." method="_on_area_entered"]

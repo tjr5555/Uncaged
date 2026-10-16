@@ -24,7 +24,3 @@ position_smoothing_enabled = true
 position_smoothing_speed = 10.0
 
 [node name="HUD" parent="Camera" unique_id=1002328406 instance=ExtResource("3_qhqgy")]
-offset_left = -944.0
-offset_top = -520.0
-offset_right = -944.0
-offset_bottom = -520.0

@@ -13,6 +13,7 @@ func _ready() -> void:
 	anim.frame = 0
 	if not anim.is_connected("animation_finished", Callable(self, "_on_animation_finished")):
 		anim.connect("animation_finished", Callable(self, "_on_animation_finished"))
+	$AnimationSprite.self_modulate = Color.from_hsv(randf(), randf_range(0.6, 0.9), randf_range(0.93, 1.0))
 
 func _physics_process(delta: float) -> void:
 	if is_popped:

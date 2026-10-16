@@ -2,7 +2,7 @@ extends CharacterBody2D
 
 enum Mode { GROUND, FLY }
 
-
+signal boost_changed(current: float, maximum: float)
 
 var SPEED = 600.0
 var JUMP_VELOCITY = -500.0
@@ -26,7 +26,7 @@ var WALL_JUMP_LOCK = 0.18
 
 var FLY_CCW_ACTION = "ui_left"
 var FLY_CW_ACTION = "ui_right"
-var FLY_BOOST_ACTION = "ui_up"
+var FLY_BOOST_ACTION = "Dash"
 var FLY_BRAKE_ACTION = "ui_down"
 
 const FLY_ENTER_SPEED = 800.0
@@ -47,15 +47,51 @@ const FLY_AUTO_LEVEL = 0.9
 const FLY_VELOCITY_SMOOTH = 14.0
 const FLY_DASH_BOOST = 700.0
 const FLY_STALL_TURN = 2.5
-const FLY_BOUNCE_LOSS = 0.7
 const FLY_FLIP_SPEED = 14.0
+
+const FLY_BOUNCE_LOSS = 0.2
+const FLY_BOUNCE_MIN_SPEED = 120.0
+const FLY_BOUNCE_RECOVERY = 350.0
+const FLY_BOUNCE_ACCEL_MULT = 0.35
+
+var speed_floor: float = FLY_MIN_SPEED
+
+const CAMERA_ZOOM_START_SPEED = 100
+const CAMERA_ZOOM_END_SPEED = 1800
+const CAMERA_MIN_ZOOM = 0.4
+const CAMERA_ZOOM_SMOOTH = 0.8
 const FLY_CAMERA_LOOK = 0.2
 const FLY_CAMERA_MAX_OFFSET = 300.0
-const FLY_CAMERA_MIN_ZOOM = 0.75
+
+const WIND_START_SPEED = 900.0
+const WIND_FULL_SPEED = 2000.0
+const WIND_OFFSET = 18.0
+const WIND_COLOR = Color(1.0, 1.0, 1.0, 0.5)
+const WIND_FADE_SPEED = 3.0
+
+var WIND_LANE_OFFSETS: PackedFloat32Array = PackedFloat32Array([-34.0, -17.0, 0.0, 17.0, 34.0])
+var WIND_LANE_LENGTHS: PackedInt32Array = PackedInt32Array([8, 12, 18, 12, 8])
+var WIND_LANE_WIDTHS: PackedFloat32Array = PackedFloat32Array([6.0, 9.0, 12.0, 9.0, 6.0])
+
+var wind_lines: Array[Line2D] = []
+var wind_amount: float = 0.0
+
+const BOOST_MAX = 100.0
+const BOOST_DRAIN = 35.0
+const BOOST_REGEN = 20.0
+const BOOST_REGEN_DELAY = 0.8
+const BOOST_RESTART_AMOUNT = 20.0
+const BOOST_GROUND_REGEN_MULT = 3.0
+
+var boost: float = BOOST_MAX
+var boost_regen_timer: float = 0.0
+var boost_exhausted: bool = false
+var is_boosting: bool = false
+var last_emitted_boost: float = -1.0
 
 @onready var bird = $Sprite
 @onready var base_scale: Vector2 = bird.scale
-@onready var camera: Camera2D = get_node_or_null("Camera2D")
+@onready var camera: Camera2D = get_node_or_null("Camera")
 @onready var base_zoom: Vector2 = camera.zoom if camera else Vector2.ONE
 
 var mode: Mode = Mode.GROUND
@@ -76,16 +112,46 @@ var speed: float = 0.0
 var turn_speed: float = 0.0
 var flip_amount: float = 1.0
 
+func _ready() -> void:
+	var width_curve := Curve.new()
+	width_curve.add_point(Vector2(0.0, 1.0))
+	width_curve.add_point(Vector2(0.35, 0.8))
+	width_curve.add_point(Vector2(1.0, 0.0))
+	
+	var gradient := Gradient.new()
+	gradient.set_color(0, WIND_COLOR)
+	gradient.set_color(1, Color(WIND_COLOR, 0.0))
+	gradient.add_point(0.4, Color(WIND_COLOR, WIND_COLOR.a * 0.5))
+	
+	for i in WIND_LANE_OFFSETS.size():
+		var line := Line2D.new()
+		line.width = WIND_LANE_WIDTHS[i]
+		line.width_curve = width_curve
+		line.gradient = gradient
+		line.begin_cap_mode = Line2D.LINE_CAP_ROUND
+		line.end_cap_mode = Line2D.LINE_CAP_ROUND
+		line.joint_mode = Line2D.LINE_JOINT_ROUND
+		line.round_precision = 12
+		line.antialiased = true
+		line.show_behind_parent = true
+		add_child(line)
+		wind_lines.append(line)
+
 
 func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("toggle_fly"):
 		_set_mode(Mode.GROUND if mode == Mode.FLY else Mode.FLY)
-
+	
+	is_boosting = false
+	
 	match mode:
 		Mode.GROUND:
 			_ground_physics(delta)
 		Mode.FLY:
 			_fly_physics(delta)
+	
+	_update_boost(delta)
+	_update_wind(delta)
 
 
 func _set_mode(new_mode: Mode) -> void:
@@ -115,12 +181,15 @@ func _set_mode(new_mode: Mode) -> void:
 		bird.flip_h = current_dir < 0
 
 
-func _update_camera(delta: float, look: Vector2, zoom_factor: float) -> void:
+func _update_camera(delta: float, look: Vector2 = Vector2.ZERO, zoom_multiplier: float = 1.0) -> void:
 	if camera == null:
 		return
-	var weight := 1.0 - exp(-3.0 * delta)
-	camera.offset = camera.offset.lerp(look, weight)
-	camera.zoom = camera.zoom.lerp(base_zoom * zoom_factor, weight)
+	var move_weight := 1.0 - exp(-3.0 * delta)
+	var zoom_weight := 1.0 - exp(-CAMERA_ZOOM_SMOOTH * delta)
+	var speed_t := smoothstep(CAMERA_ZOOM_START_SPEED, CAMERA_ZOOM_END_SPEED, velocity.length())
+	var target_zoom := base_zoom * lerpf(1.0, CAMERA_MIN_ZOOM, speed_t) * zoom_multiplier
+	camera.offset = camera.offset.lerp(look, move_weight)
+	camera.zoom = camera.zoom.lerp(target_zoom, zoom_weight)
 
 
 func _ground_physics(delta: float) -> void:
@@ -229,24 +298,33 @@ func _ground_physics(delta: float) -> void:
 
 func _fly_physics(delta: float) -> void:
 	var turn_input := Input.get_axis(FLY_CCW_ACTION, FLY_CW_ACTION)
-	var boosting := Input.is_action_pressed(FLY_BOOST_ACTION) or Input.is_action_pressed("ui_accept")
 	var braking := Input.is_action_pressed(FLY_BRAKE_ACTION)
-
+	
+	if boost <= 0.0:
+		boost_exhausted = true
+	elif boost >= BOOST_RESTART_AMOUNT:
+		boost_exhausted = false
+	
+	var boosting := Input.is_action_pressed(FLY_BOOST_ACTION) and not boost_exhausted
+	is_boosting = boosting
+	
+	speed_floor = move_toward(speed_floor, FLY_MIN_SPEED, FLY_BOUNCE_RECOVERY * delta)
+	
 	var speed_t := clampf((speed - FLY_CRUISE_SPEED) / (FLY_MAX_SPEED - FLY_CRUISE_SPEED), 0.0, 1.0)
 	var turn_rate := FLY_TURN_RATE * lerpf(1.0, FLY_FAST_TURN_MULT, speed_t)
 	if braking:
 		turn_rate *= FLY_BRAKE_TURN_MULT
-
+	
 	turn_speed = move_toward(turn_speed, turn_input * turn_rate, FLY_TURN_ACCEL * delta)
 	heading = wrapf(heading + turn_speed * delta, -PI, PI)
-
+	
 	if turn_input == 0.0:
 		var level_target := 0.0 if cos(heading) >= 0.0 else PI
 		var level_step := FLY_AUTO_LEVEL * delta
 		heading = wrapf(heading + clampf(angle_difference(heading, level_target), -level_step, level_step), -PI, PI)
-
+	
 	var heading_vec := Vector2.from_angle(heading)
-
+	
 	var target_speed := FLY_CRUISE_SPEED
 	var accel := FLY_ACCEL
 	if braking:
@@ -255,41 +333,94 @@ func _fly_physics(delta: float) -> void:
 	elif boosting:
 		target_speed = FLY_BOOST_SPEED
 		accel = FLY_BOOST_ACCEL
-
+	
 	if speed > target_speed and not braking:
 		accel = FLY_DRAG
-
+	
+	if speed_floor < FLY_MIN_SPEED:
+		accel *= FLY_BOUNCE_ACCEL_MULT
+	
 	speed += heading_vec.y * FLY_GRAVITY * delta
 	speed = move_toward(speed, target_speed, accel * delta)
-
-	if Input.is_action_just_pressed("Dash"):
-		speed += FLY_DASH_BOOST
-
-	speed = clampf(speed, FLY_MIN_SPEED, FLY_MAX_SPEED)
-
-	if speed <= FLY_MIN_SPEED + 10.0 and heading_vec.y < -0.2:
+	
+	speed = clampf(speed, speed_floor, FLY_MAX_SPEED)
+	
+	if speed <= speed_floor + 10.0 and heading_vec.y < -0.2:
 		var drop := clampf(angle_difference(heading, PI / 2.0), -FLY_STALL_TURN * delta, FLY_STALL_TURN * delta)
 		heading = wrapf(heading + drop, -PI, PI)
 		heading_vec = Vector2.from_angle(heading)
-
+	
 	velocity = velocity.lerp(heading_vec * speed, 1.0 - exp(-FLY_VELOCITY_SMOOTH * delta))
-
+	
 	move_and_slide()
-
+	
 	if get_slide_collision_count() > 0:
 		var normal := get_last_slide_collision().get_normal()
-		if heading_vec.dot(normal) < 0.0:
+		var impact := -heading_vec.dot(normal)
+		if impact > 0.0:
 			heading_vec = heading_vec.bounce(normal)
 			heading = heading_vec.angle()
-			speed = maxf(speed * FLY_BOUNCE_LOSS, FLY_MIN_SPEED)
+			speed = maxf(speed * lerpf(1.0, FLY_BOUNCE_LOSS, impact), FLY_BOUNCE_MIN_SPEED)
+			speed_floor = FLY_BOUNCE_MIN_SPEED
 			velocity = heading_vec * speed
-
+	
 	var facing := 1.0 if cos(heading) >= 0.0 else -1.0
 	flip_amount = move_toward(flip_amount, facing, FLY_FLIP_SPEED * delta)
 	bird.rotation = heading
 	bird.flip_h = false
 	bird.flip_v = false
 	bird.scale = Vector2(base_scale.x, base_scale.y * flip_amount)
+	
+	_update_camera(delta, (velocity * FLY_CAMERA_LOOK).limit_length(FLY_CAMERA_MAX_OFFSET))
 
-	var zoom_t := clampf((speed - FLY_CRUISE_SPEED) / (FLY_MAX_SPEED - FLY_CRUISE_SPEED), 0.0, 1.0)
-	_update_camera(delta, (velocity * FLY_CAMERA_LOOK).limit_length(FLY_CAMERA_MAX_OFFSET), lerpf(1.0, FLY_CAMERA_MIN_ZOOM, zoom_t))
+
+
+
+
+
+
+func _update_wind(delta: float) -> void:
+	var target := 0.0
+	if mode == Mode.FLY:
+		target = smoothstep(WIND_START_SPEED, WIND_FULL_SPEED, speed)
+	wind_amount = move_toward(wind_amount, target, WIND_FADE_SPEED * delta)
+	
+	var emitting := wind_amount > 0.02
+	var forward := Vector2.from_angle(heading)
+	var side := forward.orthogonal()
+	var time := Time.get_ticks_msec() * 0.008
+	
+	for i in wind_lines.size():
+		var line: Line2D = wind_lines[i]
+		line.global_transform = Transform2D.IDENTITY
+		line.modulate.a = wind_amount
+		
+		if not emitting:
+			line.clear_points()
+			continue
+		
+		var lane_offset: float = WIND_LANE_OFFSETS[i]
+		var lane_length: int = WIND_LANE_LENGTHS[i]
+		var spread: float = lerpf(0.55, 1.0, wind_amount)
+		var wobble: float = sin(time + i * 1.7) * 2.5 * wind_amount
+		var head: Vector2 = global_position - forward * WIND_OFFSET + side * (lane_offset * spread + wobble)
+		line.add_point(head, 0)
+		
+		var allowed: int = int(lane_length * lerpf(0.4, 1.0, wind_amount))
+		while line.get_point_count() > allowed:
+			line.remove_point(line.get_point_count() -1)
+
+func _update_boost(delta: float) -> void:
+	if is_boosting:
+		boost = maxf(boost - BOOST_DRAIN * delta, 0.0)
+		boost_regen_timer = BOOST_REGEN_DELAY
+	else:
+		boost_regen_timer = maxf(boost_regen_timer - delta, 0.0)
+		if boost_regen_timer <= 0.0:
+			var rate := BOOST_REGEN * (BOOST_GROUND_REGEN_MULT if mode == Mode.GROUND else 1.0)
+			boost = minf(boost + rate * delta, BOOST_MAX)
+	
+	if boost != last_emitted_boost:
+		last_emitted_boost = boost
+		boost_changed.emit(boost, BOOST_MAX)
+	
