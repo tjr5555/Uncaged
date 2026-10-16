@@ -10,3 +10,4 @@ func set_boost(current: float, maximum: float) -> void:
 
 func _process(delta: float) -> void:
 	boost_bar.value = lerpf(boost_bar.value, target_value, 1.0 - exp(-15.0 * delta))
+	$coinsLabel.text = "Coins: " + str(Global.total_coins)

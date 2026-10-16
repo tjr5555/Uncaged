@@ -1,0 +1,69 @@
+[gd_scene format=3 uid="uid://c7a3i1188tjny"]
+
+[ext_resource type="Script" uid="uid://glwsi83k70dk" path="res://shop_1.gd" id="1_vr6tn"]
+[ext_resource type="FontFile" uid="uid://31a0pllxp1ya" path="res://fonts/Play/Play-Bold.ttf" id="2_cyb0u"]
+[ext_resource type="AudioStream" uid="uid://dkxucyotn1yhl" path="res://audio/freesoundeffects-button-click-289742.mp3" id="2_qu5gy"]
+[ext_resource type="AudioStream" uid="uid://ir3c4ch6ieih" path="res://audio/denielcz-immersivecontrol-button-click-sound-463065.mp3" id="2_wfx2d"]
+[ext_resource type="FontFile" uid="uid://eus6nd3e135o" path="res://fonts/Inter/static/Inter_24pt-Bold.ttf" id="5_qu5gy"]
+
+[sub_resource type="Gradient" id="Gradient_wfx2d"]
+colors = PackedColorArray(0.8808251, 0.1897483, 0, 1, 1, 1, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_0jsi4"]
+gradient = SubResource("Gradient_wfx2d")
+fill_from = Vector2(0.26956522, 1)
+
+[node name="shop1" type="Control" unique_id=1976378373]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_vr6tn")
+hover_sound = ExtResource("2_qu5gy")
+click_sound = ExtResource("2_wfx2d")
+
+[node name="bg" type="TextureRect" parent="." unique_id=1781888682]
+layout_mode = 0
+offset_right = 1920.0
+offset_bottom = 1080.0
+texture = SubResource("GradientTexture2D_0jsi4")
+
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=1287147403]
+layout_mode = 0
+offset_left = 768.0
+offset_right = 1920.0
+offset_bottom = 1080.0
+
+[node name="MarginContainer" type="MarginContainer" parent="PanelContainer" unique_id=1664397242]
+layout_mode = 2
+theme_override_constants/margin_left = 30
+theme_override_constants/margin_top = 30
+
+[node name="GridContainer" type="GridContainer" parent="PanelContainer/MarginContainer" unique_id=581072559]
+layout_mode = 2
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 4
+
+[node name="flightSpeedButton" type="Button" parent="PanelContainer/MarginContainer/GridContainer" unique_id=873261451]
+custom_minimum_size = Vector2(354, 98)
+layout_mode = 2
+theme_override_constants/h_separation = 14
+theme_override_fonts/font = ExtResource("2_cyb0u")
+theme_override_font_sizes/font_size = 40
+text = "Flight Speed
+
+"
+
+[node name="flightSpeedAmount" type="Label" parent="PanelContainer/MarginContainer/GridContainer/flightSpeedButton" unique_id=441337552]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 114.0
+offset_right = 354.0
+offset_bottom = 178.0
+theme_override_fonts/font = ExtResource("5_qu5gy")
+theme_override_font_sizes/font_size = 40
+horizontal_alignment = 1
+
+[connection signal="pressed" from="PanelContainer/MarginContainer/GridContainer/flightSpeedButton" to="." method="_on_flight_speed_button_pressed"]

@@ -42,6 +42,7 @@ func respawn():
 func _on_body_entered(body: Node2D) -> void:
 	if not is_popped:
 		pop()
+		$AudioStreamPlayer2D.play()
 		Global.total_coins += coin_value
 		print(str(Global.total_coins))
 		player.dashes += 1

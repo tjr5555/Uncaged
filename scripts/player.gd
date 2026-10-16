@@ -4,11 +4,11 @@ enum Mode { GROUND, FLY }
 
 signal boost_changed(current: float, maximum: float)
 
-var SPEED = 600.0
+var SPEED = 800.0
 var JUMP_VELOCITY = -500.0
 var JUMP_CUT = 0.45
 var JUMP_BUFFER = 0.12
-var COYOTE_TIME = 0.4
+var COYOTE_TIME = 0.3
 var HOP_VELOCITY = -220.0
 var HOP_INTERVAL = 0.12
 const BASE_GRAVITY = 1200.0
@@ -29,11 +29,7 @@ var FLY_CW_ACTION = "ui_right"
 var FLY_BOOST_ACTION = "Dash"
 var FLY_BRAKE_ACTION = "ui_down"
 
-const FLY_ENTER_SPEED = 800.0
-const FLY_MIN_SPEED = 450.0
-const FLY_CRUISE_SPEED = 800.0
-const FLY_BOOST_SPEED = 1300.0
-const FLY_MAX_SPEED = 2200.0
+
 const FLY_ACCEL = 700.0
 const FLY_BOOST_ACCEL = 1400.0
 const FLY_DRAG = 350.0
