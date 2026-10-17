@@ -29,7 +29,11 @@ var FLY_CW_ACTION = "ui_right"
 var FLY_BOOST_ACTION = "Dash"
 var FLY_BRAKE_ACTION = "ui_down"
 
-
+const FLY_ENTER_SPEED = 800.0
+var FLY_CRUISE_SPEED = 800.0
+const FLY_BOOST_SPEED = 1300.0
+const FLY_MAX_SPEED = 2200.0
+const FLY_MIN_SPEED = 450.0
 const FLY_ACCEL = 700.0
 const FLY_BOOST_ACCEL = 1400.0
 const FLY_DRAG = 350.0
@@ -50,7 +54,7 @@ const FLY_BOUNCE_MIN_SPEED = 120.0
 const FLY_BOUNCE_RECOVERY = 350.0
 const FLY_BOUNCE_ACCEL_MULT = 0.35
 
-var speed_floor: float = FLY_MIN_SPEED
+var speed_floor: float = FLY_MIN_SPEED 
 
 const CAMERA_ZOOM_START_SPEED = 100
 const CAMERA_ZOOM_END_SPEED = 1800
@@ -148,7 +152,7 @@ func _physics_process(delta: float) -> void:
 	
 	_update_boost(delta)
 	_update_wind(delta)
-
+	FLY_CRUISE_SPEED = Global.base_flight_speed
 
 func _set_mode(new_mode: Mode) -> void:
 	mode = new_mode
@@ -321,7 +325,7 @@ func _fly_physics(delta: float) -> void:
 	
 	var heading_vec := Vector2.from_angle(heading)
 	
-	var target_speed := FLY_CRUISE_SPEED
+	var target_speed = FLY_CRUISE_SPEED
 	var accel := FLY_ACCEL
 	if braking:
 		target_speed = FLY_MIN_SPEED

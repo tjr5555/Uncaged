@@ -1,8 +1,30 @@
 [gd_scene format=3 uid="uid://blorw4562ivr"]
 
 [ext_resource type="Texture2D" uid="uid://tcenjagh32p2" path="res://sprites/icon.svg" id="1_gbpxa"]
+[ext_resource type="Script" uid="uid://caoiwv2d3kqvr" path="res://scenes/shopkeeper.gd" id="1_y54bd"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_rggdb"]
+size = Vector2(512, 320)
 
 [node name="shopkeeper" type="Node2D" unique_id=874633338]
+script = ExtResource("1_y54bd")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1180791722]
 texture = ExtResource("1_gbpxa")
+
+[node name="Label" type="Label" parent="." unique_id=268590427]
+offset_left = -96.0
+offset_top = -88.0
+offset_right = 96.0
+offset_bottom = -65.0
+text = "SHOPKEEPER MAN"
+horizontal_alignment = 1
+
+[node name="Area2D" type="Area2D" parent="." unique_id=1736434251]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Area2D" unique_id=2052325761]
+position = Vector2(0, -96)
+shape = SubResource("RectangleShape2D_rggdb")
+
+[connection signal="body_entered" from="Area2D" to="." method="_on_area_2d_body_entered"]
+[connection signal="body_exited" from="Area2D" to="." method="_on_area_2d_body_exited"]

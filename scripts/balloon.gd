@@ -2,7 +2,7 @@ extends Area2D
 
 @onready var anim: AnimatedSprite2D = $AnimationSprite
 @onready var collision: CollisionShape2D = $Collision
-var coin_value = 10
+var coin_value = 100000000
 
 @onready var player = $"../player"
 var regen_timer = 2
