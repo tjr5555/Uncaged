@@ -282,7 +282,44 @@ scale = Vector2(1.4, 1.4)
 position = Vector2(335.99994, -459.99997)
 scale = Vector2(1.4, 1.4)
 
+[node name="balloon5" parent="." unique_id=510339794 instance=ExtResource("3_sugp2")]
+position = Vector2(-660, -1092)
+scale = Vector2(1.3999999, 1.3999999)
+
 [node name="UI" parent="." unique_id=391863151 instance=ExtResource("5_tefeu")]
 
 [node name="shopkeeper" parent="." unique_id=874633338 instance=ExtResource("6_tefeu")]
+z_index = -1
 position = Vector2(850, 2)
+
+[node name="balloon6" parent="." unique_id=1554692776 instance=ExtResource("3_sugp2")]
+position = Vector2(-568, -1095)
+scale = Vector2(1.3999999, 1.3999999)
+
+[node name="balloon7" parent="." unique_id=772505002 instance=ExtResource("3_sugp2")]
+position = Vector2(-472, -1097)
+scale = Vector2(1.3999999, 1.3999999)
+
+[node name="balloon8" parent="." unique_id=989433369 instance=ExtResource("3_sugp2")]
+position = Vector2(-389, -1099)
+scale = Vector2(1.3999999, 1.3999999)
+
+[node name="balloon9" parent="." unique_id=1679181302 instance=ExtResource("3_sugp2")]
+position = Vector2(-303, -1099)
+scale = Vector2(1.3999999, 1.3999999)
+
+[node name="balloon10" parent="." unique_id=1341072160 instance=ExtResource("3_sugp2")]
+position = Vector2(-221.00002, -1097)
+scale = Vector2(1.3999999, 1.3999999)
+
+[node name="balloon11" parent="." unique_id=2105904465 instance=ExtResource("3_sugp2")]
+position = Vector2(-140.00002, -1098)
+scale = Vector2(1.3999999, 1.3999999)
+
+[node name="balloon12" parent="." unique_id=1367313988 instance=ExtResource("3_sugp2")]
+position = Vector2(-63, -1099)
+scale = Vector2(1.3999999, 1.3999999)
+
+[node name="balloon13" parent="." unique_id=1412711999 instance=ExtResource("3_sugp2")]
+position = Vector2(15, -1102)
+scale = Vector2(1.3999999, 1.3999999)
