@@ -17,6 +17,7 @@ enum {
 }
 
 func _ready() -> void:
+	$Label.visible = false
 	randomize()
 	start_pos = position
 	$Timer.start()
@@ -37,6 +38,13 @@ func _physics_process(delta: float) -> void:
 		dir = (start_pos - position).normalized()
 		current_state = MOVE
 
+	if Input.is_action_just_pressed("augment") and player_is_in_chat_zone == true:
+		$Label.visible = false
+		$npc1DialougeUI.start()
+		is_roaming = false
+		is_chatting = true
+
+
 func choose(array):
 	array.shuffle()
 	return array.front()
@@ -44,10 +52,12 @@ func choose(array):
 func _on_detection_area_body_entered(body: Node2D) -> void:
 	if body.is_in_group("player"):
 		player_is_in_chat_zone = true
+		hide_label()
 
 func _on_detection_area_body_exited(body: Node2D) -> void:
 	if body.is_in_group("player"):
 		player_is_in_chat_zone = false
+		hide_label()
 
 func _on_timer_timeout() -> void:
 	$Timer.wait_time = choose([2.0, 4.0, 5.0])
@@ -60,3 +70,15 @@ func _on_timer_timeout() -> void:
 		current_state = choose([IDLE, MOVE])
 		if current_state == MOVE:
 			dir = choose([Vector2.RIGHT, Vector2.LEFT])
+
+
+func hide_label():
+	if player_is_in_chat_zone == true:
+		$Label.visible = true
+	else:
+		$Label.visible = false
+
+
+func _on_npc_1_dialouge_ui_dialogue_finished() -> void:
+	is_chatting = false
+	is_roaming = true

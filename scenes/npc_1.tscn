@@ -1,7 +1,9 @@
 [gd_scene format=3 uid="uid://cr6jvodd3jiqj"]
 
-[ext_resource type="Script" uid="uid://cw7qkf1qtqnjt" path="res://npc_1.gd" id="1_gw7q4"]
+[ext_resource type="Script" uid="uid://cw7qkf1qtqnjt" path="res://scripts/npc_1.gd" id="1_gw7q4"]
 [ext_resource type="Texture2D" uid="uid://tcenjagh32p2" path="res://sprites/icon.svg" id="2_7afwl"]
+[ext_resource type="FontFile" uid="uid://cdg3t3h158oga" path="res://fonts/Michroma/Michroma-Regular.ttf" id="3_rga5l"]
+[ext_resource type="PackedScene" uid="uid://hfe1t2uuk2or" path="res://dialouge/npc1/npc_1_dialouge_ui.tscn" id="4_3w2wa"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_0jsi4"]
 radius = 320.0
@@ -26,7 +28,21 @@ shape = SubResource("CapsuleShape2D_0jsi4")
 
 [node name="Timer" type="Timer" parent="." unique_id=968683325]
 
+[node name="Label" type="Label" parent="." unique_id=725073902]
+offset_left = -112.0
+offset_top = -96.0
+offset_right = 123.0
+offset_bottom = -60.0
+theme_override_fonts/font = ExtResource("3_rga5l")
+theme_override_font_sizes/font_size = 25
+text = "Press C to talk"
+
+[node name="npc1DialougeUI" parent="." unique_id=544451575 instance=ExtResource("4_3w2wa")]
+offset_right = 0.0
+offset_bottom = 0.0
+
 [connection signal="body_entered" from="detectionArea" to="." method="_on_detection_area_body_entered"]
 [connection signal="body_exited" from="detectionArea" to="." method="_on_detection_area_body_exited"]
 [connection signal="body_shape_exited" from="detectionArea" to="." method="_on_detection_area_body_shape_exited"]
 [connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
+[connection signal="dialogue_finished" from="npc1DialougeUI" to="." method="_on_npc_1_dialouge_ui_dialogue_finished"]
