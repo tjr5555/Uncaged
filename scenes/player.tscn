@@ -2,7 +2,6 @@
 
 [ext_resource type="Script" uid="uid://bxh5f1rgkf8ug" path="res://scripts/player.gd" id="1_g2els"]
 [ext_resource type="Texture2D" uid="uid://tcenjagh32p2" path="res://sprites/icon.svg" id="2_qhqgy"]
-[ext_resource type="PackedScene" uid="uid://d07i6esvf4ay3" path="res://scenes/hud.tscn" id="3_qhqgy"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_lnspb"]
 radius = 40.0
@@ -22,5 +21,3 @@ shape = SubResource("CapsuleShape2D_lnspb")
 [node name="Camera" type="Camera2D" parent="." unique_id=802923576]
 position_smoothing_enabled = true
 position_smoothing_speed = 10.0
-
-[node name="HUD" parent="Camera" unique_id=1002328406 instance=ExtResource("3_qhqgy")]

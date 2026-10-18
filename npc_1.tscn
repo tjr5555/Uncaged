@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://cr6jvodd3jiqj"]
+
+[ext_resource type="Script" uid="uid://cw7qkf1qtqnjt" path="res://npc_1.gd" id="1_gw7q4"]
+[ext_resource type="Texture2D" uid="uid://tcenjagh32p2" path="res://sprites/icon.svg" id="2_7afwl"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_0jsi4"]
+radius = 320.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_0jsi4"]
+radius = 48.0
+height = 112.0
+
+[node name="npc1" type="CharacterBody2D" unique_id=924465278]
+script = ExtResource("1_gw7q4")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1460533927]
+texture = ExtResource("2_7afwl")
+
+[node name="detectionArea" type="Area2D" parent="." unique_id=82948314]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="detectionArea" unique_id=1681579887]
+shape = SubResource("CircleShape2D_0jsi4")
+
+[node name="hitbox" type="CollisionShape2D" parent="." unique_id=1241251424]
+shape = SubResource("CapsuleShape2D_0jsi4")
+
+[node name="Timer" type="Timer" parent="." unique_id=968683325]
+
+[connection signal="body_entered" from="detectionArea" to="." method="_on_detection_area_body_entered"]
+[connection signal="body_exited" from="detectionArea" to="." method="_on_detection_area_body_exited"]
+[connection signal="body_shape_exited" from="detectionArea" to="." method="_on_detection_area_body_shape_exited"]
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

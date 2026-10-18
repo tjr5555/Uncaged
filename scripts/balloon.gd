@@ -2,7 +2,7 @@ extends Area2D
 
 @onready var anim: AnimatedSprite2D = $AnimationSprite
 @onready var collision: CollisionShape2D = $Collision
-var coin_value = 100000000
+var coin_value = 10
 
 @onready var player = $"../player"
 var regen_timer = 2
@@ -43,7 +43,7 @@ func _on_body_entered(body: Node2D) -> void:
 	if not is_popped:
 		pop()
 		$AudioStreamPlayer2D.play()
-		Global.total_coins += coin_value
+		Global.total_coins += coin_value * Global.base_coin_mult
 		print(str(Global.total_coins))
 		player.dashes += 1
 		print(str(player.dashes))

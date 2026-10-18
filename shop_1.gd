@@ -3,27 +3,82 @@ extends Control
 @export var hover_sound: AudioStream
 @export var click_sound: AudioStream
 
-# Pricing variables, will scale depending on how good the upgrade is
-var fsbp: float = 100.0
-
 var _audio := AudioStreamPlayer.new()
 
-@onready var flight_button: Button = $PanelContainer/MarginContainer/GridContainer/flightSpeedButton
-@onready var flight_amount: Label = $PanelContainer/MarginContainer/GridContainer/flightSpeedButton/flightSpeedAmount
+# To add an upgrade, add an entry here (the key is the button's node name).
+# Use "add" to increase the stat by a fixed amount, or "mult" to multiply it.
+var upgrades := {
+	"flightSpeedButton": {
+		"title": "Flight Speed", "stat": "base_flight_speed",
+		"price": 100.0, "price_mult": 1.25, "add": 20.0,
+	},
+	"coinMultiplierButton": {
+		"title": "Coin Multiplier", "stat": "base_coin_mult",
+		"price": 100.0, "price_mult": 1.6, "mult": 1.5,
+	},
+}
 
 func _ready() -> void:
 	add_child(_audio)
+
+	# Hover/press animation on every button, including back
 	for b in find_children("*", "BaseButton", true, false):
-		_setup(b)
-	get_tree().node_added.connect(_on_node_added)
-	_update_price_ui()
-	_set_speed_text(Global.base_flight_speed)
+		_setup_animation(b)
 
-func _on_node_added(node: Node) -> void:
-	if node is BaseButton and is_ancestor_of(node):
-		_setup(node)
+	# Hook up and display every upgrade
+	for id in upgrades:
+		var button: Button = find_child(id)
+		button.pressed.connect(_buy.bind(id))
+		_refresh(id)
 
-func _setup(b: BaseButton) -> void:
+# --- Buying ---
+
+func _buy(id: String) -> void:
+	var u: Dictionary = upgrades[id]
+	if Global.total_coins < u.price:
+		return
+
+	var old_value: float = Global.get(u.stat)
+	Global.total_coins -= int(u.price)
+	Global.set(u.stat, _next(u, old_value))
+	u.price *= u.price_mult
+
+	_refresh_price(id)
+	_roll(id, old_value, Global.get(u.stat))
+	_pop(_label(id))
+
+func _next(u: Dictionary, value: float) -> float:
+	return value + u.add if u.has("add") else value * u.mult
+
+# --- UI ---
+
+func _label(id: String) -> Label:
+	return find_child(id).find_children("*", "Label", false)[0]
+
+func _refresh(id: String) -> void:
+	_refresh_price(id)
+	_set_amount(Global.get(upgrades[id].stat), id)
+
+func _refresh_price(id: String) -> void:
+	var u: Dictionary = upgrades[id]
+	find_child(id).text = u.title + "\nPrice: " + str(int(u.price))
+
+func _set_amount(value: float, id: String) -> void:
+	var next := _next(upgrades[id], value)
+	_label(id).text = String.num(value, 2) + " -> " + String.num(next, 2)
+
+func _roll(id: String, from: float, to: float) -> void:
+	create_tween().tween_method(_set_amount.bind(id), from, to, 0.3)
+
+func _pop(c: Control) -> void:
+	c.pivot_offset = c.size / 2.0
+	var t := create_tween()
+	t.tween_property(c, "scale", Vector2.ONE * 1.3, 0.08)
+	t.tween_property(c, "scale", Vector2.ONE, 0.15).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+
+# --- Hover / press animation ---
+
+func _setup_animation(b: BaseButton) -> void:
 	b.pivot_offset = b.size / 2.0
 	b.resized.connect(func(): b.pivot_offset = b.size / 2.0)
 	b.mouse_entered.connect(_grow.bind(b, 1.05, hover_sound))
@@ -40,39 +95,11 @@ func _grow(b: BaseButton, amount: float, sound: AudioStream) -> void:
 		_audio.stream = sound
 		_audio.play()
 
-func _update_price_ui() -> void:
-	flight_button.text = "Flight Speed\nPrice: " + str(int(fsbp))
-
-func _set_speed_text(speed: float) -> void:
-	flight_amount.text = str(int(speed)) + " -> " + str(int(speed) + 20)
-
-func _roll_speed(from: int, to: int) -> void:
-	var t := create_tween()
-	t.tween_method(_set_speed_text, float(from), float(to), 0.3)
-
-func _pop(c: Control) -> void:
-	c.pivot_offset = c.size / 2.0
-	var t := create_tween()
-	t.tween_property(c, "scale", Vector2.ONE * 1.3, 0.08)
-	t.tween_property(c, "scale", Vector2.ONE, 0.15).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-
-func _on_flight_speed_button_pressed() -> void:
-	var old_speed: int = Global.base_flight_speed
-	if Global.total_coins >= fsbp:
-		Global.total_coins -= fsbp
-		Global.base_flight_speed += 20
-		fsbp *= 1.25
-		_update_price_ui()
-		_roll_speed(old_speed, Global.base_flight_speed)
-		_pop(flight_amount)
-		print("Flight speed: " + str(Global.base_flight_speed))
+# --- Back button ---
 
 func _on_back_button_pressed() -> void:
 	if get_parent() is CanvasLayer:
 		get_parent().hide()
-		
-	var main_node = $/root/main
-	if main_node:
-		var boost_bar = main_node.get_node_or_null("UI/MarginContainer/BoostBar")
-		if boost_bar:
-			boost_bar.visible = true
+	var boost_bar = get_node_or_null("/root/main/UI/MarginContainer/BoostBar")
+	if boost_bar:
+		boost_bar.visible = true
