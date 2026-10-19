@@ -16,6 +16,7 @@ scale = Vector2(0.5, 0.87500006)
 texture = ExtResource("2_qhqgy")
 
 [node name="hitbox" type="CollisionShape2D" parent="." unique_id=1916319004]
+position = Vector2(0, -8)
 shape = SubResource("CapsuleShape2D_lnspb")
 
 [node name="Camera" type="Camera2D" parent="." unique_id=802923576]

@@ -14,7 +14,7 @@ var upgrades := {
 	},
 	"coinMultiplierButton": {
 		"title": "Coin Multiplier", "stat": "base_coin_mult",
-		"price": 100.0, "price_mult": 1.6, "mult": 1.5,
+		"price": 1000.0, "price_mult": 1.6, "mult": 1.5,
 	},
 }
 

@@ -7,6 +7,8 @@ var current_state = IDLE
 var dir = Vector2.ZERO
 var start_pos: Vector2
 
+
+
 var is_roaming = true
 var is_chatting = false 
 var player_is_in_chat_zone = false
@@ -17,6 +19,7 @@ enum {
 }
 
 func _ready() -> void:
+	$".".connect("give_quest", Callable(QuestManager, "add_quest"))
 	$Label.visible = false
 	randomize()
 	start_pos = position

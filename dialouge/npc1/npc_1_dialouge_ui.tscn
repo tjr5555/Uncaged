@@ -2,6 +2,7 @@
 
 [ext_resource type="Texture2D" uid="uid://bfgghiapipygm" path="res://sprites/dialougeBox.png" id="1_1jut6"]
 [ext_resource type="Script" uid="uid://x5kk7lnnxvju" path="res://dialouge/npc1/npc_1_dialouge_ui.gd" id="1_pst5r"]
+[ext_resource type="FontFile" uid="uid://jhq1gi82d1uo" path="res://fonts/Inter/static/Inter_24pt-BoldItalic.ttf" id="3_8njdy"]
 [ext_resource type="FontFile" uid="uid://bcjewu4jlsnbv" path="res://fonts/Honk/Honk-Regular-VariableFont_MORF,SHLN.ttf" id="3_osutq"]
 [ext_resource type="AudioStream" uid="uid://doq83vq1y42sm" path="res://audio/loopingver.mp3" id="4_kgfkv"]
 
@@ -16,6 +17,8 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_pst5r")
 audio_stream_player = NodePath("AudioStreamPlayer")
+parrot_font = ExtResource("3_osutq")
+player_font = ExtResource("3_8njdy")
 
 [node name="NinePatchRect" type="NinePatchRect" parent="." unique_id=102517199]
 layout_mode = 0
@@ -29,23 +32,23 @@ region_rect = Rect2(0.526947, 0.13882828, 62.94587, 63.67202)
 [node name="Name" type="RichTextLabel" parent="NinePatchRect" unique_id=827215405]
 layout_mode = 0
 offset_left = 8.0
-offset_right = 144.0
-offset_bottom = 56.0
+offset_right = 384.0
+offset_bottom = 72.0
 theme_override_fonts/normal_font = ExtResource("3_osutq")
-theme_override_font_sizes/normal_font_size = 35
+theme_override_font_sizes/normal_font_size = 38
 text = "Name:"
-metadata/_edit_lock_ = true
 
 [node name="Chatarea" type="RichTextLabel" parent="NinePatchRect" unique_id=630271158]
 layout_mode = 0
 offset_left = 8.0
-offset_top = 48.0
+offset_top = 64.0
 offset_right = 376.0
 offset_bottom = 184.0
 theme_override_fonts/normal_font = ExtResource("3_osutq")
-theme_override_font_sizes/normal_font_size = 35
+theme_override_font_sizes/normal_font_size = 28
 text = "Chatting..."
-metadata/_edit_lock_ = true
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=220062012]
 stream = ExtResource("4_kgfkv")
+
+[connection signal="give_quest" from="." to="." method="_on_give_quest"]

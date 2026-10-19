@@ -1,19 +1,33 @@
-[
-	{"name": "Parrot", "text": "Hello! I am a PARROT! (Press V to continue)"},
-	{"name": "Parrot", "text": "What are you?!"},
-	{"name": "You", "text": "I am a crow"},
-	{"name": "Parrot", "text": "Woah that's sick dude!"},
-	{"name": "Parrot", "text": "Did you see those pesky balloons out there?"},
-	{"name": "You", "text": "Yeah what're those about?"},
-	{"name": "Parrot", "text": "That's for me to know and for you to find out 😂"},
-	{"name": "You", "text": "..."},
-	{"name": "Parrot", "text": "I tried popping one of these balloons with my razor sharp beak..."},
-	{"name": "Parrot", "text": "...and there were COINS™ inside of it!"},
-	{"name": "You", "text": "woah thats INSANE!"},
-	{"name": "Parrot", "text": "Yeah its super cool. I'll tell you what."},
-	{"name": "Parrot", "text": "If you get bring me 500 coins™..."},
-	{"name": "Parrot", "text": "...I will give you something that will CHANGE YOUR LIFE™."},
-	{"name": "Parrot", "text": "Now get collecting!"},
-	{"name": "You", "text": "™™™™™™™™™™™™™™™™™"}
-
-]
+{
+	"initial_dialogue": [
+		{"name": "Parrot", "text": "Hello! I am a PARROT! (Press V to continue)"},
+		{"name": "Parrot", "text": "What are you?!"},
+		{"name": "You", "text": "I am a crow"},
+		{"name": "Parrot", "text": "Woah that's sick dude!"},
+		{"name": "Parrot", "text": "Did you see those pesky balloons out there?"},
+		{"name": "You", "text": "Yeah what're those about?"},
+		{"name": "Parrot", "text": "That's for me to know and for you to find out 😂"},
+		{"name": "You", "text": "..."},
+		{"name": "Parrot", "text": "I tried popping one of these balloons with my razor sharp beak..."},
+		{"name": "Parrot", "text": "...and there were COINS™ inside of it!"},
+		{"name": "You", "text": "woah thats INSANE!"},
+		{"name": "Parrot", "text": "Yeah its super cool. I'll tell you what."},
+		{"name": "Parrot", "text": "If you bring me 500 coins™..."},
+		{"name": "Parrot", "text": "...I will give you something that will CHANGE YOUR LIFE™."},
+		{"name": "Parrot", "text": "Now get collecting!"},
+		{"name": "You", "text": "coolio"}
+	],
+	"completed_dialogue": [
+		{"name": "Parrot", "text": "heh seems like you got the coins™!"},
+		{"name": "You", "text": "Yeah it was super hard"},
+		{"name": "Internal Monologue", "text": "(It was super easy)"},
+		{"name": "Parrot", "text": "well I am a parrot of his words..."},
+		{"name": "Parrot", "text": "Your. Reward. Is..."},
+		{"name": "You", "text": "I don't have all day..."},
+		{"name": "Parrot", "text": "The Coin™ Medallion™!!"},
+		{"name": "Internal Monologue", "text": "This is SOO lame"},
+		{"name": "You", "text": "Wow..."},
+		{"name": "Parrot", "text": "This thing give 3X COINS™"},
+		{"name": "You", "text": "WOW! I am super happy, thanks!"}
+	]
+}

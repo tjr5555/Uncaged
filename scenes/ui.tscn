@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://d20fvsnmyx1rs" path="res://scripts/ui.gd" id="1_nt7q6"]
 [ext_resource type="FontFile" uid="uid://b18ofjevqi05d" path="res://fonts/Elms_Sans/static/ElmsSans-SemiBold.ttf" id="2_x4jx1"]
 [ext_resource type="FontFile" uid="uid://c0xbdpffii5b4" path="res://fonts/Play/Play-Regular.ttf" id="3_yev5y"]
+[ext_resource type="FontFile" uid="uid://c0gtcxikyfdmx" path="res://fonts/Elms_Sans/static/ElmsSans-Bold.ttf" id="4_gdt2y"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_85g3d"]
 bg_color = Color(0.86898494, 0.86898494, 0.8689847, 1)
@@ -53,3 +54,31 @@ offset_bottom = 65.0
 theme_override_fonts/font = ExtResource("3_yev5y")
 theme_override_font_sizes/font_size = 55
 text = "Coins: 0"
+
+[node name="questArea" type="Panel" parent="." unique_id=26446695]
+offset_left = 1728.0
+offset_right = 1920.0
+offset_bottom = 192.0
+
+[node name="quest1" type="RichTextLabel" parent="questArea" unique_id=40850454]
+layout_mode = 0
+offset_right = 192.0
+offset_bottom = 48.0
+theme_override_fonts/normal_font = ExtResource("4_gdt2y")
+text = "Quests go here:"
+
+[node name="quest2" type="RichTextLabel" parent="questArea" unique_id=1354492677]
+layout_mode = 0
+offset_top = 64.0
+offset_right = 192.0
+offset_bottom = 112.0
+theme_override_fonts/normal_font = ExtResource("4_gdt2y")
+text = "Quests go here:"
+
+[node name="quest3" type="RichTextLabel" parent="questArea" unique_id=424300312]
+layout_mode = 0
+offset_top = 136.0
+offset_right = 192.0
+offset_bottom = 184.0
+theme_override_fonts/normal_font = ExtResource("4_gdt2y")
+text = "Quests go here:"
