@@ -45,5 +45,5 @@ func _on_body_entered(body: Node2D) -> void:
 		$AudioStreamPlayer2D.play()
 		Global.total_coins += coin_value * Global.base_coin_mult
 		print(str(Global.total_coins))
-		player.dashes += 1
-		print(str(player.dashes))
+		Global.dashes += 1
+		print(str(Global.dashes))

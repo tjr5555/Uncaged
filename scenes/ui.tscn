@@ -9,8 +9,12 @@
 bg_color = Color(0.86898494, 0.86898494, 0.8689847, 1)
 skew = Vector2(0.25, 0)
 
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_yev5y"]
+bg_color = Color(0.10149247, 0.47206843, 0.7529994, 1)
+skew = Vector2(0.25, 0)
+
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tipki"]
-bg_color = Color(0, 0.64006704, 0.895132, 1)
+bg_color = Color(0.7900338, 0.37471694, 0.21372142, 1)
 skew = Vector2(0.25, 0)
 
 [node name="UI" type="CanvasLayer" unique_id=391863151]
@@ -32,19 +36,37 @@ theme_override_constants/margin_bottom = 24
 custom_minimum_size = Vector2(400, 40)
 layout_mode = 2
 theme_override_styles/background = SubResource("StyleBoxFlat_85g3d")
-theme_override_styles/fill = SubResource("StyleBoxFlat_tipki")
+theme_override_styles/fill = SubResource("StyleBoxFlat_yev5y")
 value = 100.0
 show_percentage = false
 
 [node name="Label" type="Label" parent="MarginContainer/BoostBar" unique_id=752619645]
 layout_mode = 0
-offset_top = 1.0
 offset_right = 400.0
-offset_bottom = 39.0
+offset_bottom = 38.0
 theme_override_constants/outline_size = 5
 theme_override_fonts/font = ExtResource("2_x4jx1")
 theme_override_font_sizes/font_size = 29
 text = "Boost (X)"
+horizontal_alignment = 1
+vertical_alignment = 2
+
+[node name="DashBar" type="ProgressBar" parent="MarginContainer" unique_id=913566755]
+custom_minimum_size = Vector2(400, 40)
+layout_mode = 2
+theme_override_styles/background = SubResource("StyleBoxFlat_85g3d")
+theme_override_styles/fill = SubResource("StyleBoxFlat_tipki")
+value = 100.0
+show_percentage = false
+
+[node name="Label" type="Label" parent="MarginContainer/DashBar" unique_id=994914515]
+layout_mode = 0
+offset_right = 400.0
+offset_bottom = 38.0
+theme_override_constants/outline_size = 5
+theme_override_fonts/font = ExtResource("2_x4jx1")
+theme_override_font_sizes/font_size = 29
+text = "Dash(X)"
 horizontal_alignment = 1
 vertical_alignment = 2
 

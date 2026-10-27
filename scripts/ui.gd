@@ -1,13 +1,12 @@
 extends CanvasLayer
 
 @onready var boost_bar: ProgressBar = $MarginContainer/BoostBar
-@onready var quest_labels = [$questArea/quest1, $questArea/quest2, $questArea/quest3]
+@onready var dash_bar: ProgressBar = $MarginContainer/DashBar
 
 var target_value: float = 100.0
 
 func _ready() -> void:
-	QuestManager.connect("quests_updated", Callable(self, "_on_quests_updated"))
-	clear_quests()
+	dash_bar.max_value = Global.max_dashes
 
 func set_boost(current: float, maximum: float) -> void:
 	boost_bar.max_value = maximum
@@ -16,14 +15,13 @@ func set_boost(current: float, maximum: float) -> void:
 func _process(delta: float) -> void:
 	boost_bar.value = lerpf(boost_bar.value, target_value, 1.0 - exp(-15.0 * delta))
 	$coinsLabel.text = "Coins: " + str(int(Global.total_coins))
-
-func _on_quests_updated(quest_texts: Array) -> void:
-	clear_quests()
-	for i in range(min(quest_texts.size(), quest_labels.size())):
-		quest_labels[i].text = quest_texts[i]
-		quest_labels[i].visible = true
-
-func clear_quests() -> void:
-	for label in quest_labels:
-		label.text = ""
-		label.visible = false
+	dash_bar.value = Global.dashes
+	
+	if Global.mode == Global.Mode.FLY:
+		var tween = create_tween().set_parallel()
+		tween.tween_property(boost_bar, "position:y", 25.0, 1.0)
+		tween.tween_property(dash_bar, "position:y", 150, 1.0)
+	else:
+		var tween = create_tween().set_parallel()
+		tween.tween_property(boost_bar, "position:y", 150, 1.0)
+		tween.tween_property(dash_bar, "position:y", 25.0, 1.0)
