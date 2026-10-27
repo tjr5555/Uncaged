@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://c7a3i1188tjny"]
 
-[ext_resource type="Script" uid="uid://glwsi83k70dk" path="res://shop_1.gd" id="1_vr6tn"]
+[ext_resource type="Script" uid="uid://glwsi83k70dk" path="res://scripts/shop_1.gd" id="1_vr6tn"]
 [ext_resource type="FontFile" uid="uid://31a0pllxp1ya" path="res://fonts/Play/Play-Bold.ttf" id="2_cyb0u"]
 [ext_resource type="AudioStream" uid="uid://dkxucyotn1yhl" path="res://audio/freesoundeffects-button-click-289742.mp3" id="2_qu5gy"]
 [ext_resource type="AudioStream" uid="uid://ir3c4ch6ieih" path="res://audio/denielcz-immersivecontrol-button-click-sound-463065.mp3" id="2_wfx2d"]

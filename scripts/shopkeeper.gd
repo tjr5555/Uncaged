@@ -34,8 +34,6 @@ func _process(delta: float) -> void:
 func _on_area_2d_body_entered(body) -> void:
 	if body.is_in_group("player"):
 		playernear = true
-	else:
-		print("BRO IDIOT IT THE TILEMAP DOESNT COUNT 😂😂😂😂😂😂😂😂😂😂😂😂😂")
 
 
 
