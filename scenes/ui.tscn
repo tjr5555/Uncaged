@@ -35,11 +35,11 @@ theme_override_styles/fill = SubResource("StyleBoxFlat_tipki")
 value = 100.0
 show_percentage = false
 
-[node name="Label" type="Label" parent="." unique_id=752619645]
-offset_left = 19.0
-offset_top = 1016.0
-offset_right = 429.0
-offset_bottom = 1056.0
+[node name="Label" type="Label" parent="MarginContainer/BoostBar" unique_id=752619645]
+layout_mode = 0
+offset_top = 1.0
+offset_right = 400.0
+offset_bottom = 39.0
 theme_override_constants/outline_size = 5
 theme_override_fonts/font = ExtResource("2_x4jx1")
 theme_override_font_sizes/font_size = 29

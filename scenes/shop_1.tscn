@@ -66,4 +66,17 @@ theme_override_fonts/font = ExtResource("5_qu5gy")
 theme_override_font_sizes/font_size = 40
 horizontal_alignment = 1
 
+[node name="backButton" type="Button" parent="." unique_id=1558949517]
+custom_minimum_size = Vector2(354, 98)
+layout_mode = 0
+offset_left = 16.0
+offset_top = 968.0
+offset_right = 370.0
+offset_bottom = 1066.0
+theme_override_constants/h_separation = 14
+theme_override_fonts/font = ExtResource("2_cyb0u")
+theme_override_font_sizes/font_size = 76
+text = "Back"
+
 [connection signal="pressed" from="PanelContainer/MarginContainer/GridContainer/flightSpeedButton" to="." method="_on_flight_speed_button_pressed"]
+[connection signal="pressed" from="backButton" to="." method="_on_back_button_pressed"]

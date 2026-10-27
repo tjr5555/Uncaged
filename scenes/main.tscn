@@ -5,6 +5,7 @@
 [ext_resource type="PackedScene" uid="uid://nngadheagxwr" path="res://scenes/player.tscn" id="2_sugp2"]
 [ext_resource type="PackedScene" uid="uid://dac1ej83teqnb" path="res://scenes/balloon_area.tscn" id="3_sugp2"]
 [ext_resource type="PackedScene" uid="uid://di6dday241poi" path="res://scenes/ui.tscn" id="5_tefeu"]
+[ext_resource type="PackedScene" uid="uid://blorw4562ivr" path="res://scenes/shopkeeper.tscn" id="6_tefeu"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_jyhfs"]
 texture = ExtResource("1_0wfyh")
@@ -282,3 +283,6 @@ position = Vector2(335.99994, -459.99997)
 scale = Vector2(1.4, 1.4)
 
 [node name="UI" parent="." unique_id=391863151 instance=ExtResource("5_tefeu")]
+
+[node name="shopkeeper" parent="." unique_id=874633338 instance=ExtResource("6_tefeu")]
+position = Vector2(850, 2)

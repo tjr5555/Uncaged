@@ -1,4 +1,4 @@
-extends Control  # attach to shop1
+extends Control
 
 @export var hover_sound: AudioStream
 @export var click_sound: AudioStream
@@ -46,7 +46,6 @@ func _update_price_ui() -> void:
 func _set_speed_text(speed: float) -> void:
 	flight_amount.text = str(int(speed)) + " -> " + str(int(speed) + 20)
 
-
 func _roll_speed(from: int, to: int) -> void:
 	var t := create_tween()
 	t.tween_method(_set_speed_text, float(from), float(to), 0.3)
@@ -59,8 +58,21 @@ func _pop(c: Control) -> void:
 
 func _on_flight_speed_button_pressed() -> void:
 	var old_speed: int = Global.base_flight_speed
-	Global.base_flight_speed += 20
-	fsbp *= 1.25
-	_update_price_ui()
-	_roll_speed(old_speed, Global.base_flight_speed)
-	_pop(flight_amount)
+	if Global.total_coins >= fsbp:
+		Global.total_coins -= fsbp
+		Global.base_flight_speed += 20
+		fsbp *= 1.25
+		_update_price_ui()
+		_roll_speed(old_speed, Global.base_flight_speed)
+		_pop(flight_amount)
+		print("Flight speed: " + str(Global.base_flight_speed))
+
+func _on_back_button_pressed() -> void:
+	if get_parent() is CanvasLayer:
+		get_parent().hide()
+		
+	var main_node = $/root/main
+	if main_node:
+		var boost_bar = main_node.get_node_or_null("UI/MarginContainer/BoostBar")
+		if boost_bar:
+			boost_bar.visible = true
