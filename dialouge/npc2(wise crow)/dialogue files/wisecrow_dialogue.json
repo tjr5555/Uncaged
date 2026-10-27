@@ -1,3 +1,17 @@
+
+[
+	{
+	"First encounter dialogue": [
+		{"name": "Wise Crow", "text": "Hello there! It seems you are new around here."},
+		{"name": "You", "text": "Yeah, how do I get  around?"},
+		{"name": "Wise Crow", "text": "Start off by jumping (Z)"}
+	]
+},
+
+
+
+
+
 {
 	"initial_dialogue": [
 		{"name": "Parrot", "text": "Hello! I am a PARROT! (Press V to continue)"},
@@ -31,3 +45,5 @@
 		{"name": "You", "text": "WOW! I am super happy, thanks!"}
 	]
 }
+
+]

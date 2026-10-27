@@ -1,0 +1,57 @@
+[gd_scene format=3 uid="uid://ctkyv851vfgc2"]
+
+[ext_resource type="Script" uid="uid://cefyuta5vequl" path="res://scenes/npc_2.gd" id="1_362ta"]
+[ext_resource type="Texture2D" uid="uid://tcenjagh32p2" path="res://sprites/icon.svg" id="2_362ta"]
+[ext_resource type="FontFile" uid="uid://cdg3t3h158oga" path="res://fonts/Michroma/Michroma-Regular.ttf" id="3_2dwi7"]
+[ext_resource type="PackedScene" uid="uid://cf81457n1ifjd" path="res://scenes/npc_2_dialouge_ui.tscn" id="4_2dwi7"]
+[ext_resource type="FontFile" uid="uid://yfsufy21ey7x" path="res://fonts/lemon_milk/LEMONMILK-BoldItalic.otf" id="6_ekfb8"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_0jsi4"]
+radius = 320.0
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_0jsi4"]
+radius = 56.0
+height = 112.0
+
+[node name="npc2" type="CharacterBody2D" unique_id=924465278]
+script = ExtResource("1_362ta")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1460533927]
+texture = ExtResource("2_362ta")
+metadata/_edit_lock_ = true
+
+[node name="detectionArea" type="Area2D" parent="." unique_id=82948314]
+metadata/_edit_lock_ = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="detectionArea" unique_id=1681579887]
+position = Vector2(0, 3)
+shape = SubResource("CircleShape2D_0jsi4")
+metadata/_edit_lock_ = true
+
+[node name="hitbox" type="CollisionShape2D" parent="." unique_id=1241251424]
+shape = SubResource("CapsuleShape2D_0jsi4")
+metadata/_edit_lock_ = true
+
+[node name="Timer" type="Timer" parent="." unique_id=968683325]
+
+[node name="Label" type="Label" parent="." unique_id=725073902]
+offset_left = -112.0
+offset_top = -96.0
+offset_right = 123.0
+offset_bottom = -60.0
+theme_override_fonts/font = ExtResource("3_2dwi7")
+theme_override_font_sizes/font_size = 25
+text = "Press C to talk"
+metadata/_edit_lock_ = true
+
+[node name="npc2DialougeUI" parent="." unique_id=544451575 instance=ExtResource("4_2dwi7")]
+offset_top = 8.0
+offset_right = 0.0
+offset_bottom = 8.0
+player_font = ExtResource("6_ekfb8")
+metadata/_edit_lock_ = true
+
+[connection signal="body_entered" from="detectionArea" to="." method="_on_detection_area_body_entered"]
+[connection signal="body_exited" from="detectionArea" to="." method="_on_detection_area_body_exited"]
+[connection signal="body_shape_exited" from="detectionArea" to="." method="_on_detection_area_body_shape_exited"]
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]
