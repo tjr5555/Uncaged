@@ -9,3 +9,8 @@ var base_flight_speed: int = 800.0
 var flight_shop_price: float = 100.0
 var max_dashes: int = 2
 var dashes: int = 2
+var dash_target: int 
+
+
+# Debug this
+var base_coin_mult = 1.0
