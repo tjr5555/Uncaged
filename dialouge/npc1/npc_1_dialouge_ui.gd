@@ -35,9 +35,9 @@ func start():
 
 
 func load_dialogue():
-	var file = FileAccess.open("res://dialouge/npc1/parrot_dialogue.json", FileAccess.READ)
+	var file = FileAccess.open("res://dialouge/npc2(wise crow)/dialogue files/parrotDialogue.json", FileAccess.READ)
 	var content = JSON.parse_string(file.get_as_text())
-	
+
 #if the coin quest is finished, give the completed quest dialogue
 	if QuestManager.active_quests.has("collect_coins") and QuestManager.active_quests["collect_coins"].get("completed", false):
 		return content["completed_dialogue"]

@@ -4,7 +4,6 @@
 [ext_resource type="Texture2D" uid="uid://tcenjagh32p2" path="res://sprites/icon.svg" id="2_362ta"]
 [ext_resource type="FontFile" uid="uid://cdg3t3h158oga" path="res://fonts/Michroma/Michroma-Regular.ttf" id="3_2dwi7"]
 [ext_resource type="PackedScene" uid="uid://cf81457n1ifjd" path="res://scenes/npc_2_dialouge_ui.tscn" id="4_2dwi7"]
-[ext_resource type="FontFile" uid="uid://yfsufy21ey7x" path="res://fonts/lemon_milk/LEMONMILK-BoldItalic.otf" id="6_ekfb8"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_0jsi4"]
 radius = 320.0
@@ -48,7 +47,6 @@ metadata/_edit_lock_ = true
 offset_top = 8.0
 offset_right = 0.0
 offset_bottom = 8.0
-player_font = ExtResource("6_ekfb8")
 metadata/_edit_lock_ = true
 
 [connection signal="body_entered" from="detectionArea" to="." method="_on_detection_area_body_entered"]

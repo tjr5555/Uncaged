@@ -6,7 +6,7 @@ signal dialogue_finished
 @export var audio_stream_player: AudioStreamPlayer
 
 # Add export variables to assign your fonts in the Inspector
-@export var wisecrow_font: Font
+@export var crow_font: Font
 @export var player_font: Font
 
 const LETTER_TIME: float = 0.04
@@ -33,23 +33,10 @@ func start():
 
 
 func load_dialogue():
-	if d_file == "":
-		push_error("Dialogue file path is not set in the Inspector!")
-		return []
-
-	var file = FileAccess.open(d_file, FileAccess.READ)
-	if file == null:
-		push_error("Failed to open dialogue file: " + d_file)
-		return []
-
+	var file = FileAccess.open("res://dialouge/npc2(wise crow)/dialogue files/wiseCrowDialogue.json", FileAccess.READ)
 	var content = JSON.parse_string(file.get_as_text())
+	return content["first_encounter"]
 	
-	# If the JSON is structured as an array
-	if content is Array:
-		return content
-
-	return []
-
 
 func _input(event):
 	if not d_active:
@@ -80,21 +67,23 @@ func next_script():
 
 	apply_speaker_font(speaker_name)
 	animate_text(current_data['text'])
-
+ 
 
 func apply_speaker_font(speaker_name: String):
 	var name_label = $NinePatchRect/Name
 	var chat_area = $NinePatchRect/Chatarea
 
 	var selected_font: Font = null
-	if speaker_name.strip_edges().to_lower() == "Wise Crow":
-		selected_font = wisecrow_font
+	if speaker_name.strip_edges().to_lower() == "wise crow":
+		selected_font = crow_font
 	else:
 		selected_font = player_font
 
 	if selected_font:
-		name_label.add_theme_font_override("normal_font", selected_font)
-		chat_area.add_theme_font_override("normal_font", selected_font)
+		_set_font(name_label, selected_font)
+		_set_font(chat_area, selected_font)
+
+
 
 func animate_text(text: String):
 	stop_sound()
@@ -120,7 +109,7 @@ func animate_text(text: String):
 			continue
 
 		var duration = (index - last_punct_index) * LETTER_TIME
-		
+
 		tween.tween_callback(play_sound)
 		tween.tween_method(_reveal_char, last_punct_index, index, duration)
 
@@ -151,3 +140,12 @@ func play_sound():
 func stop_sound():
 	if audio_stream_player and audio_stream_player.playing:
 		audio_stream_player.stop()
+
+
+
+
+func _set_font(node: Control, font: Font) -> void:
+	if node is RichTextLabel:
+		node.add_theme_font_override("normal_font", font)
+	else:
+		node.add_theme_font_override("font", font)

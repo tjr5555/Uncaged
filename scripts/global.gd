@@ -11,6 +11,4 @@ var max_dashes: int = 2
 var dashes: int = 2
 var dash_target: int 
 
-
-# Debug this
 var base_coin_mult = 1.0

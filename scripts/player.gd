@@ -2,7 +2,7 @@ extends CharacterBody2D
 
 signal boost_changed(current: float, maximum: float)
 
-var SPEED = 800.0
+var SPEED = 400.0
 var JUMP_VELOCITY = -500.0
 var JUMP_CUT = 0.45
 var JUMP_BUFFER = 0.12

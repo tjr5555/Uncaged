@@ -21,7 +21,7 @@ grow_vertical = 2
 script = ExtResource("1_v57yx")
 d_file = "res://dialouge/npc1/wiseCrowDialogue.json"
 audio_stream_player = NodePath("AudioStreamPlayer")
-wisecrow_font = ExtResource("2_caj7x")
+crow_font = ExtResource("2_caj7x")
 player_font = ExtResource("3_gfsgr")
 
 [node name="NinePatchRect" type="NinePatchRect" parent="." unique_id=102517199]
@@ -49,7 +49,7 @@ offset_top = 64.0
 offset_right = 376.0
 offset_bottom = 184.0
 theme_override_fonts/normal_font = ExtResource("2_0sj1c")
-theme_override_font_sizes/normal_font_size = 28
+theme_override_font_sizes/normal_font_size = 33
 text = "Chatting..."
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=220062012]
