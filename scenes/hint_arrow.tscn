@@ -1,0 +1,25 @@
+[gd_scene format=3 uid="uid://dimg7c478po6b"]
+
+[ext_resource type="Script" uid="uid://d1l2l4b72hr3p" path="res://scripts/hint_arrow.gd" id="1_i6sfg"]
+[ext_resource type="Texture2D" uid="uid://d4c2bce6q7mbu" path="res://assets/arrow.png" id="2_nhxtg"]
+
+[node name="HintArrow" type="Node2D" unique_id=869631899]
+script = ExtResource("1_i6sfg")
+
+[node name="Arrow" type="TextureRect" parent="." unique_id=1212564259]
+offset_left = -250.0
+offset_top = -250.0
+offset_right = 250.0
+offset_bottom = 250.0
+scale = Vector2(0.1, 0.1)
+pivot_offset = Vector2(250, 250)
+texture = ExtResource("2_nhxtg")
+
+[node name="DistanceLabel" type="Label" parent="." unique_id=780969675]
+offset_left = -65.0
+offset_top = 27.0
+offset_right = 65.0
+offset_bottom = 53.0
+text = "Distance Label"
+horizontal_alignment = 1
+vertical_alignment = 1

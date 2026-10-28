@@ -1,0 +1,6 @@
+[gd_scene format=3 uid="uid://ccaxjuy1bhusq"]
+
+[ext_resource type="Script" uid="uid://bslfltygjdiwn" path="res://scripts/waypoint.gd" id="1_omn23"]
+
+[node name="Waypoint" type="Marker2D" unique_id=320509783]
+script = ExtResource("1_omn23")

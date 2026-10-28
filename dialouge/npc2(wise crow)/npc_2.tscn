@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://ctkyv851vfgc2"]
 
-[ext_resource type="Script" uid="uid://cefyuta5vequl" path="res://scenes/npc_2.gd" id="1_362ta"]
+[ext_resource type="Script" uid="uid://cefyuta5vequl" path="res://scripts/npc_2.gd" id="1_362ta"]
 [ext_resource type="Texture2D" uid="uid://tcenjagh32p2" path="res://sprites/icon.svg" id="2_362ta"]
 [ext_resource type="FontFile" uid="uid://cdg3t3h158oga" path="res://fonts/Michroma/Michroma-Regular.ttf" id="3_2dwi7"]
 [ext_resource type="PackedScene" uid="uid://cf81457n1ifjd" path="res://scenes/npc_2_dialouge_ui.tscn" id="4_2dwi7"]
