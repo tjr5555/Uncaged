@@ -1,8 +1,7 @@
 
-{
-	"first_encounter": [
+[
 		{"name": "Wise Crow", "text": "Hello there! Is there any chance you could help me out of this hole?"},
 		{"name": "You", "text": "Yeah, but I don't know how to get around."},
-		{"name": "Wise Crow", "text": "Start off by jumping (Z), you can also jump off walls. Try it out!"}
-	]
-}
+		{"name": "Wise Crow", "text": "Start off by jumping (Z), you can also jump off walls. Try it out!"},
+		{"name": "Wise Crow", "text": "(Maybe a shovel would help)"}
+]

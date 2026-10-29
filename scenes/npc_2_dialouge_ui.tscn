@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://cf81457n1ifjd"]
 
-[ext_resource type="Script" uid="uid://chyj6uss5jbib" path="res://dialouge/npc2(wise crow)/npc_2_dialouge_ui.gd" id="1_v57yx"]
+[ext_resource type="Script" uid="uid://chyj6uss5jbib" path="res://dialogue/npc2(wise crow)/npc_2_dialouge_ui.gd" id="1_v57yx"]
 [ext_resource type="FontFile" uid="uid://bcjewu4jlsnbv" path="res://fonts/Honk/Honk-Regular-VariableFont_MORF,SHLN.ttf" id="2_0sj1c"]
 [ext_resource type="FontFile" uid="uid://bwt83r73csyye" path="res://fonts/roman_new_times/Roman_New_Times.otf" id="2_caj7x"]
 [ext_resource type="FontFile" uid="uid://3rkiirqmwonr" path="res://fonts/birdy_2/Birdy_DEMO.ttf" id="3_gfsgr"]

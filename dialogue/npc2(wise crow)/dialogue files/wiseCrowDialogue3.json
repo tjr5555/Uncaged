@@ -1,0 +1,9 @@
+
+[
+		{"name": "You", "text": "How did you get here so fast!?"},
+		{"name": "Wise Crow", "text": "How did you get here so slow?"},
+		{"name": "You", "text": "I asked first"},
+		{"name": "Wise Crow", "text": "Press (X) to dash in the current direction you're facing in!"},
+		{"name": "Wise Crow", "text": "What? You didn't answer my question! How are you so fast?"}, 
+		{"name": "Wise Crow", "text": "Wise crows are just naturally fast"}
+]

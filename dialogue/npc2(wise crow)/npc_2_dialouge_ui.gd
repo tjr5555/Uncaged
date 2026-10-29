@@ -2,12 +2,23 @@ extends Control
 
 signal dialogue_finished
 signal give_quest(quest_id, title, description, target_count)
-@export_file("*.json") var d_file
+
+# Set these per NPC instance (the NPC script forwards them here)
+@export_file("*.json") var d_file: String = "res://dialouge/npc2(wise crow)/dialogue files/wiseCrowDialogue.json"
+@export var npc_name: String = "wise crow" # speaker name that uses crow_font
+
 @export var audio_stream_player: AudioStreamPlayer
 
 # Add export variables to assign your fonts in the Inspector
-@export var parrot_font: Font
+@export var crow_font: Font
 @export var player_font: Font
+
+# Quest settings (leave gives_quest off for plain tutorial NPCs)
+@export var gives_quest: bool = false
+@export var quest_id: String = "collect_coins"
+@export var quest_title: String = "Coin Collector"
+@export var quest_description: String = "Collect coins"
+@export var quest_target: int = 500
 
 const LETTER_TIME: float = 0.04
 const PUNCTUATION_TIME: float = 0.3
@@ -20,30 +31,46 @@ var tween: Tween
 
 func _ready():
 	$NinePatchRect.visible = false
-	# Connect the quest signals
-	if not is_connected("give_quest", Callable(QuestManager, "add_quest")):
+	if gives_quest and not is_connected("give_quest", Callable(QuestManager, "add_quest")):
 		connect("give_quest", Callable(QuestManager, "add_quest"))
+
 
 func start():
 	if d_active:
 		return
+	dialogue = load_dialogue()
+	if dialogue.is_empty():
+		return
 	d_active = true
 	$NinePatchRect.visible = true
-	dialogue = load_dialogue()
 	current_dialogue_id = -1
 	next_script()
 
 
-func load_dialogue():
-	var file = FileAccess.open("res://dialouge/npc2(wise crow)/dialogue files/parrotDialogue.json", FileAccess.READ)
-	var content = JSON.parse_string(file.get_as_text())
+func load_dialogue() -> Array:
+	if not FileAccess.file_exists(d_file):
+		push_error("Dialogue file not found: " + d_file)
+		return []
 
-#if the coin quest is finished, give the completed quest dialogue
-	if QuestManager.active_quests.has("collect_coins") and QuestManager.active_quests["collect_coins"].get("completed", false):
-		return content["completed_dialogue"]
-	
-	#default to initial dialogue
-	return content["initial_dialogue"]
+	var file := FileAccess.open(d_file, FileAccess.READ)
+	var content = JSON.parse_string(file.get_as_text())
+	if content == null:
+		push_error("Dialogue JSON failed to parse: " + d_file)
+		return []
+
+	# Simplest format: the file is just an array of lines
+	if content is Array:
+		return content
+
+	# Also accepts an object, e.g. {"first_encounter": [...], "completed_dialogue": [...]}
+	if content is Dictionary and not content.is_empty():
+		var quest_done: bool = gives_quest and QuestManager.active_quests.has(quest_id) and QuestManager.active_quests[quest_id].get("completed", false)
+		if quest_done and content.has("completed_dialogue"):
+			return content["completed_dialogue"]
+		return content.values()[0]
+
+	push_error("Dialogue file is empty or has an unexpected format: " + d_file)
+	return []
 
 
 func _input(event):
@@ -66,9 +93,8 @@ func next_script():
 		$NinePatchRect.visible = false
 		stop_sound()
 		emit_signal("dialogue_finished")
-		
-		#emits quest signal when dialogue when text is finished
-		emit_signal("give_quest", "collect_coins", "Coin Collector", "Collect coins", 500)
+		if gives_quest:
+			emit_signal("give_quest", quest_id, quest_title, quest_description, quest_target)
 		return
 
 	var current_data = dialogue[current_dialogue_id]
@@ -81,18 +107,23 @@ func next_script():
 
 
 func apply_speaker_font(speaker_name: String):
-	var name_label = $NinePatchRect/Name
-	var chat_area = $NinePatchRect/Chatarea
-
 	var selected_font: Font = null
-	if speaker_name.strip_edges().to_lower() == "parrot":
-		selected_font = parrot_font
+	if speaker_name.strip_edges().to_lower() == npc_name.strip_edges().to_lower():
+		selected_font = crow_font
 	else:
 		selected_font = player_font
 
-	if selected_font:
-		name_label.add_theme_font_override("normal_font", selected_font)
-		chat_area.add_theme_font_override("normal_font", selected_font)
+	_set_font($NinePatchRect/Name, selected_font)
+	_set_font($NinePatchRect/Chatarea, selected_font)
+
+
+func _set_font(node: Control, font: Font) -> void:
+	var font_name := "normal_font" if node is RichTextLabel else "font"
+	if font:
+		node.add_theme_font_override(font_name, font)
+	else:
+		node.remove_theme_font_override(font_name)
+
 
 func animate_text(text: String):
 	stop_sound()
@@ -118,7 +149,7 @@ func animate_text(text: String):
 			continue
 
 		var duration = (index - last_punct_index) * LETTER_TIME
-		
+
 		tween.tween_callback(play_sound)
 		tween.tween_method(_reveal_char, last_punct_index, index, duration)
 
@@ -149,6 +180,3 @@ func play_sound():
 func stop_sound():
 	if audio_stream_player and audio_stream_player.playing:
 		audio_stream_player.stop()
-#signal give_quest(quest_id, title, description, target_count)
-func _on_dialogue_finished():
-	emit_signal("give_quest", "collect_coins", "Coin Collector", "Collect coins", 500)

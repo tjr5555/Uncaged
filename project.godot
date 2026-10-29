@@ -39,6 +39,7 @@ enabled=PackedStringArray("res://addons/godot_super-wakatime/plugin.cfg")
 [global_group]
 
 button=""
+tilemap=""
 
 [input]
 

@@ -15,6 +15,10 @@ const GLIDING_GRAVITY = 200.0
 const INCREASED_GRAVITY = 1800.0
 const AIR_FRICTION = 1500.0
 const FRICTION = 3000.0
+const LEDGE_CHECK_STEP = 28.0 #spacing between ground samples ahead
+const LEDGE_CHECK_DROP = 24.0 #how far below the feet counts as ground
+const LEDGE_STEP_UP = 8.0 #ray starts this far above the floor (ignores tiny bumps)
+const LEDGE_MARGIN = 48.0 #extra look-ahead distance beyond the hop's reach
 var DASH_POWER = 1000.0
 var HOLD_DURATION = 0.3
 var WALL_SLIDE_SPEED = 120.0
@@ -259,7 +263,7 @@ func _ground_physics(delta: float) -> void:
 				velocity.y = WALL_SLIDE_SPEED
 				is_gliding = false
 	
-	if on_floor and not jumped and dir != 0.0 and hop_timer <= 0.0:
+	if on_floor and not jumped and dir != 0.0 and hop_timer <= 0.0 and not _ledge_near(dir):
 		velocity.y = HOP_VELOCITY
 		hop_timer = HOP_INTERVAL
 	
@@ -288,6 +292,45 @@ func _ground_physics(delta: float) -> void:
 	
 	if is_on_floor() and Input.is_action_pressed("augment") and velocity.y > 50.0:
 		velocity.x += velocity.y
+
+func _ledge_near(direction: float) -> bool:
+	if direction == 0.0:
+		return false
+	
+	var space := get_world_2d().direct_space_state
+	
+	# Find the floor directly under the player
+	var down_query := PhysicsRayQueryParameters2D.create(
+		global_position,
+		global_position + Vector2(0.0, 128.0),
+		collision_mask,
+		[get_rid()]
+	)
+	var floor_hit := space.intersect_ray(down_query)
+	if floor_hit.is_empty():
+		return false
+	var ground_y: float = floor_hit.position.y
+	
+	# How far a hop would carry you horizontally (up time + down time)
+	var air_time := absf(HOP_VELOCITY) / BASE_GRAVITY + absf(HOP_VELOCITY) / INCREASED_GRAVITY
+	var reach := maxf(absf(velocity.x) * air_time, LEDGE_CHECK_STEP * 2.0) + LEDGE_MARGIN
+	
+	# Sample single points ahead; no floor within the drop distance means a ledge
+	var dist := LEDGE_CHECK_STEP
+	while dist <= reach:
+		var x := global_position.x + signf(direction) * dist
+		var query := PhysicsRayQueryParameters2D.create(
+			Vector2(x, ground_y - LEDGE_STEP_UP),
+			Vector2(x, ground_y + LEDGE_CHECK_DROP),
+			collision_mask,
+			[get_rid()]
+		)
+		query.hit_from_inside = true # a wall ahead counts as ground, not a gap
+		if space.intersect_ray(query).is_empty():
+			return true
+		dist += LEDGE_CHECK_STEP
+	return false
+
 
 func _fly_physics(delta: float) -> void:
 	var turn_input := Input.get_axis(FLY_CCW_ACTION, FLY_CW_ACTION)

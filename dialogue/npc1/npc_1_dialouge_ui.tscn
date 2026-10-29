@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://hfe1t2uuk2or"]
 
 [ext_resource type="Texture2D" uid="uid://bfgghiapipygm" path="res://sprites/dialougeBox.png" id="1_1jut6"]
-[ext_resource type="Script" uid="uid://x5kk7lnnxvju" path="res://dialouge/npc1/npc_1_dialouge_ui.gd" id="1_pst5r"]
+[ext_resource type="Script" uid="uid://x5kk7lnnxvju" path="res://dialogue/npc1/npc_1_dialouge_ui.gd" id="1_pst5r"]
 [ext_resource type="FontFile" uid="uid://3rkiirqmwonr" path="res://fonts/birdy_2/Birdy_DEMO.ttf" id="3_8njdy"]
 [ext_resource type="FontFile" uid="uid://bcjewu4jlsnbv" path="res://fonts/Honk/Honk-Regular-VariableFont_MORF,SHLN.ttf" id="3_osutq"]
 [ext_resource type="AudioStream" uid="uid://doq83vq1y42sm" path="res://audio/loopingver.mp3" id="4_kgfkv"]

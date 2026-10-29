@@ -6,30 +6,20 @@
 [ext_resource type="PackedScene" uid="uid://cf81457n1ifjd" path="res://scenes/npc_2_dialouge_ui.tscn" id="4_2dwi7"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_0jsi4"]
-radius = 320.0
-
-[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_0jsi4"]
-radius = 56.0
-height = 112.0
+radius = 262.0687
 
 [node name="npc2" type="CharacterBody2D" unique_id=924465278]
 script = ExtResource("1_362ta")
 
 [node name="Sprite2D" type="Sprite2D" parent="." unique_id=1460533927]
+scale = Vector2(0.63, 0.63)
 texture = ExtResource("2_362ta")
-metadata/_edit_lock_ = true
 
 [node name="detectionArea" type="Area2D" parent="." unique_id=82948314]
-metadata/_edit_lock_ = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="detectionArea" unique_id=1681579887]
 position = Vector2(0, 3)
 shape = SubResource("CircleShape2D_0jsi4")
-metadata/_edit_lock_ = true
-
-[node name="hitbox" type="CollisionShape2D" parent="." unique_id=1241251424]
-shape = SubResource("CapsuleShape2D_0jsi4")
-metadata/_edit_lock_ = true
 
 [node name="Timer" type="Timer" parent="." unique_id=968683325]
 
@@ -44,10 +34,11 @@ text = "Press C to talk"
 metadata/_edit_lock_ = true
 
 [node name="npc2DialougeUI" parent="." unique_id=544451575 instance=ExtResource("4_2dwi7")]
-offset_top = 8.0
-offset_right = 0.0
-offset_bottom = 8.0
-metadata/_edit_lock_ = true
+offset_left = 6.0
+offset_top = -7.0
+offset_right = 6.0
+offset_bottom = -7.0
+scale = Vector2(0.71, 0.71)
 
 [connection signal="body_entered" from="detectionArea" to="." method="_on_detection_area_body_entered"]
 [connection signal="body_exited" from="detectionArea" to="." method="_on_detection_area_body_exited"]

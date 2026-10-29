@@ -1,14 +1,18 @@
 extends CharacterBody2D
 
+# Set these per instance in the Inspector
+@export_file("*.json") var dialogue_file: String
+@export var npc_name: String = "wise crow"
+
 const SPEED = 50.0
-const MAX_DISTANCE = 100.0
+const MAX_DISTANCE = 10.0
 const ACCELERATION = 100.0
 var current_state = IDLE
 var dir = Vector2.ZERO
 var start_pos: Vector2
 
 var is_roaming = true
-var is_chatting = false 
+var is_chatting = false
 var player_is_in_chat_zone = false
 
 enum {
@@ -22,9 +26,14 @@ func _ready() -> void:
 	start_pos = position
 	$Timer.start()
 
+	# Pass this instance's settings to its dialogue UI
+	if dialogue_file != "":
+		$npc2DialougeUI.d_file = dialogue_file
+	$npc2DialougeUI.npc_name = npc_name
+
 func _physics_process(delta: float) -> void:
 	var target_velocity = Vector2.ZERO
-	
+
 	if is_roaming and not is_chatting:
 		match current_state:
 			IDLE:
@@ -61,7 +70,7 @@ func _on_detection_area_body_exited(body: Node2D) -> void:
 
 func _on_timer_timeout() -> void:
 	$Timer.wait_time = choose([2.0, 4.0, 5.0])
-	
+
 	# If getting close to the boundary limit, bias movement back home
 	if position.distance_to(start_pos) > MAX_DISTANCE - 50.0:
 		dir = (start_pos - position).normalized()
