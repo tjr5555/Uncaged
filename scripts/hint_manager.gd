@@ -14,7 +14,8 @@ const MAX_SCALE = 0.2
 const MIN_SCALE = 0.08
 const PRECISE_RANGE_M = 300.0
 const FAR_STEP = 10
-
+const LABEL_MIN_SCALE = 0.8
+const LABEL_MAX_SCALE = 1.25
 
 var arrows: Dictionary = {}
 
@@ -83,10 +84,16 @@ func _update_arrow(target: Waypoint, arrow: Node2D, player: Node2D, canvas_xf: T
 		return
 	
 	var distance_alpha := clampf(remap(distance, NEAR_DISTANCE, FAR_DISTANCE, 1.0, FAR_ALPHA), FAR_ALPHA, 1.0)
-	var arrow_scale := clampf(remap(distance, NEAR_DISTANCE, FAR_DISTANCE, MAX_SCALE, MIN_SCALE), MIN_SCALE, MAX_SCALE) 
+	var arrow_scale := clampf(remap(distance, NEAR_DISTANCE, FAR_DISTANCE, MAX_SCALE, MIN_SCALE), MIN_SCALE, MAX_SCALE)
+	var closeness := inverse_lerp(MIN_SCALE, MAX_SCALE, arrow_scale)
+	var label_scale := lerpf(LABEL_MIN_SCALE, LABEL_MAX_SCALE, closeness)
 	var edge_pos := _ray_to_rect_edge(screen_center, dir, safe_rect)
 	
-	arrow.update_hint(edge_pos, dir.angle(), _label_text(target, distance), distance_alpha * arrow.presence, arrow_scale)
+	arrow.update_hint(edge_pos, dir.angle(), _label_text(target, distance), distance_alpha * arrow.presence, arrow_scale, label_scale)
+
+
+
+
 
 
 func _ray_to_rect_edge(origin: Vector2, dir: Vector2, rect: Rect2) -> Vector2:
