@@ -1,6 +1,7 @@
 [gd_scene format=3 uid="uid://di6dday241poi"]
 
 [ext_resource type="Script" uid="uid://d20fvsnmyx1rs" path="res://scripts/ui.gd" id="1_nt7q6"]
+[ext_resource type="Script" uid="uid://bvjbg3mwvckqq" path="res://scripts/speed_lines.gd" id="2_8dubc"]
 [ext_resource type="FontFile" uid="uid://b18ofjevqi05d" path="res://fonts/Elms_Sans/static/ElmsSans-SemiBold.ttf" id="2_x4jx1"]
 [ext_resource type="FontFile" uid="uid://c0xbdpffii5b4" path="res://fonts/Play/Play-Regular.ttf" id="3_yev5y"]
 [ext_resource type="FontFile" uid="uid://c0gtcxikyfdmx" path="res://fonts/Elms_Sans/static/ElmsSans-Bold.ttf" id="4_gdt2y"]
@@ -20,6 +21,16 @@ skew = Vector2(0.25, 0)
 
 [node name="UI" type="CanvasLayer" unique_id=391863151]
 script = ExtResource("1_nt7q6")
+
+[node name="SpeedLines" type="Control" parent="." unique_id=20082906]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("2_8dubc")
 
 [node name="MarginContainer" type="MarginContainer" parent="." unique_id=1952370502]
 anchors_preset = 2

@@ -1,6 +1,6 @@
 [gd_scene format=4 uid="uid://bx0q84x0xgaa5"]
 
-[ext_resource type="Script" uid="uid://bigrwto81ly7i" path="res://scenes/tutorial.gd" id="1_6yjpi"]
+[ext_resource type="Script" uid="uid://bigrwto81ly7i" path="res://scripts/tutorial.gd" id="1_6yjpi"]
 [ext_resource type="Texture2D" uid="uid://dro3ts4tguxp5" path="res://assets/untitled.png" id="1_cq4me"]
 [ext_resource type="Texture2D" uid="uid://iun40yvvupvk" path="res://sprites/grass_tile.png" id="2_ehuit"]
 [ext_resource type="Texture2D" uid="uid://c8xmtvk06ajha" path="res://sprites/inside_tile_real.png" id="3_5mrt3"]
