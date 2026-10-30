@@ -3,12 +3,24 @@
 [ext_resource type="Texture2D" uid="uid://dc4d7y0bqsvdf" path="res://sprites/Screenshot 2026-10-12 171548.png" id="1_0wfyh"]
 [ext_resource type="Script" uid="uid://3isphqggsdu8" path="res://scripts/main.gd" id="1_tbgi4"]
 [ext_resource type="PackedScene" uid="uid://nngadheagxwr" path="res://scenes/player.tscn" id="2_sugp2"]
+[ext_resource type="PackedScene" uid="uid://cmywa3ydsxlum" path="res://island scenes/island_1.tscn" id="2_yc10j"]
+[ext_resource type="PackedScene" uid="uid://dvukehth3qeiy" path="res://island scenes/island_2.tscn" id="3_jscy8"]
 [ext_resource type="PackedScene" uid="uid://dac1ej83teqnb" path="res://scenes/balloon_area.tscn" id="3_sugp2"]
 [ext_resource type="Texture2D" uid="uid://iun40yvvupvk" path="res://sprites/grass_tile.png" id="3_tipki"]
+[ext_resource type="PackedScene" uid="uid://r4f08oq51o22" path="res://island scenes/island_3.tscn" id="4_pm3ni"]
 [ext_resource type="PackedScene" uid="uid://di6dday241poi" path="res://scenes/ui.tscn" id="5_tefeu"]
+[ext_resource type="PackedScene" uid="uid://bsdq00kb8utwd" path="res://island scenes/island_4.tscn" id="5_y6deb"]
+[ext_resource type="PackedScene" uid="uid://d11ilb2rt7ac" path="res://island scenes/island_5.tscn" id="6_og1vs"]
 [ext_resource type="PackedScene" uid="uid://blorw4562ivr" path="res://scenes/shopkeeper.tscn" id="6_tefeu"]
+[ext_resource type="PackedScene" uid="uid://bxqndd13a0kf" path="res://island scenes/island_6.tscn" id="7_2wyq8"]
 [ext_resource type="PackedScene" uid="uid://cr6jvodd3jiqj" path="res://scenes/npc_1.tscn" id="7_o6xl0"]
+[ext_resource type="PackedScene" uid="uid://bn3lrd50b7lww" path="res://island scenes/island_7.tscn" id="8_vxglm"]
+[ext_resource type="PackedScene" uid="uid://cjonr7lgx4lqf" path="res://island scenes/island_8.tscn" id="9_2f3dj"]
 [ext_resource type="PackedScene" uid="uid://ccaxjuy1bhusq" path="res://scenes/waypoint.tscn" id="9_85g3d"]
+[ext_resource type="PackedScene" uid="uid://obg06oejp7qx" path="res://island scenes/island_9.tscn" id="10_yq6so"]
+[ext_resource type="PackedScene" uid="uid://dmn0rgjelv2oo" path="res://island scenes/island_10.tscn" id="11_fv21b"]
+[ext_resource type="PackedScene" uid="uid://fyhjy7sc5spb" path="res://island scenes/island_11.tscn" id="12_tel4y"]
+[ext_resource type="PackedScene" uid="uid://bhnql6ieieyxu" path="res://island scenes/island_12.tscn" id="13_qkpxi"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_tipki"]
 texture = ExtResource("1_0wfyh")
@@ -463,11 +475,20 @@ physics_layer_0/collision_layer = 1
 sources/0 = SubResource("TileSetAtlasSource_tipki")
 sources/1 = SubResource("TileSetAtlasSource_85g3d")
 
-[node name="main" type="Node2D" unique_id=54725661]
+[node name="main" type="Node2D" unique_id=54725661 node_paths=PackedStringArray("player")]
 script = ExtResource("1_tbgi4")
+island_scenes = Array[PackedScene]([ExtResource("2_yc10j"), ExtResource("3_jscy8"), ExtResource("4_pm3ni"), ExtResource("5_y6deb"), ExtResource("6_og1vs"), ExtResource("7_2wyq8"), ExtResource("8_vxglm"), ExtResource("9_2f3dj"), ExtResource("10_yq6so"), ExtResource("11_fv21b"), ExtResource("12_tel4y"), ExtResource("13_qkpxi")])
+player = NodePath("player")
+chunk_size = 1800.0
+load_radius = 3
+unload_radius = 4
+safe_radius = 3000.0
+min_spacing = 700.0
+edge_margin = 1200.0
 
 [node name="player" parent="." unique_id=2048642765 instance=ExtResource("2_sugp2")]
 position = Vector2(635, -291)
+scale = Vector2(1, 1)
 
 [node name="UI" parent="." unique_id=391863151 instance=ExtResource("5_tefeu")]
 
