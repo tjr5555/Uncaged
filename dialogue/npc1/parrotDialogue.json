@@ -1,6 +1,6 @@
 {
 	"initial_dialogue": [
-		{"name": "Parrot", "text": "Hello! I am a PARROT! (Press V to continue)"},
+		{"name": "Parrot", "text": "Hello! I am a PARROT! (Press (V) to continue)"},
 		{"name": "Parrot", "text": "What are you?!"},
 		{"name": "You", "text": "I am a crow"},
 		{"name": "Parrot", "text": "Woah that's sick dude!"},
@@ -14,7 +14,8 @@
 		{"name": "Parrot", "text": "Yeah its super cool. I'll tell you what."},
 		{"name": "Parrot", "text": "If you bring me 500 coins™..."},
 		{"name": "Parrot", "text": "...I will give you something that will CHANGE YOUR LIFE™."},
-		{"name": "Parrot", "text": "Now get collecting!"},
+		{"name": "Parrot", "text": "Quick tip before you go..."},
+		{"name": "Parrot", "text": "If you ever stray to far from here, press (R) to come back."},
 		{"name": "You", "text": "coolio"}
 	],
 	"completed_dialogue": [

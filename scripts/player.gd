@@ -152,6 +152,10 @@ func _physics_process(delta: float) -> void:
 	_update_boost(delta)
 	_update_wind(delta)
 	FLY_CRUISE_SPEED = Global.base_flight_speed
+	if Input.is_action_just_pressed("reset"):
+		reset()
+
+
 
 func _set_mode(new_mode: Global.Mode) -> void:
 	Global.mode = new_mode
@@ -461,3 +465,18 @@ func _update_boost(delta: float) -> void:
 	if boost != last_emitted_boost:
 		last_emitted_boost = boost
 		boost_changed.emit(boost, BOOST_MAX)
+
+
+
+
+
+func reset():
+	global_position = Vector2(633, -278)
+	velocity = Vector2.ZERO
+	speed = FLY_ENTER_SPEED
+	speed_floor = FLY_MIN_SPEED
+	heading = 0.0
+	turn_speed = 0.0
+	boost = BOOST_MAX
+	if camera:
+		camera.reset_smoothing()
