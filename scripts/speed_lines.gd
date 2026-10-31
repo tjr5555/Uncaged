@@ -1,9 +1,9 @@
 extends Control
 
-const SPEED_START = 950.0
-const SPEED_FULL = 2000.0
-const FALL_START = 500.0
-const FALL_FULL = 1400.0
+const SPEED_START = 1500.0
+const SPEED_FULL = 2200.0
+const FALL_START = 1200.0
+const FALL_FULL = 1700.0
 
 const MAX_STREAKS = 48
 const SPAWN_RATE = 80.0
@@ -13,18 +13,18 @@ const MIN_LENGTH = 60.0
 const MAX_LENGTH = 180.0
 const MIN_WIDTH = 1.5
 const MAX_WIDTH = 3.0
-const FLOW_SPEED = 900.0
+const FLOW_SPEED = 400.0
 
 const INNER_CLEAR = 0.5
 const MAX_ALPHA = 0.35
 const STREAK_COLOR = Color(1.0, 1.0, 1.0)
-const VELOCITY_SMOOTH = 3.0
-const TURN_STIFFNESS = 10.0
-const TURN_DAMPING = 6.3
+const VELOCITY_SMOOTH = 10.0
+const TURN_STIFFNESS = 150.0
+const TURN_DAMPING = 24.5
 const INTENSITY_RISE = 2.5
 const INTENSITY_FALL = 1.2
-const STREAK_TURN_MIN = 1.5
-const STREAK_TURN_MAX = 4.0
+const STREAK_TURN_MIN = 5.0
+const STREAK_TURN_MAX = 12.5
 const TRAIL_SPACING = 6.0
 
 var streaks: Array[Dictionary] = []

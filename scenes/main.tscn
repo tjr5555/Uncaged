@@ -475,14 +475,10 @@ physics_layer_0/collision_layer = 1
 sources/0 = SubResource("TileSetAtlasSource_tipki")
 sources/1 = SubResource("TileSetAtlasSource_85g3d")
 
-[node name="main" type="Node2D" unique_id=54725661 node_paths=PackedStringArray("player")]
+[node name="main" type="Node2D" unique_id=54725661]
 script = ExtResource("1_tbgi4")
 island_scenes = Array[PackedScene]([ExtResource("2_yc10j"), ExtResource("3_jscy8"), ExtResource("4_pm3ni"), ExtResource("5_y6deb"), ExtResource("6_og1vs"), ExtResource("7_2wyq8"), ExtResource("8_vxglm"), ExtResource("9_2f3dj"), ExtResource("10_yq6so"), ExtResource("11_fv21b"), ExtResource("12_tel4y"), ExtResource("13_qkpxi")])
-player = NodePath("player")
-safe_radius = 2000.0
-empty_chunk_chance = 0.142
-min_spacing = 1200.0
-edge_margin = 900.0
+balloon_scene = ExtResource("3_sugp2")
 
 [node name="player" parent="." unique_id=2048642765 instance=ExtResource("2_sugp2")]
 position = Vector2(633, -278)
