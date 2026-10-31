@@ -41,7 +41,7 @@ extends Node2D
 @export var max_line_bend := 120.0
 @export_range(0.0, 1.0) var sky_line_chance := 0.35
 @export var max_sky_lines := 2
-@export var hue_step := 0.035
+@export var balloon_scale := 1.35
 
 @export_group("")
 @export var debug_prints := false     # log spawns/unloads to Output
@@ -227,6 +227,8 @@ func _spawn_entry(entry: Dictionary) -> void:
 	node.scale = entry["scale"]
 	if is_balloon:
 		node.set("tint", entry["tint"])
+		node.set("coin_value", entry["value"])
+		node.set("tier_index", entry["tier"])
 	
 	var target_alpha := node.modulate.a
 	if fade_in_time > 0.0:
@@ -301,9 +303,9 @@ func _try_line(rng: RandomNumberGenerator, coord: Vector2i, token: int, island_r
 		if not _line_fits(points, island_rects, chunk_rect, placed):
 			continue
 		
-		var base_hue := rng.randf()
+		var tier_index := Global.pick_balloon_tier_index(rng.randf())
+		var tier: Dictionary = Global.BALLOON_TIERS[tier_index]
 		for i in points.size():
-			var hue := fposmod(base_hue + hue_step * i, 1.0)
 			placed.append(points[i])
 			spawn_queue.append({
 				"coord": coord,
@@ -312,8 +314,10 @@ func _try_line(rng: RandomNumberGenerator, coord: Vector2i, token: int, island_r
 				"id": Vector3i(coord.x, coord.y, index),
 				"scene": balloon_scene,
 				"pos": points[i],
-				"scale": Vector2.ONE,
-				"tint": Color.from_hsv(hue, rng.randf_range(0.6, 0.85), rng.randf_range(0.93, 1.0)),
+				"scale": Vector2.ONE * balloon_scale,
+				"tint": Global.vary_balloon_color(tier["color"], rng),
+				"value": tier["value"],
+				"tier": tier_index,
 			})
 			index += 1
 		return index
@@ -339,14 +343,15 @@ func _sky_anchor(rng: RandomNumberGenerator, chunk_rect: Rect2) -> Array:
 func _line_points(anchor: Vector2, dir: Vector2, count: int, bend: float) -> Array[Vector2]:
 	var points: Array[Vector2] = []
 	var normal := dir.orthogonal()
+	var spacing := balloon_spacing * balloon_scale
 	for i in count:
 		var t := 0.5 if count == 1 else float(i) / float(count - 1)
-		var along := (t - 0.5) * balloon_spacing * float(count - 1)
+		var along := (t - 0.5) * spacing * float(count - 1)
 		points.append(anchor + dir * along + normal * sin(t * PI) * bend)
 	return points
 
 func _line_fits(points: Array[Vector2], island_rects: Array[Rect2], chunk_rect: Rect2, placed: Array[Vector2]) -> bool:
-	var min_gap := balloon_spacing * 0.8
+	var min_gap := balloon_spacing * balloon_scale * 0.8
 	for p in points:
 		if not chunk_rect.has_point(p) or p.length() < safe_radius:
 			return false
