@@ -46,8 +46,8 @@ func pop() -> void:
 	current_regen_time = 0.0
 	anim.material = null
 	anim.play("pop")
-	collision.set_deferred("disabled", false)
-	set_physics_process(false)
+	collision.set_deferred("disabled", true)
+	set_physics_process(true)
 	popped.emit(respawn_time)
 
 func start_popped(remaining: float) -> void:

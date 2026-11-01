@@ -12,6 +12,9 @@ var max_dashes: int = 2
 var dashes: int = 2
 var dash_target: int 
 
+var in_transition := false
+var return_portal_id := ""
+
 var base_coin_mult = 1.0
 
 const BALLOON_SHADER = preload("res://shaders/balloon_shader.gdshader")
@@ -49,7 +52,7 @@ func get_balloon_material(tier_index: int) -> ShaderMaterial:
 		mat.shader = BALLOON_SHADER
 		mat.set_shader_parameter("shimmer_strength", tier["shimmer"])
 		mat.set_shader_parameter("sparkle_strength", tier["sparkle"])
-		mat.set_shader_parameter("shiner_color", tier["shine"])
+		mat.set_shader_parameter("shine_color", tier["shine"])
 		_balloon_materials[tier_index] = mat
 	return _balloon_materials[tier_index]
 

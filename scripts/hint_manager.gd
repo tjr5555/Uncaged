@@ -20,18 +20,22 @@ const LABEL_MAX_SCALE = 1.25
 var arrows: Dictionary = {}
 
 func _process(delta: float) -> void:
+	visible = not Global.in_transition
+	if Global.in_transition:
+		return
+
 	var player := get_tree().get_first_node_in_group("player") as Node2D
 	if player == null:
 		_clear_arrows()
 		return
-	
+
 	var alive := _sync_arrows(get_tree().get_nodes_in_group("waypoints"))
-	
+
 	var viewport_size := get_viewport_rect().size
 	var screen_center := viewport_size * 0.5
 	var safe_rect := Rect2(Vector2(MARGIN_LEFT, MARGIN_TOP), viewport_size - Vector2(MARGIN_LEFT + MARGIN_RIGHT, MARGIN_TOP + MARGIN_BOTTOM))
 	var canvas_xf := get_viewport().get_canvas_transform()
-	
+
 	for id in alive:
 		_update_arrow(alive[id] as Waypoint, arrows[id], player, canvas_xf, screen_center, safe_rect, delta)
 

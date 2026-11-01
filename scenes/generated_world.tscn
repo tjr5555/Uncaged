@@ -1,0 +1,42 @@
+[gd_scene format=3 uid="uid://v1tk33qddnlf"]
+
+[ext_resource type="Script" uid="uid://dd2xxjqxrkofg" path="res://scripts/island_generator.gd" id="1_dlhb1"]
+[ext_resource type="PackedScene" uid="uid://cmywa3ydsxlum" path="res://island scenes/island_1.tscn" id="2_og635"]
+[ext_resource type="PackedScene" uid="uid://dvukehth3qeiy" path="res://island scenes/island_2.tscn" id="3_msmpk"]
+[ext_resource type="PackedScene" uid="uid://r4f08oq51o22" path="res://island scenes/island_3.tscn" id="4_eamn2"]
+[ext_resource type="PackedScene" uid="uid://bsdq00kb8utwd" path="res://island scenes/island_4.tscn" id="5_2a22c"]
+[ext_resource type="PackedScene" uid="uid://d11ilb2rt7ac" path="res://island scenes/island_5.tscn" id="6_b3ooo"]
+[ext_resource type="PackedScene" uid="uid://bxqndd13a0kf" path="res://island scenes/island_6.tscn" id="7_plrht"]
+[ext_resource type="PackedScene" uid="uid://bn3lrd50b7lww" path="res://island scenes/island_7.tscn" id="8_hmfh3"]
+[ext_resource type="PackedScene" uid="uid://cjonr7lgx4lqf" path="res://island scenes/island_8.tscn" id="9_ituiu"]
+[ext_resource type="PackedScene" uid="uid://obg06oejp7qx" path="res://island scenes/island_9.tscn" id="10_flhq7"]
+[ext_resource type="PackedScene" uid="uid://dmn0rgjelv2oo" path="res://island scenes/island_10.tscn" id="11_r0wce"]
+[ext_resource type="PackedScene" uid="uid://fyhjy7sc5spb" path="res://island scenes/island_11.tscn" id="12_5yv0q"]
+[ext_resource type="PackedScene" uid="uid://bhnql6ieieyxu" path="res://island scenes/island_12.tscn" id="13_bex7j"]
+[ext_resource type="PackedScene" uid="uid://dac1ej83teqnb" path="res://scenes/balloon_area.tscn" id="14_komhj"]
+[ext_resource type="PackedScene" uid="uid://beplsivn2dg6g" path="res://scenes/portal.tscn" id="15_o2ldk"]
+
+[node name="GeneratedWorld" type="Node2D" unique_id=1066384265]
+
+[node name="IslandGenerator" type="Node2D" parent="." unique_id=1468083235]
+script = ExtResource("1_dlhb1")
+island_scenes = Array[PackedScene]([ExtResource("2_og635"), ExtResource("3_msmpk"), ExtResource("4_eamn2"), ExtResource("5_2a22c"), ExtResource("6_b3ooo"), ExtResource("7_plrht"), ExtResource("8_hmfh3"), ExtResource("9_ituiu"), ExtResource("10_flhq7"), ExtResource("11_r0wce"), ExtResource("12_5yv0q"), ExtResource("13_bex7j")])
+chunk_size = 4000.0
+safe_radius = 2500.0
+region_size = 32000.0
+sparse_empty_chance = 0.92
+dense_empty_chance = 0.35
+max_islands_per_chunk = 3
+cluster_radius = 1600.0
+min_spacing = 1800.0
+edge_margin = 900.0
+balloon_scene = ExtResource("14_komhj")
+min_lines_per_island = 1
+max_lines_per_island = 2
+max_sky_lines = 1
+
+[node name="ExitPortal" parent="." unique_id=199880354 instance=ExtResource("15_o2ldk")]
+portal_id = "exit"
+label_text = "Home"
+leads_to_hub = true
+color = Color(0, 0.60384, 0.14037186, 1)
