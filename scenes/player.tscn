@@ -4,8 +4,8 @@
 [ext_resource type="Texture2D" uid="uid://tcenjagh32p2" path="res://sprites/icon.svg" id="2_qhqgy"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_lnspb"]
-radius = 28.0
-height = 106.0
+radius = 35.555557
+height = 142.22223
 
 [node name="player" type="CharacterBody2D" unique_id=2048642765 groups=["player"]]
 scale = Vector2(0.75, 0.75)
@@ -21,5 +21,6 @@ scale = Vector2(0.75, 0.75)
 shape = SubResource("CapsuleShape2D_lnspb")
 
 [node name="Camera" type="Camera2D" parent="." unique_id=802923576]
+zoom = Vector2(1.21, 1.21)
 position_smoothing_enabled = true
 position_smoothing_speed = 10.0

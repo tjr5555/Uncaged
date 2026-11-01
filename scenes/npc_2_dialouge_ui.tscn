@@ -22,7 +22,11 @@ script = ExtResource("1_v57yx")
 d_file = "res://dialouge/npc1/wiseCrowDialogue.json"
 audio_stream_player = NodePath("AudioStreamPlayer")
 crow_font = ExtResource("2_caj7x")
+crow_font_size = 45
+crow_name_font_size = 50
 player_font = ExtResource("3_gfsgr")
+player_font_size = 33
+player_name_font_size = 38
 
 [node name="NinePatchRect" type="NinePatchRect" parent="." unique_id=102517199]
 layout_mode = 0

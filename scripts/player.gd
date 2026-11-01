@@ -49,6 +49,7 @@ const FLY_AUTO_LEVEL = 0.9
 const FLY_VELOCITY_SMOOTH = 14.0
 const FLY_DASH_BOOST = 700.0
 const FLY_STALL_TURN = 2.5
+const CONTROL_MAX_BONUS = 0.5 #flight control upgrades are maxed out at +50% turn rate
 const FLY_FLIP_SPEED = 14.0
 
 const FLY_BOUNCE_LOSS = 0.2
@@ -350,12 +351,18 @@ func _fly_physics(delta: float) -> void:
 	
 	speed_floor = move_toward(speed_floor, FLY_MIN_SPEED, FLY_BOUNCE_RECOVERY * delta)
 	
+	#base_turn_speed is the turn rate itself (starts at FLY_TURN_RATE, goes up with each upgrade)
+	#control is how much better than the starting turn rate you are: 1.0 = no upgrades, 1.5 = maxed
+	var control: float = Global.base_turn_speed / FLY_TURN_RATE
+	var control_t := clampf((control - 1.0) / CONTROL_MAX_BONUS, 0.0, 1.0) #0 = no upgrades, 1 = fully upgraded
+	
 	var speed_t := clampf((speed - FLY_CRUISE_SPEED) / (FLY_MAX_SPEED - FLY_CRUISE_SPEED), 0.0, 1.0)
-	var turn_rate := FLY_TURN_RATE * lerpf(1.0, FLY_FAST_TURN_MULT, speed_t)
+	var fast_mult := lerpf(FLY_FAST_TURN_MULT, 1.0, control_t) #upgrades remove the high speed turn penalty
+	var turn_rate := FLY_TURN_RATE * control * lerpf(1.0, fast_mult, speed_t)
 	if braking:
 		turn_rate *= FLY_BRAKE_TURN_MULT
 	
-	turn_speed = move_toward(turn_speed, turn_input * turn_rate, FLY_TURN_ACCEL * delta)
+	turn_speed = move_toward(turn_speed, turn_input * turn_rate, FLY_TURN_ACCEL * control * delta)
 	heading = wrapf(heading + turn_speed * delta, -PI, PI)
 	
 	if turn_input == 0.0:
@@ -390,7 +397,8 @@ func _fly_physics(delta: float) -> void:
 		heading = wrapf(heading + drop, -PI, PI)
 		heading_vec = Vector2.from_angle(heading)
 	
-	velocity = velocity.lerp(heading_vec * speed, 1.0 - exp(-FLY_VELOCITY_SMOOTH * delta))
+	var vel_smooth := FLY_VELOCITY_SMOOTH * lerpf(1.0, 1.5, control_t) #upgrades make movement track your aim tighter
+	velocity = velocity.lerp(heading_vec * speed, 1.0 - exp(-vel_smooth * delta))
 	
 	move_and_slide()
 	

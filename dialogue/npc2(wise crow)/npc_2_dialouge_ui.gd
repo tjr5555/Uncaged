@@ -3,17 +3,20 @@ extends Control
 signal dialogue_finished
 signal give_quest(quest_id, title, description, target_count)
 
-# Set these per NPC instance (the NPC script forwards them here)
+#set these per NPC instance (the NPC script forwards them here)
 @export_file("*.json") var d_file: String = "res://dialouge/npc2(wise crow)/dialogue files/wiseCrowDialogue.json"
 @export var npc_name: String = "wise crow" # speaker name that uses crow_font
 
 @export var audio_stream_player: AudioStreamPlayer
 
-# Add export variables to assign your fonts in the Inspector
+#fonts and sizes (a size of 0 keeps the theme's default size)
 @export var crow_font: Font
+@export_range(0, 200) var crow_font_size: int = 0
+@export_range(0, 200) var crow_name_font_size: int = 0
 @export var player_font: Font
-
-# Quest settings (leave gives_quest off for plain tutorial NPCs)
+@export_range(0, 200) var player_font_size: int = 0
+@export_range(0, 200) var player_name_font_size: int = 0
+#quest settings (leave gives_quest off for plain tutorial NPCs)
 @export var gives_quest: bool = false
 @export var quest_id: String = "collect_coins"
 @export var quest_title: String = "Coin Collector"
@@ -58,11 +61,11 @@ func load_dialogue() -> Array:
 		push_error("Dialogue JSON failed to parse: " + d_file)
 		return []
 
-	# Simplest format: the file is just an array of lines
+	#simplest format: the file is just an array of lines
 	if content is Array:
 		return content
 
-	# Also accepts an object, e.g. {"first_encounter": [...], "completed_dialogue": [...]}
+	#also accepts an object, e.g. {"first_encounter": [...], "completed_dialogue": [...]}
 	if content is Dictionary and not content.is_empty():
 		var quest_done: bool = gives_quest and QuestManager.active_quests.has(quest_id) and QuestManager.active_quests[quest_id].get("completed", false)
 		if quest_done and content.has("completed_dialogue"):
@@ -107,22 +110,29 @@ func next_script():
 
 
 func apply_speaker_font(speaker_name: String):
-	var selected_font: Font = null
-	if speaker_name.strip_edges().to_lower() == npc_name.strip_edges().to_lower():
-		selected_font = crow_font
-	else:
-		selected_font = player_font
+	var is_npc := speaker_name.strip_edges().to_lower() == npc_name.strip_edges().to_lower()
+	var font: Font = crow_font if is_npc else player_font
+	var text_size: int = crow_font_size if is_npc else player_font_size
+	var name_size: int = crow_name_font_size if is_npc else player_name_font_size
 
-	_set_font($NinePatchRect/Name, selected_font)
-	_set_font($NinePatchRect/Chatarea, selected_font)
+	_set_font($NinePatchRect/Name, font, name_size)
+	_set_font($NinePatchRect/Chatarea, font, text_size)
 
 
-func _set_font(node: Control, font: Font) -> void:
-	var font_name := "normal_font" if node is RichTextLabel else "font"
+func _set_font(node: Control, font: Font, size: int) -> void:
+	var is_rich := node is RichTextLabel
+	var font_name := "normal_font" if is_rich else "font"
+	var size_name := "normal_font_size" if is_rich else "font_size"
+
 	if font:
 		node.add_theme_font_override(font_name, font)
 	else:
 		node.remove_theme_font_override(font_name)
+
+	if size > 0:
+		node.add_theme_font_size_override(size_name, size)
+	else:
+		node.remove_theme_font_size_override(size_name)
 
 
 func animate_text(text: String):

@@ -3,15 +3,20 @@ extends Control
 @export var hover_sound: AudioStream
 @export var click_sound: AudioStream
 
-#Pricing variables, will scale depending on how good the upgrade is
+
+
+
+#pricing variables, will scale depending on how good the upgrade is
 var fsbp: float = 100.0 #flight speed base price
 var cmbp: float = 100.0 #coin multiplier base price
-
+var ftsbp: float = 100.0 #flight turn speed base price
 
 #How much that stats increase and scale by
 const FLIGHT_STEP := 20
 const COIN_STEP := 1.5 #in this case, coin step is actually a multiplier so it would go from 1.5-2.25-3.37 instead of 1.5,2,2.5,3 etc.
+const CONTROL_STEP := 0.2
 const PRICE_SCALE := 1.25
+const COIN_MULT_PRICE_SCALE := 1.8
 
 var _audio := AudioStreamPlayer.new()
 
@@ -19,6 +24,8 @@ var _audio := AudioStreamPlayer.new()
 @onready var flight_amount: Label = $PanelContainer/MarginContainer/GridContainer/flightSpeedButton/flightSpeedAmount
 @onready var coin_button: Button = $PanelContainer/MarginContainer/GridContainer/coinMultiplierButton
 @onready var coin_amount: Label = $PanelContainer/MarginContainer/GridContainer/coinMultiplierButton/coinMultLabel
+@onready var turn_rate_button: Button = $PanelContainer/MarginContainer/GridContainer/flightControlButton
+@onready var turn_rate_amount: Label = $PanelContainer/MarginContainer/GridContainer/flightControlButton/flightControlAmount
 
 
 func _ready() -> void:
@@ -29,6 +36,7 @@ func _ready() -> void:
 	_update_price_ui()
 	_set_speed_text(Global.base_flight_speed)
 	_set_coin_text(Global.base_coin_mult)
+	_set_control_text(Global.base_turn_speed)
 
 
 func _on_node_added(node: Node) -> void:
@@ -58,6 +66,7 @@ func _grow(b: BaseButton, amount: float, sound: AudioStream) -> void:
 func _update_price_ui() -> void:
 	flight_button.text = "Flight Speed\nPrice: " + str(int(fsbp))
 	coin_button.text = "Coin Multiplier\nPrice: " + str(int(cmbp))
+	turn_rate_button.text = "Flight turn rate \nPrice: " + str(int(ftsbp))
 
 
 func _set_speed_text(speed: float) -> void:
@@ -66,6 +75,10 @@ func _set_speed_text(speed: float) -> void:
 
 func _set_coin_text(mult: float) -> void:
 	coin_amount.text = String.num(mult, 2) + " -> " + String.num(mult * COIN_STEP, 2)
+
+
+func _set_control_text(control: float) -> void:
+	turn_rate_amount.text = String.num(control, 1) + " -> " + String.num(control + CONTROL_STEP, 1)
 
 
 
@@ -78,6 +91,11 @@ func _roll_speed(from: int, to: int) -> void:
 func _roll_coin(from: float, to: float) -> void:
 	var t := create_tween()
 	t.tween_method(_set_coin_text, from, to, 0.3)
+
+
+func _roll_control(from: float, to: float) -> void:
+	var t := create_tween()
+	t.tween_method(_set_control_text, from, to, 0.3)
 
 
 func _pop(c: Control) -> void:
@@ -96,7 +114,6 @@ func _on_flight_speed_button_pressed() -> void:
 		_update_price_ui()
 		_roll_speed(old_speed, Global.base_flight_speed)
 		_pop(flight_amount)
-		print("Flight speed: " + str(Global.base_flight_speed))
 
 
 func _on_coin_multiplier_button_pressed() -> void:
@@ -104,11 +121,12 @@ func _on_coin_multiplier_button_pressed() -> void:
 	if Global.total_coins >= cmbp:
 		Global.total_coins -= cmbp
 		Global.base_coin_mult *= COIN_STEP
-		cmbp *= PRICE_SCALE
+		cmbp *= COIN_MULT_PRICE_SCALE
 		_update_price_ui()
 		_roll_coin(old_coin_mult, Global.base_coin_mult)
 		_pop(coin_amount)
-		print("Coin multiplier: " + str(Global.base_coin_mult))
+
+
 func _on_back_button_pressed() -> void:
 	if get_parent() is CanvasLayer:
 		get_parent().hide()
@@ -117,3 +135,13 @@ func _on_back_button_pressed() -> void:
 		var boost_bar = main_node.get_node_or_null("UI/MarginContainer/BoostBar")
 		if boost_bar:
 			boost_bar.visible = true
+
+func _on_flight_control_button_pressed() -> void:
+	var old_control: float = Global.base_turn_speed
+	if Global.total_coins >= ftsbp:
+		Global.total_coins -= ftsbp
+		Global.base_turn_speed += CONTROL_STEP
+		ftsbp *= PRICE_SCALE
+		_update_price_ui()
+		_roll_control(old_control, Global.base_turn_speed)
+		_pop(turn_rate_amount)

@@ -45,7 +45,7 @@ theme_override_constants/margin_top = 30
 layout_mode = 2
 theme_override_constants/h_separation = 64
 theme_override_constants/v_separation = 64
-columns = 3
+columns = 2
 
 [node name="flightSpeedButton" type="Button" parent="PanelContainer/MarginContainer/GridContainer" unique_id=873261451]
 custom_minimum_size = Vector2(354, 98)
@@ -86,6 +86,24 @@ theme_override_fonts/font = ExtResource("5_qu5gy")
 theme_override_font_sizes/font_size = 40
 horizontal_alignment = 1
 
+[node name="flightControlButton" type="Button" parent="PanelContainer/MarginContainer/GridContainer" unique_id=2099312546]
+custom_minimum_size = Vector2(354, 98)
+layout_mode = 2
+theme_override_constants/h_separation = 14
+theme_override_fonts/font = ExtResource("2_cyb0u")
+theme_override_font_sizes/font_size = 40
+text = "Flight Turn Speed"
+
+[node name="flightControlAmount" type="Label" parent="PanelContainer/MarginContainer/GridContainer/flightControlButton" unique_id=1550071591]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 114.0
+offset_right = 354.0
+offset_bottom = 178.0
+theme_override_fonts/font = ExtResource("5_qu5gy")
+theme_override_font_sizes/font_size = 40
+horizontal_alignment = 1
+
 [node name="backButton" type="Button" parent="." unique_id=1558949517]
 custom_minimum_size = Vector2(354, 98)
 layout_mode = 0
@@ -100,4 +118,5 @@ text = "Back"
 
 [connection signal="pressed" from="PanelContainer/MarginContainer/GridContainer/flightSpeedButton" to="." method="_on_flight_speed_button_pressed"]
 [connection signal="pressed" from="PanelContainer/MarginContainer/GridContainer/coinMultiplierButton" to="." method="_on_coin_multiplier_button_pressed"]
+[connection signal="pressed" from="PanelContainer/MarginContainer/GridContainer/flightControlButton" to="." method="_on_flight_control_button_pressed"]
 [connection signal="pressed" from="backButton" to="." method="_on_back_button_pressed"]
