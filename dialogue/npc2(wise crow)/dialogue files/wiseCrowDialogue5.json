@@ -1,0 +1,14 @@
+
+[
+		{"name": "Wise Crow", "text": "Good job, I've tought you everything I know"},
+		{"name": "You", "text": "Woah wait..."},
+		{"name": "You", "text": "Can't you come with me? The exit is right there..."},
+		{"name": "Wise Crow", "text": "I can't, I've got birds to teach."},
+		{"name": "Wise Crow", "text": "Maybe I'll see you around..."},
+		{"name": "You", "text": "I hope so."},
+		{"name": "Wise Crow", "text": "One last thing,"},
+		{"name": "Wise Crow", "text": "be careful out there."},
+		{"name": "You", "text": "Will do."},
+		{"name": "You", "text": "Goodbye."},
+		{"name": "Wise Crow", "text": "Bye."}
+]

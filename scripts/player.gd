@@ -1,7 +1,6 @@
 extends CharacterBody2D
 
 signal boost_changed(current: float, maximum: float)
-signal portal_reached
 
 var SPEED = 400.0
 var JUMP_VELOCITY = -500.0
@@ -20,7 +19,7 @@ const LEDGE_CHECK_STEP = 28.0 #spacing between ground samples ahead
 const LEDGE_CHECK_DROP = 24.0 #how far below the feet counts as ground
 const LEDGE_STEP_UP = 8.0 #ray starts this far above the floor (ignores tiny bumps)
 const LEDGE_MARGIN = 48.0 #extra look-ahead distance beyond the hop's reach
-var DASH_POWER = 700.0
+var DASH_POWER = 1000.0
 var HOLD_DURATION = 0.3
 var WALL_SLIDE_SPEED = 120.0
 var WALL_JUMP_PUSH = 550.0
@@ -113,19 +112,11 @@ var speed: float = 0.0
 var turn_speed: float = 0.0
 var flip_amount: float = 1.0
 
-const PORTAL_MIN_PULL = 700.0
-const PORTAL_MAX_PULL = 1600.0
-const PORTAL_TURN = 10.0
-const ABSORB_SCALE = 0.15
-const ABSORB_SPIN = 9.0
-const EMERGE_TIME = 0.5
-
-var autopilot := false
-var absorbing := false
-var autopilot_target := Vector2.ZERO
-var emerge_timer := 0.0
+var last_grounded_pos: Vector2
 
 func _ready() -> void:
+	last_grounded_pos = global_position
+	
 	var width_curve := Curve.new()
 	width_curve.add_point(Vector2(0.0, 1.0))
 	width_curve.add_point(Vector2(0.35, 0.8))
@@ -152,18 +143,9 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
-	if autopilot:
-		_autopilot_physics(delta)
-		_update_wind(delta)
-		return
-	if emerge_timer > 0.0:
-		_emerge_physics(delta)
-		_update_wind(delta)
-		return
-	
 	if Input.is_action_just_pressed("toggle_fly"):
 		_set_mode(Global.Mode.GROUND if Global.mode == Global.Mode.FLY else Global.Mode.FLY)
-
+	
 	is_boosting = false
 	
 	match Global.mode:
@@ -172,11 +154,18 @@ func _physics_process(delta: float) -> void:
 		Global.Mode.FLY:
 			_fly_physics(delta)
 	
+	if _touching_hazard():
+		respawn()
+	elif Global.mode == Global.Mode.GROUND and is_on_floor():
+		last_grounded_pos = global_position
+	
 	_update_boost(delta)
 	_update_wind(delta)
 	FLY_CRUISE_SPEED = Global.base_flight_speed
 	if Input.is_action_just_pressed("reset"):
 		reset()
+
+
 
 func _set_mode(new_mode: Global.Mode) -> void:
 	Global.mode = new_mode
@@ -203,6 +192,8 @@ func _set_mode(new_mode: Global.Mode) -> void:
 		bird.scale = base_scale
 		bird.flip_v = false
 		bird.flip_h = current_dir < 0
+
+
 
 func _update_camera(delta: float, look: Vector2 = Vector2.ZERO, zoom_multiplier: float = 1.0) -> void:
 	if camera == null:
@@ -440,6 +431,37 @@ func _fly_physics(delta: float) -> void:
 	_update_camera(delta, (velocity * FLY_CAMERA_LOOK).limit_length(FLY_CAMERA_MAX_OFFSET))
 
 
+
+
+
+
+
+func _touching_hazard() -> bool:
+	for i in get_slide_collision_count():
+		var col := get_slide_collision(i)
+		var collider := col.get_collider()
+		if collider is TileMapLayer:
+			#nudge into the tile we hit so we get that tile and not its neighbor
+			var hit_pos := col.get_position() - col.get_normal() * 2.0
+			var coords: Vector2i = collider.local_to_map(collider.to_local(hit_pos))
+			var data: TileData = collider.get_cell_tile_data(coords)
+			if data and data.get_custom_data("hazard"):
+				return true
+	return false
+
+
+func respawn() -> void:
+	if Global.mode == Global.Mode.FLY:
+		_set_mode(Global.Mode.GROUND)
+	global_position = last_grounded_pos
+	velocity = Vector2.ZERO
+	speed = FLY_ENTER_SPEED
+	speed_floor = FLY_MIN_SPEED
+	turn_speed = 0.0
+	if camera:
+		camera.reset_smoothing()
+
+
 func _update_wind(delta: float) -> void:
 	var target := 0.0
 	if Global.mode == Global.Mode.FLY:
@@ -488,6 +510,9 @@ func _update_boost(delta: float) -> void:
 		boost_changed.emit(boost, BOOST_MAX)
 
 
+
+
+
 func reset():
 	global_position = Vector2(633, -278)
 	velocity = Vector2.ZERO
@@ -498,77 +523,3 @@ func reset():
 	boost = BOOST_MAX
 	if camera:
 		camera.reset_smoothing()
-
-func begin_portal_entry(target: Vector2) -> void:
-	if Global.mode != Global.Mode.FLY:
-		_set_mode(Global.Mode.FLY)
-	autopilot = true
-	absorbing = false
-	autopilot_target = target
-	emerge_timer = 0.0
-	is_boosting = false
-	speed = clampf(maxf(velocity.length(), PORTAL_MIN_PULL), PORTAL_MIN_PULL, PORTAL_MAX_PULL)
-
-func hold_at(pos: Vector2) -> void:
-	global_position = pos
-	autopilot_target = pos
-	velocity = Vector2.ZERO
-	wind_amount = 0.0
-	for line in wind_lines:
-		line.clear_points()
-	if camera:
-		camera.offset = Vector2.ZERO
-		camera.reset_smoothing()
-
-func emerge(pos: Vector2, direction: Vector2, arrival_speed: float) -> void:
-	autopilot = false
-	absorbing = false
-	global_position = pos
-	var dir := direction.normalized() if direction.length() > 0.01 else Vector2.RIGHT
-	heading = dir.angle()
-	speed = clampf(arrival_speed, FLY_ENTER_SPEED, FLY_MAX_SPEED)
-	speed_floor = FLY_MIN_SPEED
-	turn_speed = 0.0
-	velocity = dir * speed
-	flip_amount = 1.0 if dir.x >= 0.0 else -1.0
-	emerge_timer = EMERGE_TIME
-
-func _autopilot_physics(delta: float) -> void:
-	if absorbing:
-		velocity = Vector2.ZERO
-		global_position = autopilot_target
-		var flip := 1.0 if flip_amount >= 0.0 else -1.0
-		var target_scale := Vector2(base_scale.x, base_scale.y * flip) * ABSORB_SCALE
-		bird.scale = bird.scale.lerp(target_scale, 1.0 - exp(-8.0 * delta))
-		bird.rotation += ABSORB_SPIN * delta
-		return
-	
-	var to_target := autopilot_target - global_position
-	var dist := to_target.length()
-	if dist <= maxf(speed * delta, 8.0):
-		global_position = autopilot_target
-		absorbing = true
-		portal_reached.emit()
-		return
-	
-	var dir := to_target / dist
-	heading = lerp_angle(heading, dir.angle(), 1.0 - exp(-PORTAL_TURN * delta))
-	velocity = dir * speed
-	global_position += velocity * delta
-	
-	var facing := 1.0 if cos(heading) >= 0.0 else -1.0
-	flip_amount = move_toward(flip_amount, facing, FLY_FLIP_SPEED * delta)
-	bird.rotation = heading
-	bird.scale = Vector2(base_scale.x, base_scale.y * flip_amount)
-	_update_camera(delta, Vector2.ZERO)
-
-func _emerge_physics(delta: float) -> void:
-	emerge_timer = maxf(emerge_timer - delta, 0.0)
-	var t := 1.0 - emerge_timer / EMERGE_TIME
-	var grow := lerpf(ABSORB_SCALE, 1.0, 1.0 - pow(1.0 - t, 3.0))
-	
-	velocity = Vector2.from_angle(heading) * speed
-	global_position += velocity * delta
-	bird.rotation = heading
-	bird.scale = Vector2(base_scale.x, base_scale.y * flip_amount) * grow
-	_update_camera(delta, (velocity * FLY_CAMERA_LOOK).limit_length(FLY_CAMERA_MAX_OFFSET))

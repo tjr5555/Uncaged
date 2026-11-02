@@ -44,6 +44,9 @@ extends Node2D
 @export var max_sky_lines := 2
 @export var balloon_scale := 1.35
 
+@export_group("Hazards") 
+
+
 @export_group("")
 @export var debug_prints := false     # log spawns/unloads to Output
 
