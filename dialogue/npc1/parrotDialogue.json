@@ -24,11 +24,16 @@
 		{"name": "Internal Monologue", "text": "(It was super easy)"},
 		{"name": "Parrot", "text": "well I am a parrot of his words..."},
 		{"name": "Parrot", "text": "Your. Reward. Is..."},
-		{"name": "You", "text": "I don't have all day..."},
 		{"name": "Parrot", "text": "The Coin™ Medallion™!!"},
-		{"name": "Internal Monologue", "text": "This is SOO lame"},
-		{"name": "You", "text": "Wow..."},
 		{"name": "Parrot", "text": "This thing gives 3X COINS™"},
-		{"name": "You", "text": "WOW! I am super happy, thanks!"}
+		{"name": "You", "text": "3X?"},
+		{"name": "Parrot", "text": "Yes, 3X"},
+		{"name": "Parrot", "text": "So if you get 3 COINS™ you would actually get 9 COINS™ because..."},
+		{"name": "You", "text": "Yes, yes, I know how multiplication works."},
+		{"name": "Parrot", "text": "Do you?"},
+		{"name": "You", "text": "Yes?"},
+		{"name": "Parrot", "text": "ok so if you normally got 1200 COINS™ how much would you get with the Coin™ Medallion™?"},
+		{"name": "You", "text": "3599"},
+		{"name": "Parrot", "text": "..."}
 	]
 }

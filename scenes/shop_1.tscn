@@ -44,7 +44,7 @@ theme_override_constants/margin_top = 30
 [node name="GridContainer" type="GridContainer" parent="PanelContainer/MarginContainer" unique_id=581072559]
 layout_mode = 2
 theme_override_constants/h_separation = 64
-theme_override_constants/v_separation = 64
+theme_override_constants/v_separation = 128
 columns = 2
 
 [node name="flightSpeedButton" type="Button" parent="PanelContainer/MarginContainer/GridContainer" unique_id=873261451]

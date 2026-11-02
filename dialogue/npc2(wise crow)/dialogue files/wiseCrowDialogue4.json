@@ -1,0 +1,20 @@
+
+[
+		{"name": "Wise Crow", "text": "Oh geez"},
+		{"name": "You", "text": "What?"},
+		{"name": "Wise Crow", "text": "Look ahead, those are spikes."},
+		{"name": "Wise Crow", "text": "It's time."},
+		{"name": "You", "text": "What? Why are talking like that? Can't I just jump over them?"}, 
+		{"name": "Wise Crow", "text": "No."},
+		{"name": "Wise Crow", "text": "You're going to have to get off the ground"},
+		{"name": "Wise Crow", "text": "and fly."},
+		{"name": "You", "text": "What? Fly? I'm not ready! I can barely get off the ground! There must be another way."},
+		{"name": "Wise Crow", "text": "There isn't, the hall if full of spikes."},  
+		{"name": "You", "text": "Ok, just tell me what I need to do."},
+		{"name": "Wise Crow", "text": "You need to press (G) to enter fly mode."},
+		{"name": "Wise Crow", "text": "When you are in the air use the arrow keys to control your flight"},
+		{"name": "Wise Crow", "text": "Also, if needed press (X) to boost your flight."},
+		{"name": "Wise Crow", "text": "Did you get all of that?"},
+		{"name": "You", "text": "Yes, I think I'm ready."},
+		{"name": "Wise Crow", "text": "Good luck."}
+]

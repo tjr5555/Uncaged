@@ -4,7 +4,13 @@
 		{"name": "Wise Crow", "text": "How did you get here so slow?"},
 		{"name": "You", "text": "I asked first"},
 		{"name": "Wise Crow", "text": "Press (X) to dash in the current direction you're facing in!"},
+		{"name": "Wise Crow", "text": "Try holding (Z) while dashing as well"},
 		{"name": "You", "text": "What? You didn't answer my question!"}, 
-		{"name": "You", "text": "How are you so fast?"},
-		{"name": "Wise Crow", "text": "Wise crows are just naturally fast"}
+		{"name": "You", "text": "How did you get here so fast? How can I get as fast as you?"},
+		{"name": "Wise Crow", "text": "Wise crows are just naturally fast"},
+		{"name": "Wise Crow", "text": "OH and one more thing. I promise I am almost done talking."},
+		{"name": "Wise Crow", "text": "Normally when you dash you get pretty tired so you can usually only do it ONCE in the air"},
+		{"name": "Wise Crow", "text": "But if you rest your wings while on the wall, you can dash again (or just being on the floor)"},
+		{"name": "Wise Crow", "text": "Ok that is all."},
+		{"name": "Wise Crow", "text": "Please be careful, you're my favorite apprenctice yet."}
 ]

@@ -1,8 +1,15 @@
 
 [
-		{"name": "Wise Crow", "text": "Hey look you found the shovel!"},
+		{"name": "Wise Crow", "text": "Woah good job"},
+		{"name": "Wise Crow", "text": "looks like you found the shovel!"},
 		{"name": "You", "text": "Wha- How did you"},
-		{"name": "You", "text": "I thought you were trapped!"},
-		{"name": "Wise Crow", "text": "Trapped? No! I just wanted to see if you could get around."},
+		{"name": "You", "text": "how did you"},
+		{"name": "You", "text": "get here faster than me?"},
+		{"name": "You", "text": "I never"},
+		{"name": "You", "text": "even"},
+		{"name": "You", "text": "saw you pass me once!"},
+		{"name": "You", "text": "ALSO, I thought you were trapped!"},
+		{"name": "Wise Crow", "text": "Trapped?"},
+		{"name": "Wise Crow", "text": "Ha. You're funny! I just wanted to see if you could get around."},
 		{"name": "Wise Crow", "text": "After jumping, keep holding (Z)! See what happens"}
 ]

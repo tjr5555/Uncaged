@@ -9,6 +9,10 @@ signal give_quest(quest_id, title, description, target_count)
 
 @export var audio_stream_player: AudioStreamPlayer
 
+#textbox sizing: the box grows to fit the text and never gets smaller than its size in the editor
+@export var box_padding_bottom: float = 16.0
+@export var grow_upward: bool = true #keeps the bottom edge fixed (good when the box sits above the npc)
+
 #fonts and sizes (a size of 0 keeps the theme's default size)
 @export var crow_font: Font
 @export_range(0, 200) var crow_font_size: int = 0
@@ -30,10 +34,14 @@ var dialogue = []
 var current_dialogue_id = 0
 var d_active = false
 var tween: Tween
+var _base_box_pos_y: float
+var _base_box_height: float
 
 
 func _ready():
 	$NinePatchRect.visible = false
+	_base_box_pos_y = $NinePatchRect.position.y
+	_base_box_height = $NinePatchRect.size.y
 	if gives_quest and not is_connected("give_quest", Callable(QuestManager, "add_quest")):
 		connect("give_quest", Callable(QuestManager, "add_quest"))
 
@@ -145,6 +153,11 @@ func animate_text(text: String):
 	var chat_area = $NinePatchRect/Chatarea
 	chat_area.text = text
 	chat_area.visible_characters = 0
+	if chat_area is RichTextLabel:
+		#hide letters after wrapping so the text does not re-wrap while it types
+		chat_area.visible_characters_behavior = TextServer.VC_CHARS_AFTER_SHAPING
+		chat_area.scroll_active = false
+	_fit_box_to_text()
 
 	var index: int = 0
 	var last_punct_index: int = 0
@@ -166,12 +179,33 @@ func animate_text(text: String):
 		tween.tween_callback(stop_sound)
 		if letter == ",":
 			tween.tween_interval(PUNCTUATION_TIME / 2.0)
-		elif letter in [".", "?", "!"]:
+		elif letter in [".", "?", "!", "-"]:
 			tween.tween_interval(PUNCTUATION_TIME)
+
 
 		last_punct_index = index
 
 	tween.tween_callback(stop_sound)
+
+
+func _fit_box_to_text() -> void:
+	var box: Control = $NinePatchRect
+	var chat_area = $NinePatchRect/Chatarea
+	if not chat_area is RichTextLabel:
+		return
+	
+	#wait a frame so the label has laid out the new text
+	await get_tree().process_frame
+	
+	var needed: float = chat_area.position.y + chat_area.get_content_height() + box_padding_bottom
+	var new_height := maxf(_base_box_height, needed)
+	if grow_upward:
+		box.position.y = _base_box_pos_y - (new_height - _base_box_height)
+	box.size.y = new_height
+	
+	#the label has to grow too, or it clips the extra lines at its old bottom edge
+	chat_area.clip_contents = false
+	chat_area.size.y = chat_area.get_content_height()
 
 
 func _reveal_char(v: int):
