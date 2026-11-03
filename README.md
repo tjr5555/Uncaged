@@ -8,11 +8,11 @@ The goal is to pop balloons for coins, explore via. a vast network of procedural
 
 ## Movement
 
-On the ground, your character can jump across islands and talk to NPCs. Switch to flight and your movement completely changes. Enjoy a comprehensive physics-based flight system with boosts, variable turning rate, and other features to make flying feel real and fun!
+On the ground, your character can jump across islands and talk to NPCs. Switch to flight and your movement completely changes. Enjoy a detailed physics-based flight system that feels realistic and fun!
 
 ## Planned Features
 
-- Seamless loading between portals
+- Smooth loading between portals
 - Quest and progression system
 - Advanced flight & movement system
 - Procedurally generated worlds
