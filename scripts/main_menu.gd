@@ -32,3 +32,6 @@ func _process(delta: float) -> void:
 
 func _on_enter_button_pressed() -> void:
 	get_tree().change_scene_to_file("res://scenes/main.tscn")
+
+func _on_enter_button_2_pressed() -> void:
+	get_tree().change_scene_to_file("res://scenes/tutorial.scn")

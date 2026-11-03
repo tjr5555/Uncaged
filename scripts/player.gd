@@ -27,6 +27,9 @@ var WALL_JUMP_PUSH = 550.0
 var WALL_JUMP_HEIGHT = -520.0
 var WALL_JUMP_LOCK = 0.18
 
+const FALL_ANIM_SPEED = 350.0 #downward speed that counts as falling (a normal hop lands at ~270)
+const SPRITE_FACES_LEFT = true #which way the art is drawn; flip this if the bird faces backwards
+
 var FLY_CCW_ACTION = "ui_left"
 var FLY_CW_ACTION = "ui_right"
 var FLY_BOOST_ACTION = "Dash"
@@ -64,7 +67,7 @@ const CAMERA_ZOOM_START_SPEED = 300
 const CAMERA_ZOOM_END_SPEED = 1500
 const CAMERA_MIN_ZOOM = 0.2
 const CAMERA_ZOOM_SMOOTH = 1.5
-const FLY_CAMERA_LOOK = 0.2
+const FLY_CAMERA_LOOK = 0.4
 const FLY_CAMERA_MAX_OFFSET = 300.0
 
 const WIND_START_SPEED = 900.0
@@ -93,7 +96,7 @@ var boost_exhausted: bool = false
 var is_boosting: bool = false
 var last_emitted_boost: float = -1.0
 
-@onready var bird = $Sprite
+@onready var bird: AnimatedSprite2D = $AnimatedSprite2D
 @onready var base_scale: Vector2 = bird.scale
 @onready var camera: Camera2D = get_node_or_null("Camera")
 @onready var base_zoom: Vector2 = camera.zoom if camera else Vector2.ONE
@@ -195,8 +198,9 @@ func _set_mode(new_mode: Global.Mode) -> void:
 		flip_amount = 1.0 if cos(heading) >= 0.0 else -1.0
 		is_gliding = false
 		hold_timer = 0.0
-		bird.flip_h = false
+		bird.flip_h = SPRITE_FACES_LEFT #fly mode rotates the sprite toward its heading, so it must face right at rest
 		bird.flip_v = false
+		bird.play("idle") #placeholder until there's a fly animation
 	else:
 		motion_mode = MOTION_MODE_GROUNDED
 		velocity = Vector2.from_angle(heading) * speed
@@ -206,7 +210,7 @@ func _set_mode(new_mode: Global.Mode) -> void:
 		bird.rotation = 0.0
 		bird.scale = base_scale
 		bird.flip_v = false
-		bird.flip_h = current_dir < 0
+		_face(current_dir)
 
 
 
@@ -230,7 +234,7 @@ func _ground_physics(delta: float) -> void:
 	
 	if dir != 0.0:
 		current_dir = 1 if dir > 0.0 else -1
-		bird.flip_h = dir < 0.0
+		_face(dir)
 	
 	if on_floor:
 		coyote_timer = 0.0
@@ -254,7 +258,7 @@ func _ground_physics(delta: float) -> void:
 			velocity.y = WALL_JUMP_HEIGHT
 			wall_lock_timer = WALL_JUMP_LOCK
 			current_dir = 1 if wall_normal.x > 0.0 else -1
-			bird.flip_h = current_dir < 0
+			_face(current_dir)
 			flaps = 1
 			Global.dashes = Global.max_dashes
 			coyote_timer = 0.0
@@ -295,6 +299,8 @@ func _ground_physics(delta: float) -> void:
 	if on_floor and not jumped and dir != 0.0 and hop_timer <= 0.0 and not _ledge_near(dir):
 		velocity.y = HOP_VELOCITY
 		hop_timer = HOP_INTERVAL
+		bird.play("hop")
+		bird.set_frame_and_progress(0, 0.0) #restart the windup on every hop
 	
 	if wall_lock_timer <= 0.0:
 		var accel := FRICTION if on_floor else AIR_FRICTION
@@ -321,6 +327,37 @@ func _ground_physics(delta: float) -> void:
 	
 	if is_on_floor() and Input.is_action_pressed("augment") and velocity.y > 50.0:
 		velocity.x += velocity.y
+	
+	_update_ground_animation()
+
+func _update_ground_animation() -> void:
+	var standing := is_on_floor() and absf(velocity.x) <= 20.0
+	
+	#let the hop windup finish before anything else takes over,
+	#unless we've come to rest (also protects against a looping hop that never "finishes")
+	if bird.animation == "hop" and bird.is_playing() and not standing:
+		return
+	
+	var anim := ""
+	if is_on_floor():
+		#still moving along the ground: the next hop starts within a few frames,
+		#so hold the last hop frame instead of flickering to idle between hops
+		if not standing:
+			return
+		anim = "idle"
+	elif velocity.y > FALL_ANIM_SPEED or is_gliding or is_on_wall_only():
+		anim = "fall"
+	elif bird.animation == "idle" and coyote_timer > 0.08:
+		anim = "hop" #left the ground from standing still (a jump or a real drop, not a one-frame floor flicker)
+	else:
+		return #rising or a short drop: hold the current frame
+	
+	if bird.animation != anim:
+		bird.play(anim)
+
+func _face(direction: float) -> void:
+	#negative = facing left, positive = facing right, regardless of which way the art is drawn
+	bird.flip_h = (direction < 0.0) != SPRITE_FACES_LEFT
 
 func _ledge_near(direction: float) -> bool:
 	if direction == 0.0:
@@ -438,7 +475,7 @@ func _fly_physics(delta: float) -> void:
 	var facing := 1.0 if cos(heading) >= 0.0 else -1.0
 	flip_amount = move_toward(flip_amount, facing, FLY_FLIP_SPEED * delta)
 	bird.rotation = heading
-	bird.flip_h = false
+	bird.flip_h = SPRITE_FACES_LEFT
 	bird.flip_v = false
 	bird.scale = Vector2(base_scale.x, base_scale.y * flip_amount)
 	
@@ -598,4 +635,3 @@ func _emerge_physics(delta: float) -> void:
 	bird.rotation = heading
 	bird.scale = Vector2(base_scale.x, base_scale.y * flip_amount) * grow
 	_update_camera(delta, (velocity * FLY_CAMERA_LOOK).limit_length(FLY_CAMERA_MAX_OFFSET))
-	
