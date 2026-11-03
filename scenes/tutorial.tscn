@@ -7,6 +7,7 @@
 [ext_resource type="PackedScene" uid="uid://nngadheagxwr" path="res://scenes/player.tscn" id="3_ehuit"]
 [ext_resource type="PackedScene" uid="uid://ctkyv851vfgc2" path="res://dialogue/npc2(wise crow)/npc_2.tscn" id="4_5mrt3"]
 [ext_resource type="Texture2D" uid="uid://c3y6vjr0av6te" path="res://assets/hazards_tileset.png" id="4_gbqnl"]
+[ext_resource type="PackedScene" uid="uid://beplsivn2dg6g" path="res://scenes/portal.tscn" id="8_ckvwl"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ckvwl"]
 texture = ExtResource("4_gbqnl")
@@ -320,6 +321,13 @@ dialogue_file = "res://dialogue/npc2(wise crow)/dialogue files/wiseCrowDialogue4
 [node name="npc25" parent="." unique_id=227557674 instance=ExtResource("4_5mrt3")]
 position = Vector2(264, -2920)
 dialogue_file = "res://dialogue/npc2(wise crow)/dialogue files/wiseCrowDialogue5.json"
+
+[node name="Portal" parent="." unique_id=199880354 instance=ExtResource("8_ckvwl")]
+position = Vector2(-870, -2980)
+portal_id = "tut_portal"
+label_text = "End"
+leads_to_hub = true
+color = Color(4.0911138e-07, 0.6235958, 0.050377123, 1)
 
 [connection signal="body_entered" from="npcdectzone1" to="." method="_on_npcdectzone_1_body_entered"]
 [connection signal="body_entered" from="npcdectzone3" to="." method="_on_npcdectzone_3_body_entered"]
