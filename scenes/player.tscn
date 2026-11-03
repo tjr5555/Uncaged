@@ -1,22 +1,115 @@
 [gd_scene format=3 uid="uid://nngadheagxwr"]
 
 [ext_resource type="Script" uid="uid://bxh5f1rgkf8ug" path="res://scripts/player.gd" id="1_g2els"]
-[ext_resource type="Texture2D" uid="uid://tcenjagh32p2" path="res://sprites/icon.svg" id="2_qhqgy"]
+[ext_resource type="Texture2D" uid="uid://xulcq4bsp2ka" path="res://assets/animations/maincrowfall.png" id="2_dqkch"]
+[ext_resource type="Texture2D" uid="uid://dp5hynm2th3cb" path="res://assets/animations/maincrowwalk.png" id="3_qlg0r"]
+[ext_resource type="Texture2D" uid="uid://b7n5k5kwru7wh" path="res://assets/animations/maincrowidle.png" id="4_tuyoq"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_lnspb"]
-radius = 35.555557
-height = 142.22223
+radius = 35.555553
+height = 113.77779
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fjrip"]
+atlas = ExtResource("2_dqkch")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_smehm"]
+atlas = ExtResource("3_qlg0r")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ur7pv"]
+atlas = ExtResource("3_qlg0r")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_y4r1p"]
+atlas = ExtResource("3_qlg0r")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_d2wvv"]
+atlas = ExtResource("3_qlg0r")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_3v2ag"]
+atlas = ExtResource("3_qlg0r")
+region = Rect2(128, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_jej6c"]
+atlas = ExtResource("3_qlg0r")
+region = Rect2(160, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_f1ej7"]
+atlas = ExtResource("4_tuyoq")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_oprun"]
+atlas = ExtResource("4_tuyoq")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_a8ls1"]
+atlas = ExtResource("4_tuyoq")
+region = Rect2(64, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_qfm1y"]
+atlas = ExtResource("4_tuyoq")
+region = Rect2(96, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_0jsi4"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fjrip")
+}],
+"loop": 1,
+"name": &"fall",
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_smehm")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ur7pv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_y4r1p")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_d2wvv")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_3v2ag")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_jej6c")
+}],
+"loop": 1,
+"name": &"hop",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_f1ej7")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_oprun")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_a8ls1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_qfm1y")
+}],
+"loop": 1,
+"name": &"idle",
+"speed": 6.0
+}]
 
 [node name="player" type="CharacterBody2D" unique_id=2048642765 groups=["player"]]
 scale = Vector2(0.75, 0.75)
 script = ExtResource("1_g2els")
 
-[node name="Sprite" type="Sprite2D" parent="." unique_id=91750941]
-position = Vector2(9.536743e-07, 3.8146973e-06)
-scale = Vector2(0.5, 0.87500006)
-texture = ExtResource("2_qhqgy")
-
 [node name="hitbox" type="CollisionShape2D" parent="." unique_id=1916319004]
+position = Vector2(0, 5.3333335)
 scale = Vector2(0.75, 0.75)
 shape = SubResource("CapsuleShape2D_lnspb")
 
@@ -24,3 +117,10 @@ shape = SubResource("CapsuleShape2D_lnspb")
 zoom = Vector2(1.21, 1.21)
 position_smoothing_enabled = true
 position_smoothing_speed = 10.0
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=489924948]
+position = Vector2(-1.9073486e-06, 0)
+scale = Vector2(3.0000002, 3)
+sprite_frames = SubResource("SpriteFrames_0jsi4")
+animation = &"hop"
+metadata/_edit_lock_ = true
