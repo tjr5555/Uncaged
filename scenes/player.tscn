@@ -1,7 +1,8 @@
 [gd_scene format=3 uid="uid://nngadheagxwr"]
 
 [ext_resource type="Script" uid="uid://bxh5f1rgkf8ug" path="res://scripts/player.gd" id="1_g2els"]
-[ext_resource type="Texture2D" uid="uid://xulcq4bsp2ka" path="res://assets/animations/maincrowfall.png" id="2_dqkch"]
+[ext_resource type="Texture2D" uid="uid://dq2xmn8pbk4uj" path="res://assets/animations/maincrow_1.png" id="2_qlg0r"]
+[ext_resource type="PackedScene" uid="uid://c4trdpveldysg" path="res://scenes/combo_medallion.tscn" id="2_tuyoq"]
 [ext_resource type="Texture2D" uid="uid://dp5hynm2th3cb" path="res://assets/animations/maincrowwalk.png" id="3_qlg0r"]
 [ext_resource type="Texture2D" uid="uid://b7n5k5kwru7wh" path="res://assets/animations/maincrowidle.png" id="4_tuyoq"]
 [ext_resource type="AudioStream" uid="uid://bjp0p6x8rokfl" path="res://audio/fallThud.wav" id="5_qlg0r"]
@@ -10,9 +11,17 @@
 radius = 35.555553
 height = 113.77779
 
-[sub_resource type="AtlasTexture" id="AtlasTexture_fjrip"]
-atlas = ExtResource("2_dqkch")
+[sub_resource type="AtlasTexture" id="AtlasTexture_tuyoq"]
+atlas = ExtResource("2_qlg0r")
 region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fjrip"]
+atlas = ExtResource("2_qlg0r")
+region = Rect2(32, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_fulsm"]
+atlas = ExtResource("2_qlg0r")
+region = Rect2(64, 0, 32, 32)
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_smehm"]
 atlas = ExtResource("3_qlg0r")
@@ -58,11 +67,17 @@ region = Rect2(96, 0, 32, 32)
 animations = [{
 "frames": [{
 "duration": 1.0,
+"texture": SubResource("AtlasTexture_tuyoq")
+}, {
+"duration": 1.0,
 "texture": SubResource("AtlasTexture_fjrip")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_fulsm")
 }],
 "loop": 1,
 "name": &"fall",
-"speed": 1.0
+"speed": 12.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -108,6 +123,7 @@ animations = [{
 [node name="player" type="CharacterBody2D" unique_id=2048642765 groups=["player"]]
 scale = Vector2(0.75, 0.75)
 script = ExtResource("1_g2els")
+medallion_scene = ExtResource("2_tuyoq")
 
 [node name="hitbox" type="CollisionShape2D" parent="." unique_id=1916319004]
 position = Vector2(0, 5.3333335)
@@ -123,7 +139,8 @@ position_smoothing_speed = 10.0
 position = Vector2(-1.9073486e-06, 0)
 scale = Vector2(3.0000002, 3)
 sprite_frames = SubResource("SpriteFrames_0jsi4")
-animation = &"hop"
+animation = &"fall"
+frame_progress = 0.44264525
 metadata/_edit_lock_ = true
 
 [node name="LandSound" type="AudioStreamPlayer2D" parent="." unique_id=861012951]

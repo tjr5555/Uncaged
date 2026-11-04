@@ -3,6 +3,12 @@ extends CharacterBody2D
 signal boost_changed(current: float, maximum: float)
 signal portal_reached
 
+
+@export var medallion_scene: PackedScene
+var medallion: Node2D
+
+
+
 var SPEED = 400.0
 var JUMP_VELOCITY = -500.0
 var JUMP_CUT = 0.45
@@ -37,16 +43,21 @@ const HOP_LAND_VOLUME_DB = -26.0
 
 var land_tween: Tween
 var hop_airborne := false
+var jump_cut_available := false #true only while rising from a real jump, so releasing the button can shorten it
 
 const FALL_ANIM_SPEED = 350.0 #downward speed that counts as falling (a normal hop lands at ~270)
 const SPRITE_FACES_LEFT = true #which way the art is drawn; flip this if the bird faces backwards
 
-const HAZARD_DATA = "hazards" #name of the custom data layer (bool) on your TileSet that marks hazard tiles
+const HAZARD_DATA_NAMES = ["hazards", "hazard"] #accepted names for the bool custom data layer that marks hazard tiles
+const DEBUG_HAZARDS = true #prints what the hazard check sees; set to false once it works
+const NO_SPEED_ZOOM_SCENES = ["tutorial"] #scene file names (no extension, lowercase) where the camera doesn't zoom out with speed
 
 var FLY_CCW_ACTION = "ui_left"
 var FLY_CW_ACTION = "ui_right"
+var FLY_UP_ACTION = "ui_up" #pitch the nose up
+var FLY_DOWN_ACTION = "ui_down" #pitch the nose down (hold it to dive straight down)
 var FLY_BOOST_ACTION = "Dash"
-var FLY_BRAKE_ACTION = "ui_down"
+var FLY_BRAKE_ACTION = "augment" #moved off ui_down so the down arrow can dive
 
 const FLY_ENTER_SPEED = 800.0
 var FLY_CRUISE_SPEED = 800.0
@@ -62,7 +73,9 @@ const FLY_TURN_RATE = 4.2
 const FLY_TURN_ACCEL = 18.0
 const FLY_BRAKE_TURN_MULT = 1.6
 const FLY_FAST_TURN_MULT = 0.7
-const FLY_AUTO_LEVEL = 0.9
+const FLY_AUTO_LEVEL = 0.0 #0 = never levels itself out; raise it (0.9 was the old value) to bring auto-leveling back
+const FLY_LEVEL_FADE_START = 0.3 #auto-level is full strength below this pitch (sin of the angle, 0.3 is about 17 degrees)
+const FLY_LEVEL_FADE_END = 0.6 #and fully off above this one (about 37 degrees), so steep dives and climbs hold their angle
 const FLY_VELOCITY_SMOOTH = 14.0
 const FLY_DASH_BOOST = 700.0
 const FLY_STALL_TURN = 2.5
@@ -168,8 +181,9 @@ func _ready() -> void:
 		line.show_behind_parent = true
 		add_child(line)
 		wind_lines.append(line)
-
-
+	SignalBus.finishquest1.connect(_give_medallion)
+	if Global.has_medallion:
+		_give_medallion()
 func _physics_process(delta: float) -> void:
 	if autopilot:
 		_autopilot_physics(delta)
@@ -232,10 +246,19 @@ func _update_camera(delta: float, look: Vector2 = Vector2.ZERO, zoom_multiplier:
 		return
 	var move_weight := 1.0 - exp(-3.0 * delta)
 	var zoom_weight := 1.0 - exp(-CAMERA_ZOOM_SMOOTH * delta)
-	var speed_t := smoothstep(CAMERA_ZOOM_START_SPEED, CAMERA_ZOOM_END_SPEED, velocity.length())
+	var speed_t := 0.0
+	if _speed_zoom_allowed():
+		speed_t = smoothstep(CAMERA_ZOOM_START_SPEED, CAMERA_ZOOM_END_SPEED, velocity.length())
 	var target_zoom := base_zoom * lerpf(1.0, CAMERA_MIN_ZOOM, speed_t) * zoom_multiplier
 	camera.offset = camera.offset.lerp(look, move_weight)
 	camera.zoom = camera.zoom.lerp(target_zoom, zoom_weight)
+
+func _speed_zoom_allowed() -> bool:
+	var scene := get_tree().current_scene
+	if scene == null:
+		return true
+	var scene_name := scene.scene_file_path.get_file().get_basename().to_lower()
+	return not NO_SPEED_ZOOM_SCENES.has(scene_name)
 
 func _ground_physics(delta: float) -> void:
 	var dir := Input.get_axis("ui_left", "ui_right")
@@ -269,6 +292,7 @@ func _ground_physics(delta: float) -> void:
 			var wall_normal := get_wall_normal()
 			velocity.x = wall_normal.x * WALL_JUMP_PUSH
 			velocity.y = WALL_JUMP_HEIGHT
+			jump_cut_available = false
 			wall_lock_timer = WALL_JUMP_LOCK
 			current_dir = 1 if wall_normal.x > 0.0 else -1
 			_face(current_dir)
@@ -282,12 +306,16 @@ func _ground_physics(delta: float) -> void:
 			flaps -= 1
 			coyote_timer = COYOTE_TIME
 			velocity.y = JUMP_VELOCITY
+			jump_cut_available = true
 			jump_buffer_timer = 0.0
 			jumped = true
 			hop_airborne = false
 	
-	if Input.is_action_just_released("ui_accept") and velocity.y < 0.0:
+	if velocity.y >= 0.0:
+		jump_cut_available = false
+	if Input.is_action_just_released("ui_accept") and jump_cut_available and velocity.y < 0.0:
 		velocity.y *= JUMP_CUT
+		jump_cut_available = false
 	if Input.is_action_pressed("ui_accept") and not on_floor:
 		hold_timer += delta
 		if hold_timer >= HOLD_DURATION and velocity.y > 0.0:
@@ -331,6 +359,7 @@ func _ground_physics(delta: float) -> void:
 		Global.dashes -= 1
 		wall_lock_timer = 0.0
 		hop_airborne = false
+		jump_cut_available = false
 		velocity = dash_dir * (DASH_POWER if on_floor else DASH_POWER * 1.4)
 	
 	var incoming_speed_y := velocity.y
@@ -355,6 +384,7 @@ func _ground_physics(delta: float) -> void:
 	
 	if is_on_floor() and incoming_speed_y > 50.0 and Input.is_action_pressed("ui_down") and Input.is_action_pressed("augment"):
 		velocity.y = incoming_speed_y * 1.1 * -1.0
+		jump_cut_available = false
 		velocity.x = 0.0
 		Global.dashes = Global.max_dashes
 	
@@ -365,10 +395,11 @@ func _ground_physics(delta: float) -> void:
 
 func _update_ground_animation() -> void:
 	var standing := is_on_floor() and absf(velocity.x) <= 20.0
+	var falling := not is_on_floor() and velocity.y > 0.0 and (not hop_airborne or velocity.y > FALL_ANIM_SPEED)
 	
 	#let the hop windup finish before anything else takes over,
-	#unless we've come to rest (also protects against a looping hop that never "finishes")
-	if bird.animation == "hop" and bird.is_playing() and not standing:
+	#unless we've come to rest or started falling
+	if bird.animation == "hop" and bird.is_playing() and not standing and not falling:
 		return
 	
 	var anim := ""
@@ -378,7 +409,7 @@ func _update_ground_animation() -> void:
 		if not standing:
 			return
 		anim = "idle"
-	elif velocity.y > FALL_ANIM_SPEED or is_gliding or is_on_wall_only():
+	elif falling:
 		anim = "fall"
 	elif bird.animation == "idle" and coyote_timer > 0.08:
 		anim = "hop" #left the ground from standing still (a jump or a real drop, not a one-frame floor flicker)
@@ -432,7 +463,13 @@ func _ledge_near(direction: float) -> bool:
 
 func _fly_physics(delta: float) -> void:
 	var turn_input := Input.get_axis(FLY_CCW_ACTION, FLY_CW_ACTION)
+	var pitch_input := Input.get_axis(FLY_UP_ACTION, FLY_DOWN_ACTION) #-1 = up, +1 = down
 	var braking := Input.is_action_pressed(FLY_BRAKE_ACTION)
+	
+	#up/down pitch relative to the screen: when facing left, nose-down means turning the other way.
+	#holding down settles at straight down, holding up at straight up (the sign flips as you pass vertical)
+	var facing_sign := 1.0 if cos(heading) >= 0.0 else -1.0
+	var steer := clampf(turn_input + pitch_input * facing_sign, -1.0, 1.0)
 	
 	if boost <= 0.0:
 		boost_exhausted = true
@@ -455,12 +492,15 @@ func _fly_physics(delta: float) -> void:
 	if braking:
 		turn_rate *= FLY_BRAKE_TURN_MULT
 	
-	turn_speed = move_toward(turn_speed, turn_input * turn_rate, FLY_TURN_ACCEL * control * delta)
+	turn_speed = move_toward(turn_speed, steer * turn_rate, FLY_TURN_ACCEL * control * delta)
 	heading = wrapf(heading + turn_speed * delta, -PI, PI)
 	
-	if turn_input == 0.0:
+	if steer == 0.0:
+		#level out toward horizontal, but only when the nose is close to level.
+		#steep dives and climbs hold their angle so you can fly straight down without swooping
 		var level_target := 0.0 if cos(heading) >= 0.0 else PI
-		var level_step := FLY_AUTO_LEVEL * delta
+		var level_weight := 1.0 - smoothstep(FLY_LEVEL_FADE_START, FLY_LEVEL_FADE_END, absf(sin(heading)))
+		var level_step := FLY_AUTO_LEVEL * level_weight * delta
 		heading = wrapf(heading + clampf(angle_difference(heading, level_target), -level_step, level_step), -PI, PI)
 	
 	var heading_vec := Vector2.from_angle(heading)
@@ -525,15 +565,25 @@ func _touching_hazard() -> bool:
 		var layer := col.get_collider() as TileMapLayer
 		if layer == null or layer.tile_set == null:
 			continue
-		#skip tilesets that don't have the custom data layer (reading a missing layer throws an error)
-		if layer.tile_set.get_custom_data_layer_by_name(HAZARD_DATA) == -1:
+		
+		#find which of the accepted names exists on this tileset (reading a missing layer throws an error)
+		var data_name := ""
+		for n in HAZARD_DATA_NAMES:
+			if layer.tile_set.get_custom_data_layer_by_name(n) != -1:
+				data_name = n
+				break
+		if data_name == "":
 			continue
+		
 		#nudge into the tile we hit so we get that tile and not its neighbor
-		var hit_pos := col.get_position() - col.get_normal() * 2.0
-		var coords: Vector2i = layer.local_to_map(layer.to_local(hit_pos))
-		var data: TileData = layer.get_cell_tile_data(coords)
-		if data and data.get_custom_data(HAZARD_DATA):
-			return true
+		for depth in [2.0, 6.0]:
+			var hit_pos: Vector2 = col.get_position() - col.get_normal() * depth
+			var coords: Vector2i = layer.local_to_map(layer.to_local(hit_pos))
+			var data: TileData = layer.get_cell_tile_data(coords)
+			if DEBUG_HAZARDS:
+				print("hazard check: ", layer.name, " tile ", coords, " ", data_name, " = ", data.get_custom_data(data_name) if data else "no tile")
+			if data and data.get_custom_data(data_name):
+				return true
 	return false
 
 func respawn() -> void:
@@ -547,6 +597,7 @@ func respawn() -> void:
 	
 	#clear anything that could carry over from before the hit
 	hop_airborne = false
+	jump_cut_available = false
 	is_gliding = false
 	hold_timer = 0.0
 	hop_timer = 0.0
@@ -760,3 +811,13 @@ func _on_hop_landed() -> void:
 		sound.pitch_scale = randf_range(1.2, 1.35)
 		sound.volume_db = HOP_LAND_VOLUME_DB
 		sound.play()
+
+
+
+func _give_medallion() -> void:
+	if medallion != null:
+		return
+	Global.has_medallion = true
+	medallion = medallion_scene.instantiate()
+	add_child(medallion)
+	medallion.position = Vector2(0, -8)

@@ -4,14 +4,14 @@ enum Mode { GROUND, FLY }
 
 var mode: Mode = Mode.GROUND
 
-var total_coins = 0
+var total_coins = 10000
 var base_flight_speed: int = 800.0
 var base_turn_speed: float = 4.2
 var flight_shop_price: float = 100.0
 var max_dashes: int = 2
 var dashes: int = 2
 var dash_target: int 
-
+var has_medallion := false
 var in_transition := false
 var return_portal_id := ""
 

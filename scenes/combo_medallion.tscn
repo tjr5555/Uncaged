@@ -1,0 +1,9 @@
+[gd_scene format=3 uid="uid://c4trdpveldysg"]
+
+[ext_resource type="Texture2D" uid="uid://14c4t1avdy0m" path="res://assets/combomedallion.png" id="1_jtcei"]
+
+[node name="comboMedallion" type="Node2D" unique_id=1559441635]
+
+[node name="Combomedallion" type="Sprite2D" parent="." unique_id=633631149]
+position = Vector2(1, 8)
+texture = ExtResource("1_jtcei")

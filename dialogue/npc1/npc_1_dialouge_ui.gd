@@ -41,6 +41,7 @@ func load_dialogue():
 #if the coin quest is finished, give the completed quest dialogue
 	if QuestManager.active_quests.has("collect_coins") and QuestManager.active_quests["collect_coins"].get("completed", false):
 		return content["completed_dialogue"]
+		SignalBus.finishquest1.emit()
 	
 	#default to initial dialogue
 	return content["initial_dialogue"]
