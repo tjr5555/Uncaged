@@ -174,6 +174,14 @@ func _fog_to(target: float, time: float) -> Tween:
 func _set_fog_coverage(value: float) -> void:
 	fog_material.set_shader_parameter("coverage", value)
 
-
 func _now() -> float:
 	return Time.get_ticks_msec() / 1000.0
+
+func is_world_ready() -> bool:
+	var generator = _find_generator(current_world)
+	if generator == null:
+		return true
+	return generator.pending_near(player.global_position, ready_radius) == 0
+
+func set_world_burst(enabled: bool) -> void:
+	_set_burst(enabled)

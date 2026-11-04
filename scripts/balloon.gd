@@ -7,6 +7,8 @@ signal popped(respawn_time: float)
 @onready var anim: AnimatedSprite2D = $AnimationSprite
 @onready var collision: CollisionShape2D = $Collision
 
+const POP_EFFECT = preload("res://scripts/pop_effect.gd")
+
 var coin_value = 10
 var tint := Color(0, 0, 0, 0)
 var current_regen_time := 0.0
@@ -73,6 +75,21 @@ func _on_body_entered(body: Node2D) -> void:
 	if is_popped or not body.is_in_group("player"):
 		return
 	pop()
-	$AudioStreamPlayer2D.play()
-	Global.total_coins += coin_value * Global.base_coin_mult
+	
+	var reward := Combo.register_pop(coin_value * Global.base_coin_mult)
+	Global.total_coins += reward
 	Global.dashes += 1
+	
+	var sound: AudioStreamPlayer2D = $AudioStreamPlayer2D
+	sound.pitch_scale = 1.0 + maxi(tier_index, 0) * 0.06 + minf(Combo.count, 20) * 0.025 + randf_range(-0.03, 0.03)
+	sound.play()
+	
+	_spawn_pop_effect(reward)
+
+func _spawn_pop_effect(reward: int) -> void:
+	var effect = POP_EFFECT.new()
+	effect.tier = maxi(tier_index, 0)
+	effect.color = tint
+	effect.reward = reward
+	get_tree().current_scene.add_child(effect)
+	effect.global_position = global_position

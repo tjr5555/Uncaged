@@ -2,6 +2,8 @@ extends Node2D
 
 @onready var back_rect: TextureRect = $backRect
 
+const GAME_SCENE = "res://scenes/main.tscn"
+
 var colors: Array[Color] = [
 	Color("3498db"),
 	Color("e67e22"),
@@ -15,6 +17,7 @@ func _ready() -> void:
 	if back_rect:
 		back_rect.modulate = colors[0]
 		_fade_to_next_color()
+	SceneFader.preload_scene(GAME_SCENE)
 
 func _fade_to_next_color() -> void:
 	var next_index = (current_color_index + 1 ) % colors.size()
@@ -25,13 +28,14 @@ func _fade_to_next_color() -> void:
 		_fade_to_next_color()
 		)
 
-
-func _process(delta: float) -> void:
-	pass
-
-
 func _on_enter_button_pressed() -> void:
-	get_tree().change_scene_to_file("res://scenes/main.tscn")
+	SceneFader.change_scene(GAME_SCENE)
 
 func _on_enter_button_2_pressed() -> void:
 	get_tree().change_scene_to_file("res://scenes/tutorial.scn")
+
+func _on_settings_button_pressed() -> void:
+	$Overlay/SettingsPanel.open()
+
+func _on_quit_button_pressed() -> void:
+	get_tree().quit()

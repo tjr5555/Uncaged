@@ -8,6 +8,7 @@
 [ext_resource type="PackedScene" uid="uid://ctkyv851vfgc2" path="res://dialogue/npc2(wise crow)/npc_2.tscn" id="4_5mrt3"]
 [ext_resource type="Texture2D" uid="uid://c3y6vjr0av6te" path="res://assets/hazards_tileset.png" id="4_gbqnl"]
 [ext_resource type="PackedScene" uid="uid://beplsivn2dg6g" path="res://scenes/portal.tscn" id="8_ckvwl"]
+[ext_resource type="PackedScene" uid="uid://dm63dvgwexm6t" path="res://scenes/main.tscn" id="8_nlqja"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_ckvwl"]
 texture = ExtResource("4_gbqnl")
@@ -319,15 +320,15 @@ position = Vector2(264, -2920)
 dialogue_file = "res://dialogue/npc2(wise crow)/dialogue files/wiseCrowDialogue5.json"
 
 [node name="Portal" parent="." unique_id=199880354 instance=ExtResource("8_ckvwl")]
-position = Vector2(-870, -2980)
+position = Vector2(-840, -3000)
 portal_id = "tut_portal"
 label_text = "End"
-leads_to_hub = true
+destination_scene = ExtResource("8_nlqja")
 color = Color(4.0911138e-07, 0.6235958, 0.050377123, 1)
 
 [node name="player" parent="." unique_id=2048642765 instance=ExtResource("3_ehuit")]
 z_index = 4
-position = Vector2(-605, -2951)
+position = Vector2(340, -40)
 
 [connection signal="body_entered" from="npcdectzone1" to="." method="_on_npcdectzone_1_body_entered"]
 [connection signal="body_entered" from="npcdectzone3" to="." method="_on_npcdectzone_3_body_entered"]

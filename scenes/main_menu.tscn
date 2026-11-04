@@ -20,6 +20,7 @@
 [ext_resource type="PackedScene" uid="uid://bhnql6ieieyxu" path="res://island scenes/island_12.tscn" id="18_6h3lr"]
 [ext_resource type="PackedScene" uid="uid://dac1ej83teqnb" path="res://scenes/balloon_area.tscn" id="19_dj67d"]
 [ext_resource type="PackedScene" uid="uid://beplsivn2dg6g" path="res://scenes/portal.tscn" id="20_6vcge"]
+[ext_resource type="PackedScene" uid="uid://dypb7qlgribk4" path="res://scenes/settings_panel.tscn" id="21_gw5y6"]
 
 [sub_resource type="Gradient" id="Gradient_ekxnf"]
 offsets = PackedFloat32Array(0.090361446, 1)
@@ -41,17 +42,6 @@ offset_bottom = 1080.0
 texture = SubResource("GradientTexture2D_d8fr4")
 metadata/_edit_lock_ = true
 
-[node name="enterButton" type="Button" parent="." unique_id=930286790]
-offset_left = 720.0
-offset_top = 810.0
-offset_right = 1200.0
-offset_bottom = 930.0
-theme_override_constants/outline_size = 4
-theme_override_fonts/font = ExtResource("1_l6cm7")
-theme_override_font_sizes/font_size = 84
-text = "Enter"
-script = ExtResource("3_8ln24")
-
 [node name="headerLabel" type="Label" parent="." unique_id=1785602283]
 z_index = 50
 offset_right = 1920.0
@@ -71,16 +61,6 @@ balloon_scene = ExtResource("19_dj67d")
 portal_scene = ExtResource("20_6vcge")
 sky_node = NodePath("../backRect")
 
-[node name="enterButton2" type="Button" parent="." unique_id=1065461488]
-offset_left = 712.0
-offset_top = 568.0
-offset_right = 1192.0
-offset_bottom = 688.0
-theme_override_constants/outline_size = 4
-theme_override_fonts/font = ExtResource("1_l6cm7")
-theme_override_font_sizes/font_size = 84
-text = "Tutorial"
-
 [node name="Label" type="Label" parent="." unique_id=1973398537]
 offset_left = 520.0
 offset_top = 696.0
@@ -92,5 +72,41 @@ text = "(Highly reccomended)
 (TUTORIAL CURRENTLY DOESN'T CONNECT TO MAIN WORLD, RESTART ON FINISHING)"
 horizontal_alignment = 1
 
-[connection signal="pressed" from="enterButton" to="." method="_on_enter_button_pressed"]
-[connection signal="pressed" from="enterButton2" to="." method="_on_enter_button_2_pressed"]
+[node name="Buttons" type="VBoxContainer" parent="." unique_id=1709943516]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="enterButton" type="Button" parent="Buttons" unique_id=930286790]
+layout_mode = 2
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("1_l6cm7")
+theme_override_font_sizes/font_size = 84
+text = "Enter"
+script = ExtResource("3_8ln24")
+
+[node name="tutorialButton" type="Button" parent="Buttons" unique_id=1065461488]
+layout_mode = 2
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("1_l6cm7")
+theme_override_font_sizes/font_size = 84
+text = "Tutorial"
+
+[node name="settingsButton" type="Button" parent="Buttons" unique_id=1458972000]
+layout_mode = 2
+theme_override_font_sizes/font_size = 70
+text = "Settings"
+
+[node name="quitButton" type="Button" parent="Buttons" unique_id=250192057]
+layout_mode = 2
+theme_override_font_sizes/font_size = 70
+text = "Quit"
+
+[node name="Overlay" type="CanvasLayer" parent="." unique_id=25995367]
+layer = 10
+
+[node name="SettingsPanel" parent="Overlay" unique_id=337991324 instance=ExtResource("21_gw5y6")]
+
+[connection signal="pressed" from="Buttons/enterButton" to="." method="_on_enter_button_pressed"]
+[connection signal="pressed" from="Buttons/tutorialButton" to="." method="_on_enter_button_2_pressed"]
+[connection signal="pressed" from="Buttons/settingsButton" to="." method="_on_settings_button_pressed"]
+[connection signal="pressed" from="Buttons/quitButton" to="." method="_on_quit_button_pressed"]

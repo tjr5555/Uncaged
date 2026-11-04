@@ -27,6 +27,17 @@ var WALL_JUMP_PUSH = 550.0
 var WALL_JUMP_HEIGHT = -520.0
 var WALL_JUMP_LOCK = 0.18
 
+const LAND_MIN_IMPACT = 250.0
+const LAND_MAX_IMPACT = 1600.0
+const LAND_SQUASH = 0.28
+const LAND_CAMERA_DIP = 18.0
+const HOP_LAND_SQUASH = 0.05
+const HOP_LAND_MAX_IMPACT = 420.0
+const HOP_LAND_VOLUME_DB = -26.0
+
+var land_tween: Tween
+var hop_airborne := false
+
 const FALL_ANIM_SPEED = 350.0 #downward speed that counts as falling (a normal hop lands at ~270)
 const SPRITE_FACES_LEFT = true #which way the art is drawn; flip this if the bird faces backwards
 
@@ -264,12 +275,14 @@ func _ground_physics(delta: float) -> void:
 			coyote_timer = 0.0
 			jump_buffer_timer = 0.0
 			jumped = true
+			hop_airborne = false
 		elif coyote_timer <= COYOTE_TIME and flaps > 0:
 			flaps -= 1
 			coyote_timer = COYOTE_TIME
 			velocity.y = JUMP_VELOCITY
 			jump_buffer_timer = 0.0
 			jumped = true
+			hop_airborne = false
 	
 	if Input.is_action_just_released("ui_accept") and velocity.y < 0.0:
 		velocity.y *= JUMP_CUT
@@ -299,8 +312,9 @@ func _ground_physics(delta: float) -> void:
 	if on_floor and not jumped and dir != 0.0 and hop_timer <= 0.0 and not _ledge_near(dir):
 		velocity.y = HOP_VELOCITY
 		hop_timer = HOP_INTERVAL
+		hop_airborne = true
 		bird.play("hop")
-		bird.set_frame_and_progress(0, 0.0) #restart the windup on every hop
+		bird.set_frame_and_progress(0, 0.0)
 	
 	if wall_lock_timer <= 0.0:
 		var accel := FRICTION if on_floor else AIR_FRICTION
@@ -314,11 +328,19 @@ func _ground_physics(delta: float) -> void:
 			dash_dir = dash_dir.normalized()
 		Global.dashes -= 1
 		wall_lock_timer = 0.0
+		hop_airborne = false
 		velocity = dash_dir * (DASH_POWER if on_floor else DASH_POWER * 1.4)
 	
 	var incoming_speed_y := velocity.y
 	
 	move_and_slide()
+	
+	if not on_floor and is_on_floor():
+		if hop_airborne and incoming_speed_y < HOP_LAND_MAX_IMPACT:
+			_on_hop_landed()
+		elif incoming_speed_y > LAND_MIN_IMPACT:
+			_on_landed(incoming_speed_y)
+		hop_airborne = false
 	
 	if is_on_floor() and incoming_speed_y > 50.0 and Input.is_action_pressed("ui_down") and Input.is_action_pressed("augment"):
 		velocity.y = incoming_speed_y * 1.1 * -1.0
@@ -635,3 +657,71 @@ func _emerge_physics(delta: float) -> void:
 	bird.rotation = heading
 	bird.scale = Vector2(base_scale.x, base_scale.y * flip_amount) * grow
 	_update_camera(delta, (velocity * FLY_CAMERA_LOOK).limit_length(FLY_CAMERA_MAX_OFFSET))
+
+func _on_landed(impact: float) -> void:
+	var t := clampf(inverse_lerp(LAND_MIN_IMPACT, LAND_MAX_IMPACT, impact), 0.0, 1.0)
+	var squash := lerpf(0.08, LAND_SQUASH, t)
+	
+	if land_tween and land_tween.is_valid():
+		land_tween.kill()
+	bird.scale = Vector2(base_scale.x * (1.0 + squash), base_scale.y * (1.0 - squash))
+	land_tween = create_tween()
+	land_tween.tween_property(bird, "scale", base_scale, 0.28).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	
+	if camera:
+		camera.offset.y += LAND_CAMERA_DIP * t * Settings.screen_shake
+	
+	_spawn_dust(_floor_contact_point(), t)
+	
+	var sound := get_node_or_null("LandSound") as AudioStreamPlayer2D
+	if sound:
+		sound.pitch_scale = lerpf(1.15, 0.85, t)
+		sound.volume_db = lerpf(-12.0, 0.0, t)
+		sound.play()
+
+func _floor_contact_point() -> Vector2:
+	for i in get_slide_collision_count():
+		var collision := get_slide_collision(i)
+		if collision.get_normal().y < -0.7:
+			return collision.get_position()
+	return global_position
+
+func _spawn_dust(pos: Vector2, strength: float) -> void:
+	var dust := CPUParticles2D.new()
+	dust.one_shot = true
+	dust.explosiveness = 0.95
+	dust.amount = int(lerpf(8.0, 22.0, strength))
+	dust.lifetime = 0.55
+	dust.local_coords = true
+	dust.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+	dust.emission_rect_extents = Vector2(14.0, 2.0)
+	dust.direction = Vector2.UP
+	dust.spread = 75.0
+	dust.gravity = Vector2(0.0, 220.0)
+	dust.initial_velocity_min = lerpf(40.0, 90.0, strength)
+	dust.initial_velocity_max = lerpf(90.0, 220.0, strength)
+	dust.damping_min = 120.0
+	dust.damping_max = 220.0
+	dust.scale_amount_min = 3.0
+	dust.scale_amount_max = lerpf(5.0, 8.0, strength)
+	var ramp := Gradient.new()
+	ramp.set_color(0, Color(0.92, 0.88, 0.8, 0.85))
+	ramp.set_color(1, Color(0.92, 0.88, 0.8, 0.0))
+	dust.color_ramp = ramp
+	get_tree().current_scene.add_child(dust)
+	dust.global_position = pos
+	dust.emitting = true
+	get_tree().create_timer(1.2).timeout.connect(dust.queue_free)
+
+func _on_hop_landed() -> void:
+	if land_tween and land_tween.is_valid():
+		land_tween.kill()
+	bird.scale = Vector2(base_scale.x * (1.0 + HOP_LAND_SQUASH), base_scale.y * (1.0 - HOP_LAND_SQUASH))
+	land_tween = create_tween()
+	land_tween.tween_property(bird, "scale", base_scale, 0.16).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
+	
+	var sound := get_node_or_null("LandSound") as AudioStreamPlayer2D
+	if sound:
+		sound.pitch_scale = randf_range(1.2, 1.35)
+		sound.volume_db = HOP_LAND_VOLUME_DB
+		sound.play()

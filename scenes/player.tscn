@@ -4,6 +4,7 @@
 [ext_resource type="Texture2D" uid="uid://xulcq4bsp2ka" path="res://assets/animations/maincrowfall.png" id="2_dqkch"]
 [ext_resource type="Texture2D" uid="uid://dp5hynm2th3cb" path="res://assets/animations/maincrowwalk.png" id="3_qlg0r"]
 [ext_resource type="Texture2D" uid="uid://b7n5k5kwru7wh" path="res://assets/animations/maincrowidle.png" id="4_tuyoq"]
+[ext_resource type="AudioStream" uid="uid://bjp0p6x8rokfl" path="res://audio/fallThud.wav" id="5_qlg0r"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_lnspb"]
 radius = 35.555553
@@ -59,7 +60,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_fjrip")
 }],
-"loop": 1,
+"loop": true,
 "name": &"fall",
 "speed": 1.0
 }, {
@@ -82,7 +83,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_jej6c")
 }],
-"loop": 1,
+"loop": true,
 "name": &"hop",
 "speed": 12.0
 }, {
@@ -99,7 +100,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_qfm1y")
 }],
-"loop": 1,
+"loop": true,
 "name": &"idle",
 "speed": 6.0
 }]
@@ -124,3 +125,7 @@ scale = Vector2(3.0000002, 3)
 sprite_frames = SubResource("SpriteFrames_0jsi4")
 animation = &"hop"
 metadata/_edit_lock_ = true
+
+[node name="LandSound" type="AudioStreamPlayer2D" parent="." unique_id=861012951]
+stream = ExtResource("5_qlg0r")
+bus = &"SFX"
