@@ -41,6 +41,8 @@ var hop_airborne := false
 const FALL_ANIM_SPEED = 350.0 #downward speed that counts as falling (a normal hop lands at ~270)
 const SPRITE_FACES_LEFT = true #which way the art is drawn; flip this if the bird faces backwards
 
+const HAZARD_DATA = "hazards" #name of the custom data layer (bool) on your TileSet that marks hazard tiles
+
 var FLY_CCW_ACTION = "ui_left"
 var FLY_CW_ACTION = "ui_right"
 var FLY_BOOST_ACTION = "Dash"
@@ -335,6 +337,15 @@ func _ground_physics(delta: float) -> void:
 	
 	move_and_slide()
 	
+	#touching a hazard tile sends you back to the last safe ground
+	if _touching_hazard():
+		respawn()
+		return
+	
+	#remember the last safe ground (a hazard touch returned above, so this is never a hazard)
+	if is_on_floor():
+		last_grounded_pos = global_position
+	
 	if not on_floor and is_on_floor():
 		if hop_airborne and incoming_speed_y < HOP_LAND_MAX_IMPACT:
 			_on_hop_landed()
@@ -484,6 +495,11 @@ func _fly_physics(delta: float) -> void:
 	
 	move_and_slide()
 	
+	#touching a hazard tile sends you back to the last safe ground (before the bounce below can run)
+	if _touching_hazard():
+		respawn()
+		return
+	
 	if get_slide_collision_count() > 0:
 		var normal := get_last_slide_collision().get_normal()
 		var impact := -heading_vec.dot(normal)
@@ -506,14 +522,18 @@ func _fly_physics(delta: float) -> void:
 func _touching_hazard() -> bool:
 	for i in get_slide_collision_count():
 		var col := get_slide_collision(i)
-		var collider := col.get_collider()
-		if collider is TileMapLayer:
-			#nudge into the tile we hit so we get that tile and not its neighbor
-			var hit_pos := col.get_position() - col.get_normal() * 2.0
-			var coords: Vector2i = collider.local_to_map(collider.to_local(hit_pos))
-			var data: TileData = collider.get_cell_tile_data(coords)
-			if data and data.get_custom_data("hazard"):
-				return true
+		var layer := col.get_collider() as TileMapLayer
+		if layer == null or layer.tile_set == null:
+			continue
+		#skip tilesets that don't have the custom data layer (reading a missing layer throws an error)
+		if layer.tile_set.get_custom_data_layer_by_name(HAZARD_DATA) == -1:
+			continue
+		#nudge into the tile we hit so we get that tile and not its neighbor
+		var hit_pos := col.get_position() - col.get_normal() * 2.0
+		var coords: Vector2i = layer.local_to_map(layer.to_local(hit_pos))
+		var data: TileData = layer.get_cell_tile_data(coords)
+		if data and data.get_custom_data(HAZARD_DATA):
+			return true
 	return false
 
 func respawn() -> void:
@@ -524,7 +544,22 @@ func respawn() -> void:
 	speed = FLY_ENTER_SPEED
 	speed_floor = FLY_MIN_SPEED
 	turn_speed = 0.0
+	
+	#clear anything that could carry over from before the hit
+	hop_airborne = false
+	is_gliding = false
+	hold_timer = 0.0
+	hop_timer = 0.0
+	wall_lock_timer = 0.0
+	jump_buffer_timer = 0.0
+	if land_tween and land_tween.is_valid():
+		land_tween.kill()
+	bird.scale = base_scale
+	bird.rotation = 0.0
+	bird.play("idle")
+	
 	if camera:
+		camera.offset = Vector2.ZERO
 		camera.reset_smoothing()
 
 

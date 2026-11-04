@@ -47,7 +47,7 @@ func _physics_process(delta: float) -> void:
 		dir = (start_pos - position).normalized()
 		current_state = MOVE
 
-	if Input.is_action_just_pressed("augment") and player_is_in_chat_zone == true:
+	if Input.is_action_just_pressed("augment") and player_is_in_chat_zone and not is_chatting:
 		$Label.visible = false
 		$npc2DialougeUI.start()
 		is_roaming = false
@@ -67,6 +67,17 @@ func _on_detection_area_body_exited(body: Node2D) -> void:
 	if body.is_in_group("player"):
 		player_is_in_chat_zone = false
 		hide_label()
+		# Walking away mid-conversation closes it, so the next chat starts from the beginning
+		if is_chatting:
+			_close_dialogue()
+
+func _close_dialogue() -> void:
+	if $npc2DialougeUI.has_method("close"):
+		$npc2DialougeUI.close()
+	else:
+		$npc2DialougeUI.hide() # fallback if the UI has no close() yet; add one so it also resets its state
+	is_chatting = false
+	is_roaming = true
 
 func _on_timer_timeout() -> void:
 	$Timer.wait_time = choose([2.0, 4.0, 5.0])

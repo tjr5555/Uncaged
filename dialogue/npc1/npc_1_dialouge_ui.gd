@@ -68,7 +68,7 @@ func next_script():
 		emit_signal("dialogue_finished")
 		
 		#emits quest signal when dialogue when text is finished
-		emit_signal("give_quest", "collect_coins", "Coin Collector", "Collect coins", 500)
+		emit_signal("give_quest", "collect_coins", "Coin Collector", "Collect coins", 10000)
 		return
 
 	var current_data = dialogue[current_dialogue_id]

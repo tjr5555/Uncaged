@@ -9,7 +9,7 @@ const LEVEL_COLORS = [
 	Color(1.0, 0.85, 0.3),
 ]
 
-const LEVEL_WORDS = ["", "NICE!", "GREAT!", "AMAZING!", "INSANE!", "UNCAGED!"]
+const LEVEL_WORDS = ["REDUNDANT", "OKAY", "NICE!", "BRUTAL!", "INSANE!", "UNCAGED!"]
 const SHOW_AT = 2
 const MAX_SHAKE = 14.0
 const LOW_TIME = 0.3
@@ -49,13 +49,13 @@ func _process(delta: float) -> void:
 		label.modulate = Color(display_color, label.modulate.a)
 	fill_style.bg_color = display_color
 	
-	var ratio := Combo.time_ratio()
+	var ratio: float = Combo.time_ratio()
 	bar_display = lerpf(bar_display, ratio, 1.0 - exp(-18.0 * delta))
 	timer_bar.value = bar_display
 	timer_bar.modulate.a = 0.55 + 0.45 * absf(sin(time * 14.0)) if shown and ratio < LOW_TIME else 1.0
 	
 	trauma = maxf(trauma - delta * 2.0, 0.0)
-	var amount := trauma * trauma * Settings.screen_shake
+	var amount: float = trauma * trauma * Settings.screen_shake
 	box.position = box_base + Vector2(randf_range(-1.0, 1.0), randf_range(-1.0, 1.0)) * amount * MAX_SHAKE
 	box.rotation = randf_range(-1.0, 1.0) * 0.03 * amount
 

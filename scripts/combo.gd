@@ -59,5 +59,5 @@ func _level_for(c: int) -> int:
 	var result := 0
 	for i in THRESHOLDS.size():
 		if c >= int(THRESHOLDS[i]):
-			result = 1
+			result = i
 	return result

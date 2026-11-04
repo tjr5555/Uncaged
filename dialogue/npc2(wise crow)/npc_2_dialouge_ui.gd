@@ -224,3 +224,16 @@ func play_sound():
 func stop_sound():
 	if audio_stream_player and audio_stream_player.playing:
 		audio_stream_player.stop()
+
+
+func close():
+	if not d_active:
+		return
+	d_active = false
+	if tween:
+		tween.kill()
+	stop_sound()
+	current_dialogue_id = -1
+	$NinePatchRect.visible = false
+	$NinePatchRect.position.y = _base_box_pos_y
+	$NinePatchRect.size.y = _base_box_height
