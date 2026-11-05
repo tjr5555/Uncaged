@@ -3,10 +3,37 @@
 [ext_resource type="Script" uid="uid://3isphqggsdu8" path="res://scripts/main.gd" id="1_tbgi4"]
 [ext_resource type="PackedScene" uid="uid://b5hbtfopubmjd" path="res://scenes/hub.tscn" id="2_jyhfs"]
 [ext_resource type="PackedScene" uid="uid://nngadheagxwr" path="res://scenes/player.tscn" id="2_sugp2"]
+[ext_resource type="Shader" uid="uid://bv2f3cmg2a2nb" path="res://shaders/sky.gdshader" id="2_tefeu"]
+[ext_resource type="Script" uid="uid://dab0yedekt4ed" path="res://scripts/sky.gd" id="3_o6xl0"]
 [ext_resource type="PackedScene" uid="uid://di6dday241poi" path="res://scenes/ui.tscn" id="5_tefeu"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_tipki"]
+shader = ExtResource("2_tefeu")
+shader_parameter/camera_pos = Vector2(0, 0)
+shader_parameter/screen_size = Vector2(1920, 1080)
+shader_parameter/top_color = Color(0.36078432, 0.5803922, 0.9019608, 1)
+shader_parameter/horizon_color = Color(0.61960787, 0.7607843, 0.92156863, 1)
+shader_parameter/high_color = Color(0.16, 0.3, 0.62, 1)
+shader_parameter/cloud_color = Color(1, 1, 1, 1)
+shader_parameter/cloud_shade = Color(0.78, 0.84, 0.94, 1)
+shader_parameter/altitude_range = 20000.0
+shader_parameter/cloud_amount = 0.5
+shader_parameter/cloud_scale = 900.0
+shader_parameter/parallax = Vector3(0.08, 0.18, 0.35)
+shader_parameter/wind = Vector2(40, 0)
+shader_parameter/pixel_size = 3.0
 
 [node name="main" type="Node2D" unique_id=54725661]
 script = ExtResource("1_tbgi4")
+
+[node name="Sky" type="CanvasLayer" parent="." unique_id=723540808]
+layer = -10
+
+[node name="SkyRect" type="ColorRect" parent="Sky" unique_id=481291844]
+material = SubResource("ShaderMaterial_tipki")
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("3_o6xl0")
 
 [node name="World" type="Node2D" parent="." unique_id=1255837007]
 

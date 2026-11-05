@@ -10,6 +10,9 @@ signal closed
 @onready var fullscreen_check: CheckButton = %FullscreenCheck
 @onready var vsync_check: CheckButton = %VsyncCheck
 @onready var back_button: Button = %BackButton
+@onready var keyboard_steer_check: CheckButton = %KeyboardSteerCheck
+@onready var mouse_steer_check: CheckButton = %MouseSteerCheck
+
 
 var tween: Tween
 
@@ -23,6 +26,8 @@ func _ready() -> void:
 	shake_slider.value_changed.connect(_set_setting.bind("screen_shake"))
 	fullscreen_check.toggled.connect(_set_setting.bind("fullscreen"))
 	vsync_check.toggled.connect(_set_setting.bind("vsync"))
+	keyboard_steer_check.toggled.connect(_on_steer_toggled.bind("keyboard_steering"))
+	mouse_steer_check.toggled.connect(_on_steer_toggled.bind("mouse_steering"))
 	back_button.pressed.connect(close)
 
 func open() -> void:
@@ -60,7 +65,16 @@ func _sync_from_settings() -> void:
 	shake_slider.set_value_no_signal(Settings.screen_shake)
 	fullscreen_check.set_pressed_no_signal(Settings.fullscreen)
 	vsync_check.set_pressed_no_signal(Settings.vsync)
+	keyboard_steer_check.set_pressed_no_signal(Settings.keyboard_steering)
+	mouse_steer_check.set_pressed_no_signal(Settings.mouse_steering)
 
 func _set_setting(value: Variant, key: String) -> void:
 	Settings.set(key, value)
 	Settings.apply()
+
+func _on_steer_toggled(pressed: bool, key: String) -> void:
+	Settings.set(key, pressed)
+	if not Settings.keyboard_steering and not Settings.mouse_steering:
+		var other := "mouse_steering" if key == "keyboard_steering" else "keyboard_steering"
+		Settings.set(other, true)
+		_sync_from_settings()

@@ -57,30 +57,42 @@ var FLY_CW_ACTION = "ui_right"
 var FLY_UP_ACTION = "ui_up" #pitch the nose up
 var FLY_DOWN_ACTION = "ui_down" #pitch the nose down (hold it to dive straight down)
 var FLY_BOOST_ACTION = "Dash"
-var FLY_BRAKE_ACTION = "augment" #moved off ui_down so the down arrow can dive
+var FLY_BRAKE_ACTION = "brake" #moved off ui_down so the down arrow can dive
 
 const FLY_ENTER_SPEED = 800.0
 var FLY_CRUISE_SPEED = 800.0
 const FLY_BOOST_SPEED = 1300.0
-const FLY_MAX_SPEED = 2200.0
+const FLY_MAX_SPEED = 1700.0
 const FLY_MIN_SPEED = 450.0
 const FLY_ACCEL = 700.0
 const FLY_BOOST_ACCEL = 1400.0
-const FLY_DRAG = 350.0
+const FLY_DRAG = 450.0
 const FLY_BRAKE_DECEL = 900.0
-const FLY_GRAVITY = 1100.0
 const FLY_TURN_RATE = 4.2
-const FLY_TURN_ACCEL = 50
+const FLY_TURN_ACCEL = 45.0
 const FLY_BRAKE_TURN_MULT = 1.6
-const FLY_FAST_TURN_MULT = 0.7
-const FLY_AUTO_LEVEL = 0.0 #0 = never levels itself out; raise it (0.9 was the old value) to bring auto-leveling back
+const FLY_FAST_TURN_MULT = 0.85
+const FLY_AUTO_LEVEL = 0.1 #0 = never levels itself out; raise it (0.9 was the old value) to bring auto-leveling back
 const FLY_LEVEL_FADE_START = 0.3 #auto-level is full strength below this pitch (sin of the angle, 0.3 is about 17 degrees)
 const FLY_LEVEL_FADE_END = 0.6 #and fully off above this one (about 37 degrees), so steep dives and climbs hold their angle
-const FLY_VELOCITY_SMOOTH = 14.0
+const FLY_VELOCITY_SMOOTH = 24.0
 const FLY_DASH_BOOST = 700.0
-const FLY_STALL_TURN = 2.5
+const FLY_STALL_TURN = 1.2
 const CONTROL_MAX_BONUS = 0.5 #flight control upgrades are maxed out at +50% turn rate
 const FLY_FLIP_SPEED = 14.0
+const FLY_BOOST_BONUS = 500.0
+const FLY_DIVE_GAIN = 900.0
+const FLY_CLIMB_COST = 800.0
+const FLY_LEVEL_DELAY = 0.4
+const FLY_STALL_SLOPE = 0.5
+const MOUSE_DEADZONE = 40.0
+const MOUSE_TURN_GAIN = 6.0
+const MOUSE_SWITCH_THRESHOLD = 3.0
+
+enum SteerSource { KEYBOARD, MOUSE }
+
+var steer_source := SteerSource.KEYBOARD
+var level_delay := 0.0
 
 const FLY_BOUNCE_LOSS = 0.2
 const FLY_BOUNCE_MIN_SPEED = 120.0
@@ -184,6 +196,7 @@ func _ready() -> void:
 	SignalBus.finishquest1.connect(_give_medallion)
 	if Global.has_medallion:
 		_give_medallion()
+
 func _physics_process(delta: float) -> void:
 	if autopilot:
 		_autopilot_physics(delta)
@@ -211,6 +224,12 @@ func _physics_process(delta: float) -> void:
 	if Input.is_action_just_pressed("reset"):
 		reset()
 
+func _input(event: InputEvent) -> void:
+	if not Settings.mouse_steering:
+		return
+	var motion := event as InputEventMouseMotion
+	if motion != null and motion.relative.length() > MOUSE_SWITCH_THRESHOLD:
+		steer_source = SteerSource.MOUSE
 
 func _set_mode(new_mode: Global.Mode) -> void:
 	Global.mode = new_mode
@@ -462,14 +481,7 @@ func _ledge_near(direction: float) -> bool:
 	return false
 
 func _fly_physics(delta: float) -> void:
-	var turn_input := Input.get_axis(FLY_CCW_ACTION, FLY_CW_ACTION)
-	var pitch_input := Input.get_axis(FLY_UP_ACTION, FLY_DOWN_ACTION) #-1 = up, +1 = down
 	var braking := Input.is_action_pressed(FLY_BRAKE_ACTION)
-	
-	#up/down pitch relative to the screen: when facing left, nose-down means turning the other way.
-	#holding down settles at straight down, holding up at straight up (the sign flips as you pass vertical)
-	var facing_sign := 1.0 if cos(heading) >= 0.0 else -1.0
-	var steer := clampf(turn_input + pitch_input * facing_sign, -1.0, 1.0)
 	
 	if boost <= 0.0:
 		boost_exhausted = true
@@ -481,37 +493,37 @@ func _fly_physics(delta: float) -> void:
 	
 	speed_floor = move_toward(speed_floor, FLY_MIN_SPEED, FLY_BOUNCE_RECOVERY * delta)
 	
-	#base_turn_speed is the turn rate itself (starts at FLY_TURN_RATE, goes up with each upgrade)
-	#control is how much better than the starting turn rate you are: 1.0 = no upgrades, 1.5 = maxed
 	var control: float = Global.base_turn_speed / FLY_TURN_RATE
-	var control_t := clampf((control - 1.0) / CONTROL_MAX_BONUS, 0.0, 1.0) #0 = no upgrades, 1 = fully upgraded
+	var control_t := clampf((control - 1.0) / CONTROL_MAX_BONUS, 0.0, 1.0)
 	
-	var speed_t := clampf((speed - FLY_CRUISE_SPEED) / (FLY_MAX_SPEED - FLY_CRUISE_SPEED), 0.0, 1.0)
-	var fast_mult := lerpf(FLY_FAST_TURN_MULT, 1.0, control_t) #upgrades remove the high speed turn penalty
+	var speed_t := clampf((speed - FLY_CRUISE_SPEED) / maxf(FLY_MAX_SPEED - FLY_CRUISE_SPEED, 1.0), 0.0, 1.0)
+	var fast_mult := lerpf(FLY_FAST_TURN_MULT, 1.0, control_t)
 	var turn_rate := FLY_TURN_RATE * control * lerpf(1.0, fast_mult, speed_t)
 	if braking:
 		turn_rate *= FLY_BRAKE_TURN_MULT
 	
-	turn_speed = move_toward(turn_speed, steer * turn_rate, FLY_TURN_ACCEL * control * delta)
+	var target_turn := _steer_turn_target(turn_rate)
+	turn_speed = move_toward(turn_speed, target_turn, FLY_TURN_ACCEL * control * delta)
 	heading = wrapf(heading + turn_speed * delta, -PI, PI)
 	
-	if steer == 0.0:
-		#level out toward horizontal, but only when the nose is close to level.
-		#steep dives and climbs hold their angle so you can fly straight down without swooping
-		var level_target := 0.0 if cos(heading) >= 0.0 else PI
-		var level_weight := 1.0 - smoothstep(FLY_LEVEL_FADE_START, FLY_LEVEL_FADE_END, absf(sin(heading)))
-		var level_step := FLY_AUTO_LEVEL * level_weight * delta
-		heading = wrapf(heading + clampf(angle_difference(heading, level_target), -level_step, level_step), -PI, PI)
+	if steer_source == SteerSource.KEYBOARD and is_zero_approx(target_turn):
+		level_delay = maxf(level_delay - delta, 0.0)
+		if level_delay <= 0.0:
+			var level_target := 0.0 if cos(heading) >= 0.0 else PI
+			var level_step := FLY_AUTO_LEVEL * delta
+			heading = wrapf(heading + clampf(angle_difference(heading, level_target), -level_step, level_step), -PI, PI)
+	else:
+		level_delay = FLY_LEVEL_DELAY
 	
 	var heading_vec := Vector2.from_angle(heading)
 	
-	var target_speed = FLY_CRUISE_SPEED
+	var target_speed: float = FLY_CRUISE_SPEED
 	var accel := FLY_ACCEL
 	if braking:
 		target_speed = FLY_MIN_SPEED
 		accel = FLY_BRAKE_DECEL
 	elif boosting:
-		target_speed = FLY_CRUISE_SPEED + 500.0
+		target_speed = FLY_CRUISE_SPEED + FLY_BOOST_BONUS
 		accel = FLY_BOOST_ACCEL
 	
 	if speed > target_speed and not braking:
@@ -520,25 +532,24 @@ func _fly_physics(delta: float) -> void:
 	if speed_floor < FLY_MIN_SPEED:
 		accel *= FLY_BOUNCE_ACCEL_MULT
 	
-	speed += heading_vec.y * FLY_GRAVITY * delta
-	speed = move_toward(speed, target_speed, accel * delta)
+	if heading_vec.y > 0.0:
+		var headroom := 1.0 - smoothstep(FLY_MAX_SPEED * 0.75, FLY_MAX_SPEED, speed)
+		speed += heading_vec.y * FLY_DIVE_GAIN * headroom * delta
+	else:
+		speed += heading_vec.y * FLY_CLIMB_COST * delta
 	
+	speed = move_toward(speed, target_speed, accel * delta)
 	speed = clampf(speed, speed_floor, FLY_MAX_SPEED)
 	
-	if speed <= speed_floor + 10.0 and heading_vec.y < -0.2:
+	if speed <= speed_floor + 10.0 and heading_vec.y < -FLY_STALL_SLOPE:
 		var drop := clampf(angle_difference(heading, PI / 2.0), -FLY_STALL_TURN * delta, FLY_STALL_TURN * delta)
 		heading = wrapf(heading + drop, -PI, PI)
 		heading_vec = Vector2.from_angle(heading)
 	
-	var vel_smooth := FLY_VELOCITY_SMOOTH * lerpf(1.0, 1.5, control_t) #upgrades make movement track your aim tighter
+	var vel_smooth := FLY_VELOCITY_SMOOTH * lerpf(1.0, 1.5, control_t)
 	velocity = velocity.lerp(heading_vec * speed, 1.0 - exp(-vel_smooth * delta))
 	
 	move_and_slide()
-	
-	#touching a hazard tile sends you back to the last safe ground (before the bounce below can run)
-	if _touching_hazard():
-		respawn()
-		return
 	
 	if get_slide_collision_count() > 0:
 		var normal := get_last_slide_collision().get_normal()
@@ -812,8 +823,6 @@ func _on_hop_landed() -> void:
 		sound.volume_db = HOP_LAND_VOLUME_DB
 		sound.play()
 
-
-
 func _give_medallion() -> void:
 	if medallion != null:
 		return
@@ -822,13 +831,31 @@ func _give_medallion() -> void:
 	bird.add_child(medallion)
 	_place_medallion()
 
-
 func _place_medallion() -> void:
 	if medallion == null:
 		return
 	var x := -MEDALLION_NECK.x if bird.flip_h else MEDALLION_NECK.x
 	medallion.position = Vector2(x, MEDALLION_NECK.y)
 
-
 func _process(_delta: float) -> void:
 	_place_medallion()
+
+func _steer_turn_target(turn_rate: float) -> float:
+	if not Settings.mouse_steering:
+		steer_source = SteerSource.KEYBOARD
+	
+	var keys_allowed := Settings.keyboard_steering or not Settings.mouse_steering
+	var key_input := Input.get_axis(FLY_CCW_ACTION, FLY_CW_ACTION) if keys_allowed else 0.0
+	if key_input != 0.0:
+		steer_source = SteerSource.KEYBOARD
+		return key_input * turn_rate
+	
+	if steer_source != SteerSource.MOUSE:
+		return 0.0
+	
+	var screen_pos := get_viewport().get_canvas_transform() * global_position
+	var to_mouse := get_viewport().get_mouse_position() - screen_pos
+	if to_mouse.length() < MOUSE_DEADZONE:
+		return 0.0
+	var diff := angle_difference(heading, to_mouse.angle())
+	return clamp(diff * MOUSE_TURN_GAIN, -turn_rate, turn_rate)

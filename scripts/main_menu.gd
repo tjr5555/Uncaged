@@ -14,6 +14,7 @@ var colors: Array[Color] = [
 var current_color_index = 0
 
 func _ready() -> void:
+	print("Menu loaded from: ", scene_file_path)
 	if back_rect:
 		back_rect.modulate = colors[0]
 		_fade_to_next_color()
@@ -27,12 +28,8 @@ func _fade_to_next_color() -> void:
 		current_color_index = next_index
 		_fade_to_next_color()
 		)
-
 func _on_enter_button_pressed() -> void:
 	SceneFader.change_scene(GAME_SCENE)
-
-func _on_enter_button_2_pressed() -> void:
-	get_tree().change_scene_to_file("res://scenes/tutorial.scn")
 
 func _on_settings_button_pressed() -> void:
 	$Overlay/SettingsPanel.open()

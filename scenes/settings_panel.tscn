@@ -117,6 +117,16 @@ unique_name_in_owner = true
 layout_mode = 2
 text = "VSync"
 
+[node name="KeyboardSteerCheck" type="CheckButton" parent="Panel/Margin/VBox" unique_id=951831586]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Keyboard Steering"
+
+[node name="MouseSteerCheck" type="CheckButton" parent="Panel/Margin/VBox" unique_id=1763671265]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Mouse Steering"
+
 [node name="BackButton" type="Button" parent="Panel/Margin/VBox" unique_id=1318472792]
 unique_name_in_owner = true
 layout_mode = 2

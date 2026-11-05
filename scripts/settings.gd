@@ -8,6 +8,8 @@ var sfx_volume := 0.9
 var screen_shake := 1.0
 var fullscreen := false
 var vsync := true
+var keyboard_steering := true
+var mouse_steering := true
 
 func _ready() -> void:
 	load_settings()
@@ -30,11 +32,13 @@ func apply() -> void:
 func save_settings() -> void:
 	var config := ConfigFile.new()
 	config.set_value("audio", "master", master_volume)
-	config.seet_value("audio", "music", music_volume)
+	config.set_value("audio", "music", music_volume)
 	config.set_value("audio", "sfx", sfx_volume)
 	config.set_value("video", "fullscreen", fullscreen)
 	config.set_value("video", "vsync", vsync)
 	config.set_value("gameplay", "screen_shake", screen_shake)
+	config.set_value("controls", "keyboard_steering", keyboard_steering)
+	config.set_value("controls", "mouse_steering", mouse_steering)
 	config.save(PATH)
 
 func load_settings() -> void:
@@ -47,6 +51,8 @@ func load_settings() -> void:
 	fullscreen = config.get_value("video", "fullscreen", fullscreen)
 	vsync = config.get_value("video", "vsync", vsync)
 	screen_shake = config.get_value("gameplay", "screen_shake", screen_shake)
+	keyboard_steering = config.get_value("controls", "keyboard_steering", keyboard_steering)
+	mouse_steering = config.get_value("controls", "mouse_steering", mouse_steering)
 
 func _set_bus_volume(bus_name: String, linear: float) -> void:
 	var index := AudioServer.get_bus_index(bus_name)

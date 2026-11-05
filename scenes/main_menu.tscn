@@ -61,6 +61,56 @@ balloon_scene = ExtResource("19_dj67d")
 portal_scene = ExtResource("20_6vcge")
 sky_node = NodePath("../backRect")
 
+[node name="MenuUI" type="CanvasLayer" parent="." unique_id=1820194525]
+
+[node name="Root" type="Control" parent="MenuUI" unique_id=177192761]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Buttons" type="VBoxContainer" parent="MenuUI/Root" unique_id=1709943516]
+top_level = true
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -162.5
+offset_top = -456.0
+offset_right = 162.5
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="enterButton" type="Button" parent="MenuUI/Root/Buttons" unique_id=930286790]
+layout_mode = 2
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("1_l6cm7")
+theme_override_font_sizes/font_size = 84
+text = "Enter"
+script = ExtResource("3_8ln24")
+
+[node name="tutorialButton" type="Button" parent="MenuUI/Root/Buttons" unique_id=1065461488]
+layout_mode = 2
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("1_l6cm7")
+theme_override_font_sizes/font_size = 84
+text = "Tutorial"
+
+[node name="settingsButton" type="Button" parent="MenuUI/Root/Buttons" unique_id=1458972000]
+layout_mode = 2
+theme_override_font_sizes/font_size = 70
+text = "Settings"
+
+[node name="quitButton" type="Button" parent="MenuUI/Root/Buttons" unique_id=250192057]
+layout_mode = 2
+theme_override_font_sizes/font_size = 70
+text = "Quit"
+
 [node name="Label" type="Label" parent="." unique_id=1973398537]
 offset_left = 520.0
 offset_top = 696.0
@@ -72,41 +122,12 @@ text = "(Highly reccomended)
 (TUTORIAL CURRENTLY DOESN'T CONNECT TO MAIN WORLD, RESTART ON FINISHING)"
 horizontal_alignment = 1
 
-[node name="Buttons" type="VBoxContainer" parent="." unique_id=1709943516]
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="enterButton" type="Button" parent="Buttons" unique_id=930286790]
-layout_mode = 2
-theme_override_constants/outline_size = 4
-theme_override_fonts/font = ExtResource("1_l6cm7")
-theme_override_font_sizes/font_size = 84
-text = "Enter"
-script = ExtResource("3_8ln24")
-
-[node name="tutorialButton" type="Button" parent="Buttons" unique_id=1065461488]
-layout_mode = 2
-theme_override_constants/outline_size = 4
-theme_override_fonts/font = ExtResource("1_l6cm7")
-theme_override_font_sizes/font_size = 84
-text = "Tutorial"
-
-[node name="settingsButton" type="Button" parent="Buttons" unique_id=1458972000]
-layout_mode = 2
-theme_override_font_sizes/font_size = 70
-text = "Settings"
-
-[node name="quitButton" type="Button" parent="Buttons" unique_id=250192057]
-layout_mode = 2
-theme_override_font_sizes/font_size = 70
-text = "Quit"
-
 [node name="Overlay" type="CanvasLayer" parent="." unique_id=25995367]
-layer = 10
+follow_viewport_enabled = true
 
 [node name="SettingsPanel" parent="Overlay" unique_id=337991324 instance=ExtResource("21_gw5y6")]
 
-[connection signal="pressed" from="Buttons/enterButton" to="." method="_on_enter_button_pressed"]
-[connection signal="pressed" from="Buttons/tutorialButton" to="." method="_on_enter_button_2_pressed"]
-[connection signal="pressed" from="Buttons/settingsButton" to="." method="_on_settings_button_pressed"]
-[connection signal="pressed" from="Buttons/quitButton" to="." method="_on_quit_button_pressed"]
+[connection signal="pressed" from="MenuUI/Root/Buttons/enterButton" to="." method="_on_enter_button_pressed"]
+[connection signal="pressed" from="MenuUI/Root/Buttons/tutorialButton" to="." method="_on_enter_button_2_pressed"]
+[connection signal="pressed" from="MenuUI/Root/Buttons/settingsButton" to="." method="_on_settings_button_pressed"]
+[connection signal="pressed" from="MenuUI/Root/Buttons/quitButton" to="." method="_on_quit_button_pressed"]
