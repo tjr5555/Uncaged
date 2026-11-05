@@ -29,7 +29,7 @@ const UPGRADES = [
 	{
 		"id": "coin_mult", "title": "Coin Multiplier", "var": "base_coin_mult",
 		"button": "coinMultiplierButton", "label": "coinMultLabel",
-		"step": 1.5, "mode": "add", "price": 100.0, "price_scale": 1.6, "decimals": 2,
+		"step": 0.5, "mode": "add", "price": 100.0, "price_scale": 1.6, "decimals": 2,
 	},
 	{
 		"id": "turn_rate", "title": "Flight turn rate", "var": "base_turn_speed",
@@ -41,17 +41,11 @@ const UPGRADES = [
 		"button": "BrakeTurnBonusButton", "label": "brakeTurnBonusAmount",
 		"step": 0.2, "mode": "add", "price": 100.0, "price_scale": 1.25, "decimals": 1,
 	},
-	
 	{
 		"id": "brake_strength", "title": "Brake Strength", "var": "brake_decel_scale",
 		"button": "brakeStrengthButton", "label": "brakeStrengthAmount",
 		"step": 0.15, "mode": "add", "price": 150.0, "price_scale": 1.3, "decimals": 2, "limit": 1.6,
 	}
-	#{
-	#	"id": "gravity", "title": "Steady Flight", "var": "gravity_scale",
-	#	"button": "gravityButton", "label": "gravityAmount",
-	#	"step": -0.1, "mode": "add", "price": 150.0, "price_scale": 1.3, "decimals": 1, "limit": 0.5,
-	#},
 ]
 
 var _audio := AudioStreamPlayer.new()
@@ -68,8 +62,16 @@ func _ready() -> void:
 	get_tree().node_added.connect(_on_node_added)
 	
 	for u in UPGRADES:
-		var button := grid.get_node(u["button"]) as Button
-		var label := button.get_node(u["label"]) as Label
+		var button := grid.get_node_or_null(u["button"]) as Button
+		if button == null:
+			print("ERROR: Could not find button node named: ", u["button"], " for upgrade: ", u["id"])
+			continue
+			
+		var label := button.get_node_or_null(u["label"]) as Label
+		if label == null:
+			print("ERROR: Could not find label node named: ", u["label"], " inside button: ", u["button"])
+			continue
+			
 		_nodes[u["id"]] = {"button": button, "label": label}
 		_prices[u["id"]] = float(u["price"])
 		button.pressed.connect(_buy.bind(u))
@@ -178,7 +180,7 @@ func _pop(c: Control) -> void:
 func _on_back_button_pressed() -> void:
 	if get_parent() is CanvasLayer:
 		get_parent().hide()
-	var main_node = $/root/main
+	var main_node = get_node_or_null("/root/main")
 	if main_node:
 		var boost_bar = main_node.get_node_or_null("UI/MarginContainer/BoostBar")
 		if boost_bar:

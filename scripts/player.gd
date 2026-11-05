@@ -59,6 +59,10 @@ var FLY_DOWN_ACTION = "ui_down" #pitch the nose down (hold it to dive straight d
 var FLY_BOOST_ACTION = "Dash"
 var FLY_BRAKE_ACTION = "brake" #moved off ui_down so the down arrow can dive
 
+
+
+const BASE_FLY_TURN_ACCEL = 45.0
+const DEFAULT_TURN_RATE = 4.2
 const FLY_ENTER_SPEED = 800.0
 var FLY_CRUISE_SPEED = 800.0
 const FLY_BOOST_SPEED = 1300.0
@@ -67,10 +71,10 @@ const FLY_MIN_SPEED = 450.0
 const FLY_ACCEL = 700.0
 const FLY_BOOST_ACCEL = 1400.0
 const FLY_DRAG = 450.0
-const FLY_BRAKE_DECEL = 900.0
-const FLY_TURN_RATE = 4.2
-const FLY_TURN_ACCEL = 45.0
-const FLY_BRAKE_TURN_MULT = 1.6
+var FLY_BRAKE_DECEL = 900.0
+var FLY_TURN_RATE = 4.2
+var FLY_TURN_ACCEL = 45.0
+var FLY_BRAKE_TURN_MULT = 1.6
 const FLY_FAST_TURN_MULT = 0.85
 const FLY_AUTO_LEVEL = 0.1 #0 = never levels itself out; raise it (0.9 was the old value) to bring auto-leveling back
 const FLY_LEVEL_FADE_START = 0.3 #auto-level is full strength below this pitch (sin of the angle, 0.3 is about 17 degrees)
@@ -198,6 +202,13 @@ func _ready() -> void:
 		_give_medallion()
 
 func _physics_process(delta: float) -> void:
+	#set shop variables constantly (Player specfic ones)
+	FLY_CRUISE_SPEED = Global.base_flight_speed
+	FLY_TURN_RATE = Global.base_turn_speed
+	FLY_BRAKE_DECEL = Global.brake_decel_scale
+	FLY_BRAKE_TURN_MULT = Global.brake_turn_bonus
+	FLY_TURN_ACCEL = Global.turn_accel_scale
+	FLY_TURN_ACCEL = BASE_FLY_TURN_ACCEL * Global.turn_accel_scale
 	if autopilot:
 		_autopilot_physics(delta)
 		_update_wind(delta)
@@ -220,7 +231,6 @@ func _physics_process(delta: float) -> void:
 	
 	_update_boost(delta)
 	_update_wind(delta)
-	FLY_CRUISE_SPEED = Global.base_flight_speed
 	if Input.is_action_just_pressed("reset"):
 		reset()
 
@@ -493,12 +503,12 @@ func _fly_physics(delta: float) -> void:
 	
 	speed_floor = move_toward(speed_floor, FLY_MIN_SPEED, FLY_BOUNCE_RECOVERY * delta)
 	
-	var control: float = Global.base_turn_speed / FLY_TURN_RATE
+	var control: float = FLY_TURN_RATE / DEFAULT_TURN_RATE
 	var control_t := clampf((control - 1.0) / CONTROL_MAX_BONUS, 0.0, 1.0)
 	
 	var speed_t := clampf((speed - FLY_CRUISE_SPEED) / maxf(FLY_MAX_SPEED - FLY_CRUISE_SPEED, 1.0), 0.0, 1.0)
 	var fast_mult := lerpf(FLY_FAST_TURN_MULT, 1.0, control_t)
-	var turn_rate := FLY_TURN_RATE * control * lerpf(1.0, fast_mult, speed_t)
+	var turn_rate = FLY_TURN_RATE * control * lerpf(1.0, fast_mult, speed_t)
 	if braking:
 		turn_rate *= FLY_BRAKE_TURN_MULT
 	

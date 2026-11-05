@@ -6,7 +6,7 @@ var mode: Mode = Mode.GROUND
 
 
 #shop variables
-var total_coins = 0
+var total_coins = 99999
 var base_flight_speed: int = 800.0
 var base_turn_speed: float = 4.2
 var brake_turn_bonus := 1.6   #added to the turn boost while braking (base is 1.6)
