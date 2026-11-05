@@ -4,11 +4,12 @@ signal combo_changed(count: int, multiplier: float, level: int)
 signal level_up(level: int, multiplier: float)
 signal combo_ended(count: int, bonus: int)
 
-const THRESHOLDS = [0, 3, 6, 10, 16, 25]
-const MULTIPLIERS = [1.0, 1.5, 2.0, 3.0, 4.0, 5.0]
+const THRESHOLDS = [0, 10, 15, 20, 25, 35]
+const MULTIPLIERS = [1.0, 1.25, 1.5, 1.75, 2, 3.0]
 const BASE_WINDOW = 2.4
 const MIN_WINDOW = 1.4
 const WINDOW_SHRINK = 0.03
+const MEDALLION_DRAIN = 0.6 #combo drain if you have the medallion
 
 var count := 0
 var level := 0
@@ -19,7 +20,8 @@ var window := BASE_WINDOW
 func _process(delta: float) -> void:
 	if count == 0 or Global.in_transition:
 		return
-	time_left -= delta
+	var drain := MEDALLION_DRAIN if Global.has_medallion else 1.0
+	time_left -= delta * drain
 	if time_left <= 0.0:
 		_end()
 

@@ -4,10 +4,19 @@ enum Mode { GROUND, FLY }
 
 var mode: Mode = Mode.GROUND
 
-var total_coins = 10000
+
+#shop variables
+var total_coins = 0
 var base_flight_speed: int = 800.0
 var base_turn_speed: float = 4.2
-var flight_shop_price: float = 100.0
+var brake_turn_bonus := 1.6   #added to the turn boost while braking (base is 1.6)
+var brake_decel_scale := 1.0  #multiplies brake strength (higher = stops faster)
+var gravity_scale := 1.0      #multiplies flight gravity (lower = steadier speed in climbs and dives)
+var turn_accel_scale := 1.0   #multiplies how fast the bird reaches full turn speed (higher = snappier)
+
+
+
+
 var max_dashes: int = 2
 var dashes: int = 2
 var dash_target: int 

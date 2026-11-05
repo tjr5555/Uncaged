@@ -6,7 +6,7 @@ signal portal_reached
 
 @export var medallion_scene: PackedScene
 var medallion: Node2D
-
+const MEDALLION_NECK = Vector2(-3.0, 0)
 
 
 var SPEED = 400.0
@@ -70,7 +70,7 @@ const FLY_DRAG = 350.0
 const FLY_BRAKE_DECEL = 900.0
 const FLY_GRAVITY = 1100.0
 const FLY_TURN_RATE = 4.2
-const FLY_TURN_ACCEL = 18.0
+const FLY_TURN_ACCEL = 50
 const FLY_BRAKE_TURN_MULT = 1.6
 const FLY_FAST_TURN_MULT = 0.7
 const FLY_AUTO_LEVEL = 0.0 #0 = never levels itself out; raise it (0.9 was the old value) to bring auto-leveling back
@@ -819,5 +819,16 @@ func _give_medallion() -> void:
 		return
 	Global.has_medallion = true
 	medallion = medallion_scene.instantiate()
-	add_child(medallion)
-	medallion.position = Vector2(0, -8)
+	bird.add_child(medallion)
+	_place_medallion()
+
+
+func _place_medallion() -> void:
+	if medallion == null:
+		return
+	var x := -MEDALLION_NECK.x if bird.flip_h else MEDALLION_NECK.x
+	medallion.position = Vector2(x, MEDALLION_NECK.y)
+
+
+func _process(_delta: float) -> void:
+	_place_medallion()

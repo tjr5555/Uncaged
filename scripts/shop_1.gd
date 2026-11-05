@@ -3,29 +3,62 @@ extends Control
 @export var hover_sound: AudioStream
 @export var click_sound: AudioStream
 
-
-
-
-#pricing variables, will scale depending on how good the upgrade is
-var fsbp: float = 100.0 #flight speed base price
-var cmbp: float = 100.0 #coin multiplier base price
-var ftsbp: float = 100.0 #flight turn speed base price
-
-#How much that stats increase and scale by
-const FLIGHT_STEP := 20
-const COIN_STEP := 1.5 #in this case, coin step is actually a multiplier so it would go from 1.5-2.25-3.37 instead of 1.5,2,2.5,3 etc.
-const CONTROL_STEP := 0.2
-const PRICE_SCALE := 1.25
-const COIN_MULT_PRICE_SCALE := 1.8
+#every upgrade is one entry in this list. To add a new one:
+#1. add a variable for it to Global (for example: var gravity_scale := 1.0)
+#2. add a Button to the GridContainer in the scene, with a Label as a child of the button
+#3. copy an entry below and fill in the names
+#
+#keys:
+#  id           any unique name
+#  title        text shown on the button
+#  var          the Global variable this upgrade changes
+#  button       name of the Button node under GridContainer
+#  label        name of the Label node under that button (shows "old -> new")
+#  step         how much one purchase changes the value (negative to lower it)
+#  mode         "add" (value + step) or "mult" (value * step)
+#  price        starting price
+#  price_scale  the price is multiplied by this after every purchase
+#  decimals     decimals shown in the label
+#  limit        optional: stops being buyable once the value reaches this
+const UPGRADES = [
+	{
+		"id": "flight_speed", "title": "Flight Speed", "var": "base_flight_speed",
+		"button": "flightSpeedButton", "label": "flightSpeedAmount",
+		"step": 20.0, "mode": "add", "price": 100.0, "price_scale": 1.25, "decimals": 0,
+	},
+	{
+		"id": "coin_mult", "title": "Coin Multiplier", "var": "base_coin_mult",
+		"button": "coinMultiplierButton", "label": "coinMultLabel",
+		"step": 1.5, "mode": "add", "price": 100.0, "price_scale": 1.6, "decimals": 2,
+	},
+	{
+		"id": "turn_rate", "title": "Flight turn rate", "var": "base_turn_speed",
+		"button": "flightControlButton", "label": "flightControlAmount",
+		"step": 0.2, "mode": "add", "price": 100.0, "price_scale": 1.25, "decimals": 1,
+	},
+	{
+		"id": "brake_turn", "title": "Brake Turn Bonus", "var": "brake_turn_bonus",
+		"button": "BrakeTurnBonusButton", "label": "brakeTurnBonusAmount",
+		"step": 0.2, "mode": "add", "price": 100.0, "price_scale": 1.25, "decimals": 1,
+	},
+	
+	{
+		"id": "brake_strength", "title": "Brake Strength", "var": "brake_decel_scale",
+		"button": "brakeStrengthButton", "label": "brakeStrengthAmount",
+		"step": 0.15, "mode": "add", "price": 150.0, "price_scale": 1.3, "decimals": 2, "limit": 1.6,
+	}
+	#{
+	#	"id": "gravity", "title": "Steady Flight", "var": "gravity_scale",
+	#	"button": "gravityButton", "label": "gravityAmount",
+	#	"step": -0.1, "mode": "add", "price": 150.0, "price_scale": 1.3, "decimals": 1, "limit": 0.5,
+	#},
+]
 
 var _audio := AudioStreamPlayer.new()
+var _prices := {} #upgrade id -> current price
+var _nodes := {} #upgrade id -> {"button": Button, "label": Label}
 
-@onready var flight_button: Button = $PanelContainer/MarginContainer/GridContainer/flightSpeedButton
-@onready var flight_amount: Label = $PanelContainer/MarginContainer/GridContainer/flightSpeedButton/flightSpeedAmount
-@onready var coin_button: Button = $PanelContainer/MarginContainer/GridContainer/coinMultiplierButton
-@onready var coin_amount: Label = $PanelContainer/MarginContainer/GridContainer/coinMultiplierButton/coinMultLabel
-@onready var turn_rate_button: Button = $PanelContainer/MarginContainer/GridContainer/flightControlButton
-@onready var turn_rate_amount: Label = $PanelContainer/MarginContainer/GridContainer/flightControlButton/flightControlAmount
+@onready var grid: Control = $PanelContainer/MarginContainer/GridContainer
 
 
 func _ready() -> void:
@@ -33,10 +66,14 @@ func _ready() -> void:
 	for b in find_children("*", "BaseButton", true, false):
 		_setup(b)
 	get_tree().node_added.connect(_on_node_added)
-	_update_price_ui()
-	_set_speed_text(Global.base_flight_speed)
-	_set_coin_text(Global.base_coin_mult)
-	_set_control_text(Global.base_turn_speed)
+	
+	for u in UPGRADES:
+		var button := grid.get_node(u["button"]) as Button
+		var label := button.get_node(u["label"]) as Label
+		_nodes[u["id"]] = {"button": button, "label": label}
+		_prices[u["id"]] = float(u["price"])
+		button.pressed.connect(_buy.bind(u))
+		_refresh(u)
 
 
 func _on_node_added(node: Node) -> void:
@@ -63,39 +100,72 @@ func _grow(b: BaseButton, amount: float, sound: AudioStream) -> void:
 		_audio.play()
 
 
-func _update_price_ui() -> void:
-	flight_button.text = "Flight Speed\nPrice: " + str(int(fsbp))
-	coin_button.text = "Coin Multiplier\nPrice: " + str(int(cmbp))
-	turn_rate_button.text = "Flight turn rate \nPrice: " + str(int(ftsbp))
+func _buy(u: Dictionary) -> void:
+	var id: String = u["id"]
+	var price := int(_prices[id])
+	if _is_maxed(u) or Global.total_coins < price:
+		return
+	
+	var current: Variant = Global.get(u["var"])
+	var old := float(current)
+	var next := _next_value(u, old)
+	
+	Global.total_coins -= price
+	#keep integer variables as integers
+	Global.set(u["var"], int(roundf(next)) if typeof(current) == TYPE_INT else next)
+	_prices[id] = float(_prices[id]) * float(u["price_scale"])
+	
+	_refresh_button(u)
+	_roll(u, old, next)
+	_pop(_nodes[id]["label"])
 
 
-func _set_speed_text(speed: float) -> void:
-	flight_amount.text = str(int(speed)) + " -> " + str(int(speed) + FLIGHT_STEP)
+func _next_value(u: Dictionary, current: float) -> float:
+	var next: float = current * u["step"] if u["mode"] == "mult" else current + u["step"]
+	if u.has("limit"):
+		next = minf(next, u["limit"]) if u["step"] > 0.0 else maxf(next, u["limit"])
+	return next
 
 
-func _set_coin_text(mult: float) -> void:
-	coin_amount.text = String.num(mult, 2) + " -> " + String.num(mult * COIN_STEP, 2)
+func _is_maxed(u: Dictionary) -> bool:
+	return _is_maxed_at(u, float(Global.get(u["var"])))
 
 
-func _set_control_text(control: float) -> void:
-	turn_rate_amount.text = String.num(control, 1) + " -> " + String.num(control + CONTROL_STEP, 1)
+func _is_maxed_at(u: Dictionary, value: float) -> bool:
+	if not u.has("limit"):
+		return false
+	if u["step"] > 0.0:
+		return value >= u["limit"] - 0.0001
+	return value <= u["limit"] + 0.0001
 
 
+func _refresh(u: Dictionary) -> void:
+	_set_label(float(Global.get(u["var"])), u)
+	_refresh_button(u)
 
 
-func _roll_speed(from: int, to: int) -> void:
+func _refresh_button(u: Dictionary) -> void:
+	var button: Button = _nodes[u["id"]]["button"]
+	if _is_maxed(u):
+		button.text = u["title"] + "\nMAX"
+		button.disabled = true
+	else:
+		button.text = u["title"] + "\nPrice: " + str(int(_prices[u["id"]]))
+		button.disabled = false
+
+
+func _set_label(value: float, u: Dictionary) -> void:
+	var label: Label = _nodes[u["id"]]["label"]
+	var d: int = u["decimals"]
+	if _is_maxed_at(u, value):
+		label.text = String.num(value, d)
+	else:
+		label.text = String.num(value, d) + " -> " + String.num(_next_value(u, value), d)
+
+
+func _roll(u: Dictionary, from: float, to: float) -> void:
 	var t := create_tween()
-	t.tween_method(_set_speed_text, float(from), float(to), 0.3)
-
-
-func _roll_coin(from: float, to: float) -> void:
-	var t := create_tween()
-	t.tween_method(_set_coin_text, from, to, 0.3)
-
-
-func _roll_control(from: float, to: float) -> void:
-	var t := create_tween()
-	t.tween_method(_set_control_text, from, to, 0.3)
+	t.tween_method(_set_label.bind(u), from, to, 0.3)
 
 
 func _pop(c: Control) -> void:
@@ -103,28 +173,6 @@ func _pop(c: Control) -> void:
 	var t := create_tween()
 	t.tween_property(c, "scale", Vector2.ONE * 1.3, 0.08)
 	t.tween_property(c, "scale", Vector2.ONE, 0.15).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-
-
-func _on_flight_speed_button_pressed() -> void:
-	var old_speed: int = Global.base_flight_speed
-	if Global.total_coins >= fsbp:
-		Global.total_coins -= fsbp
-		Global.base_flight_speed += FLIGHT_STEP
-		fsbp *= PRICE_SCALE
-		_update_price_ui()
-		_roll_speed(old_speed, Global.base_flight_speed)
-		_pop(flight_amount)
-
-
-func _on_coin_multiplier_button_pressed() -> void:
-	var old_coin_mult: float = Global.base_coin_mult
-	if Global.total_coins >= cmbp:
-		Global.total_coins -= cmbp
-		Global.base_coin_mult *= COIN_STEP
-		cmbp *= COIN_MULT_PRICE_SCALE
-		_update_price_ui()
-		_roll_coin(old_coin_mult, Global.base_coin_mult)
-		_pop(coin_amount)
 
 
 func _on_back_button_pressed() -> void:
@@ -135,13 +183,3 @@ func _on_back_button_pressed() -> void:
 		var boost_bar = main_node.get_node_or_null("UI/MarginContainer/BoostBar")
 		if boost_bar:
 			boost_bar.visible = true
-
-func _on_flight_control_button_pressed() -> void:
-	var old_control: float = Global.base_turn_speed
-	if Global.total_coins >= ftsbp:
-		Global.total_coins -= ftsbp
-		Global.base_turn_speed += CONTROL_STEP
-		ftsbp *= PRICE_SCALE
-		_update_price_ui()
-		_roll_control(old_control, Global.base_turn_speed)
-		_pop(turn_rate_amount)

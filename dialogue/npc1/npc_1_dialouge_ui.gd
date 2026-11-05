@@ -16,6 +16,7 @@ var dialogue = []
 var current_dialogue_id = 0
 var d_active = false
 var tween: Tween
+var end_action := "give" #what finishing this conversation does: "give", "turn_in" or "none"
 
 
 func _ready():
@@ -38,12 +39,14 @@ func load_dialogue():
 	var file = FileAccess.open("res://dialogue/npc1/parrotDialogue.json", FileAccess.READ)
 	var content = JSON.parse_string(file.get_as_text())
 
-#if the coin quest is finished, give the completed quest dialogue
-	if QuestManager.active_quests.has("collect_coins") and QuestManager.active_quests["collect_coins"].get("completed", false):
+	var quest: Dictionary = QuestManager.active_quests.get("collect_coins", {})
+	if quest.get("completed", false):
+		#the first talk after finishing turns the quest in; later talks do nothing special
+		end_action = "none" if quest.get("turned_in", false) else "turn_in"
 		return content["completed_dialogue"]
-		SignalBus.finishquest1.emit()
-	
+
 	#default to initial dialogue
+	end_action = "give"
 	return content["initial_dialogue"]
 
 
@@ -67,9 +70,13 @@ func next_script():
 		$NinePatchRect.visible = false
 		stop_sound()
 		emit_signal("dialogue_finished")
-		
-		#emits quest signal when dialogue when text is finished
-		emit_signal("give_quest", "collect_coins", "Coin Collector", "Collect coins", 10000)
+
+		match end_action:
+			"give":
+				emit_signal("give_quest", "collect_coins", "Coin Collector", "Collect coins", 10000)
+			"turn_in":
+				QuestManager.active_quests["collect_coins"]["turned_in"] = true
+				SignalBus.finishquest1.emit()
 		return
 
 	var current_data = dialogue[current_dialogue_id]
@@ -119,7 +126,7 @@ func animate_text(text: String):
 			continue
 
 		var duration = (index - last_punct_index) * LETTER_TIME
-		
+
 		tween.tween_callback(play_sound)
 		tween.tween_method(_reveal_char, last_punct_index, index, duration)
 
@@ -150,6 +157,3 @@ func play_sound():
 func stop_sound():
 	if audio_stream_player and audio_stream_player.playing:
 		audio_stream_player.stop()
-#signal give_quest(quest_id, title, description, target_count)
-func _on_dialogue_finished():
-	emit_signal("give_quest", "collect_coins", "Coin Collector", "Collect coins", 500)
