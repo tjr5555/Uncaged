@@ -1,0 +1,186 @@
+[gd_scene format=3 uid="uid://de0x0t27wvghm"]
+
+[ext_resource type="Script" uid="uid://0aicbu6rsj6y" path="res://scripts/settings_panel.gd" id="1_wk5a6"]
+[ext_resource type="Shader" uid="uid://bwi0montndkud" path="res://shaders/ui_blur.gdshader" id="2_u5gid"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_lnx0a"]
+shader = ExtResource("2_u5gid")
+shader_parameter/amount = 1.0
+shader_parameter/blur_radius = 3.0
+shader_parameter/tint = Color(0.04, 0.07, 0.14, 0.55)
+
+[sub_resource type="Theme" id="Theme_fgkvo"]
+
+[node name="SettingsFull" type="Control" unique_id=928376227]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_wk5a6")
+
+[node name="Backdrop" type="ColorRect" parent="." unique_id=221729888]
+unique_name_in_owner = true
+material = SubResource("ShaderMaterial_lnx0a")
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = SubResource("Theme_fgkvo")
+
+[node name="Center" type="CenterContainer" parent="." unique_id=1094454584]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="Center" unique_id=1718603479]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(640, 480)
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="Center/Panel" unique_id=1409276188]
+layout_mode = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 32
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 32
+
+[node name="VBox" type="VBoxContainer" parent="Center/Panel/Margin" unique_id=184446027]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Center/Panel/Margin/VBox" unique_id=823256769]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"HeaderLarge"
+text = "Settings"
+
+[node name="Tabs" type="TabContainer" parent="Center/Panel/Margin/VBox" unique_id=1610675116]
+layout_mode = 2
+size_flags_vertical = 3
+current_tab = 2
+
+[node name="Audio" type="GridContainer" parent="Center/Panel/Margin/VBox/Tabs" unique_id=1709817128]
+visible = false
+layout_mode = 2
+columns = 3
+metadata/_tab_index = 0
+
+[node name="MasterLabel" type="Label" parent="Center/Panel/Margin/VBox/Tabs/Audio" unique_id=1516477365]
+layout_mode = 2
+text = "Master"
+
+[node name="MasterSlider" type="HSlider" parent="Center/Panel/Margin/VBox/Tabs/Audio" unique_id=1485212801]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="MasterValue" type="Label" parent="Center/Panel/Margin/VBox/Tabs/Audio" unique_id=457630479]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="MusicLabel" type="Label" parent="Center/Panel/Margin/VBox/Tabs/Audio" unique_id=216140695]
+layout_mode = 2
+text = "Music"
+
+[node name="MusicSlider" type="HSlider" parent="Center/Panel/Margin/VBox/Tabs/Audio" unique_id=1934283452]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="MusicValue" type="Label" parent="Center/Panel/Margin/VBox/Tabs/Audio" unique_id=2093904630]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="SfxLabel" type="Label" parent="Center/Panel/Margin/VBox/Tabs/Audio" unique_id=1936550776]
+layout_mode = 2
+text = "Effects"
+
+[node name="SfxSlider" type="HSlider" parent="Center/Panel/Margin/VBox/Tabs/Audio" unique_id=1083406676]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="SfxValue" type="Label" parent="Center/Panel/Margin/VBox/Tabs/Audio" unique_id=2093887786]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Display" type="GridContainer" parent="Center/Panel/Margin/VBox/Tabs" unique_id=743438298]
+visible = false
+layout_mode = 2
+columns = 3
+metadata/_tab_index = 1
+
+[node name="FullscreenLabel" type="Label" parent="Center/Panel/Margin/VBox/Tabs/Display" unique_id=942969119]
+layout_mode = 2
+text = "Fullscreen"
+
+[node name="FullscreenCheck" type="CheckButton" parent="Center/Panel/Margin/VBox/Tabs/Display" unique_id=1177500153]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="FullscreenSpacer" type="Control" parent="Center/Panel/Margin/VBox/Tabs/Display" unique_id=1816761592]
+layout_mode = 2
+
+[node name="VsyncLabel" type="Label" parent="Center/Panel/Margin/VBox/Tabs/Display" unique_id=1124816562]
+layout_mode = 2
+text = "Vsync"
+
+[node name="VsyncCheck" type="CheckButton" parent="Center/Panel/Margin/VBox/Tabs/Display" unique_id=1101365154]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="VsyncSpacer" type="Control" parent="Center/Panel/Margin/VBox/Tabs/Display" unique_id=1153242713]
+layout_mode = 2
+
+[node name="ShakeLabel" type="Label" parent="Center/Panel/Margin/VBox/Tabs/Display" unique_id=1180247106]
+layout_mode = 2
+text = "Screen Shake"
+
+[node name="ShakeSlider" type="HSlider" parent="Center/Panel/Margin/VBox/Tabs/Display" unique_id=2097010506]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="ShakeValue" type="Label" parent="Center/Panel/Margin/VBox/Tabs/Display" unique_id=1736049855]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Controls" type="VBoxContainer" parent="Center/Panel/Margin/VBox/Tabs" unique_id=1903589400]
+layout_mode = 2
+metadata/_tab_index = 2
+
+[node name="ControlsGrid" type="GridContainer" parent="Center/Panel/Margin/VBox/Tabs/Controls" unique_id=1338481362]
+layout_mode = 2
+columns = 2
+
+[node name="KeyboardLabel" type="Label" parent="Center/Panel/Margin/VBox/Tabs/Controls/ControlsGrid" unique_id=859899414]
+layout_mode = 2
+text = "Keyboard Steering"
+
+[node name="KeyboardSteerCheck" type="CheckButton" parent="Center/Panel/Margin/VBox/Tabs/Controls/ControlsGrid" unique_id=1735791945]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="MouseLabel" type="Label" parent="Center/Panel/Margin/VBox/Tabs/Controls/ControlsGrid" unique_id=383578449]
+layout_mode = 2
+text = "Mouse Steering"
+
+[node name="MouseSteerCheck" type="CheckButton" parent="Center/Panel/Margin/VBox/Tabs/Controls/ControlsGrid" unique_id=1515131695]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Footer" type="HBoxContainer" parent="Center/Panel/Margin/VBox" unique_id=2022327318]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="ResetButton" type="Button" parent="Center/Panel/Margin/VBox/Footer" unique_id=101688018]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Reset to Default"
+
+[node name="BackButton" type="Button" parent="Center/Panel/Margin/VBox/Footer" unique_id=40757551]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Back"

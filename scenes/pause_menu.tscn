@@ -1,0 +1,64 @@
+[gd_scene format=3 uid="uid://b7n5a1d4y5bd3"]
+
+[ext_resource type="Script" uid="uid://cqnb5dywxlwc6" path="res://scripts/pause_menu.gd" id="1_n87rw"]
+[ext_resource type="PackedScene" uid="uid://dypb7qlgribk4" path="res://scenes/settings_compact.tscn" id="2_myx47"]
+
+[node name="PauseMenu" type="CanvasLayer" unique_id=149015961]
+script = ExtResource("1_n87rw")
+
+[node name="Backdrop" type="ColorRect" parent="." unique_id=51165698]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Root" type="Control" parent="." unique_id=256128810]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Center" type="CenterContainer" parent="Root" unique_id=2026061123]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PausePanel" type="PanelContainer" parent="Root/Center" unique_id=1272320115]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="Margin" type="MarginContainer" parent="Root/Center/PausePanel" unique_id=1435073714]
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="Root/Center/PausePanel/Margin" unique_id=1398902584]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Root/Center/PausePanel/Margin/VBox" unique_id=586844363]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Paused"
+
+[node name="ResumeButton" type="Button" parent="Root/Center/PausePanel/Margin/VBox" unique_id=2136137855]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Resume
+"
+
+[node name="SettingsButton" type="Button" parent="Root/Center/PausePanel/Margin/VBox" unique_id=947753491]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Settings"
+
+[node name="MenuButton" type="Button" parent="Root/Center/PausePanel/Margin/VBox" unique_id=1818027913]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Main Menu"
+
+[node name="QuitButton" type="Button" parent="Root/Center/PausePanel/Margin/VBox" unique_id=333808207]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Quit"
+
+[node name="SettingsCompact" parent="." unique_id=337991324 instance=ExtResource("2_myx47")]
+unique_name_in_owner = true

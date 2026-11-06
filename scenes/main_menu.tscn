@@ -20,7 +20,7 @@
 [ext_resource type="PackedScene" uid="uid://bhnql6ieieyxu" path="res://island scenes/island_12.tscn" id="18_6h3lr"]
 [ext_resource type="PackedScene" uid="uid://dac1ej83teqnb" path="res://scenes/balloon_area.tscn" id="19_dj67d"]
 [ext_resource type="PackedScene" uid="uid://beplsivn2dg6g" path="res://scenes/portal.tscn" id="20_6vcge"]
-[ext_resource type="PackedScene" uid="uid://dypb7qlgribk4" path="res://scenes/settings_panel.tscn" id="21_gw5y6"]
+[ext_resource type="PackedScene" uid="uid://dypb7qlgribk4" path="res://scenes/settings_compact.tscn" id="21_gw5y6"]
 
 [sub_resource type="Gradient" id="Gradient_ekxnf"]
 offsets = PackedFloat32Array(0.090361446, 1)

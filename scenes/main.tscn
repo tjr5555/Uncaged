@@ -6,6 +6,8 @@
 [ext_resource type="Shader" uid="uid://bv2f3cmg2a2nb" path="res://shaders/sky.gdshader" id="2_tefeu"]
 [ext_resource type="Script" uid="uid://dab0yedekt4ed" path="res://scripts/sky.gd" id="3_o6xl0"]
 [ext_resource type="PackedScene" uid="uid://di6dday241poi" path="res://scenes/ui.tscn" id="5_tefeu"]
+[ext_resource type="Script" uid="uid://cemmhpjfox58t" path="res://scripts/combo_fx.gd" id="7_tipki"]
+[ext_resource type="PackedScene" uid="uid://b7n5a1d4y5bd3" path="res://scenes/pause_menu.tscn" id="8_85g3d"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_tipki"]
 shader = ExtResource("2_tefeu")
@@ -44,3 +46,12 @@ position = Vector2(633, -278)
 scale = Vector2(1, 1)
 
 [node name="UI" parent="." unique_id=391863151 instance=ExtResource("5_tefeu")]
+
+[node name="ComboFX" type="Control" parent="UI" unique_id=2036890622]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("7_tipki")
+
+[node name="PauseMenu" parent="." unique_id=149015961 instance=ExtResource("8_85g3d")]

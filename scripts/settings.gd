@@ -11,23 +11,38 @@ var vsync := true
 var keyboard_steering := true
 var mouse_steering := true
 
+
 func _ready() -> void:
 	load_settings()
 	apply()
+
 
 func apply() -> void:
 	_set_bus_volume("Master", master_volume)
 	_set_bus_volume("Music", music_volume)
 	_set_bus_volume("SFX", sfx_volume)
-	
+
 	var current := DisplayServer.window_get_mode()
 	var is_full := current == DisplayServer.WINDOW_MODE_FULLSCREEN or current == DisplayServer.WINDOW_MODE_EXCLUSIVE_FULLSCREEN
 	if fullscreen and not is_full:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_FULLSCREEN)
 	elif not fullscreen and is_full:
 		DisplayServer.window_set_mode(DisplayServer.WINDOW_MODE_WINDOWED)
-	
+
 	DisplayServer.window_set_vsync_mode(DisplayServer.VSYNC_ENABLED if vsync else DisplayServer.VSYNC_DISABLED)
+
+
+func reset_to_defaults() -> void:
+	master_volume = 1.0
+	music_volume = 0.8
+	sfx_volume = 0.9
+	screen_shake = 1.0
+	fullscreen = false
+	vsync = true
+	keyboard_steering = true
+	mouse_steering = true
+	apply()
+
 
 func save_settings() -> void:
 	var config := ConfigFile.new()
@@ -41,6 +56,7 @@ func save_settings() -> void:
 	config.set_value("controls", "mouse_steering", mouse_steering)
 	config.save(PATH)
 
+
 func load_settings() -> void:
 	var config := ConfigFile.new()
 	if config.load(PATH) != OK:
@@ -53,6 +69,7 @@ func load_settings() -> void:
 	screen_shake = config.get_value("gameplay", "screen_shake", screen_shake)
 	keyboard_steering = config.get_value("controls", "keyboard_steering", keyboard_steering)
 	mouse_steering = config.get_value("controls", "mouse_steering", mouse_steering)
+
 
 func _set_bus_volume(bus_name: String, linear: float) -> void:
 	var index := AudioServer.get_bus_index(bus_name)

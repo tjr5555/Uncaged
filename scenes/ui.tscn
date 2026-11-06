@@ -132,10 +132,13 @@ script = ExtResource("5_wm3ai")
 
 [node name="ComboDisplay" type="Control" parent="." unique_id=1533434663]
 layout_mode = 3
-anchors_preset = 0
-offset_left = 1450.0
-offset_right = 1730.0
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -140.0
+offset_right = 140.0
 offset_bottom = 160.0
+grow_horizontal = 2
 mouse_filter = 2
 script = ExtResource("8_ktti3")
 
@@ -150,16 +153,28 @@ alignment = 1
 
 [node name="Top" type="HBoxContainer" parent="ComboDisplay/Box" unique_id=563516944]
 layout_mode = 2
+alignment = 1
 
 [node name="ComboCount" type="Label" parent="ComboDisplay/Box/Top" unique_id=912393179]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.35000002)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 4
+theme_override_constants/outline_size = 5
+theme_override_constants/shadow_outline_size = 1
+theme_override_fonts/font = ExtResource("2_x4jx1")
 theme_override_font_sizes/font_size = 64
 text = "0"
 
 [node name="ComboMultiplier" type="Label" parent="ComboDisplay/Box/Top" unique_id=1666820441]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.45800003)
+theme_override_constants/shadow_offset_y = 3
+theme_override_constants/outline_size = 5
+theme_override_fonts/font = ExtResource("2_x4jx1")
 theme_override_font_sizes/font_size = 34
 text = "x1"
 
@@ -173,3 +188,5 @@ horizontal_alignment = 1
 unique_name_in_owner = true
 custom_minimum_size = Vector2(220, 10)
 layout_mode = 2
+theme_override_constants/outline_size = 4
+theme_override_fonts/font = ExtResource("2_x4jx1")
