@@ -24,12 +24,12 @@ const UPGRADES = [
 	{
 		"id": "flight_speed", "title": "Flight Speed", "var": "base_flight_speed",
 		"button": "flightSpeedButton", "label": "flightSpeedAmount",
-		"step": 30.0, "mode": "add", "price": 150.0, "price_scale": 1.3, "decimals": 0, "limit": 1100.0,
+		"step": 50.0, "mode": "add", "price": 150.0, "price_scale": 1.3, "decimals": 0, "limit": 2500.0,
 	},
 	{
 		"id": "coin_mult", "title": "Coin Multiplier", "var": "base_coin_mult",
 		"button": "coinMultiplierButton", "label": "coinMultLabel",
-		"step": 0.25, "mode": "add", "price": 300.0, "price_scale": 1.55, "decimals": 2, "limit": 3.0,
+		"step": 0.25, "mode": "add", "price": 300.0, "price_scale": 1.5, "decimals": 2, "limit": 5.0,
 	},
 	{
 		"id": "turn_rate", "title": "Turn Rate", "var": "base_turn_speed",
@@ -49,7 +49,7 @@ const UPGRADES = [
 	{
 		"id": "magnet", "title": "Balloon Magnet", "var": "magnet_radius",
 		"button": "magnetButton", "label": "magnetAmount",
-		"step": 70.0, "mode": "add", "price": 250.0, "price_scale": 1.6, "decimals": 0, "limit": 350.0,
+		"step": 70.0, "mode": "add", "price": 500.0, "price_scale": 1.6, "decimals": 0, "limit": 350.0,
 	},
 ]
 
@@ -190,6 +190,7 @@ func _pop(c: Control) -> void:
 
 
 func _on_back_button_pressed() -> void:
+	Global.INPUT_LOCKED = false
 	if get_parent() is CanvasLayer:
 		get_parent().hide()
 	var main_node = get_node_or_null("/root/main")

@@ -149,10 +149,12 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 alignment = 1
 
 [node name="Top" type="HBoxContainer" parent="ComboDisplay/Box" unique_id=563516944]
 layout_mode = 2
+mouse_filter = 2
 alignment = 1
 
 [node name="ComboCount" type="Label" parent="ComboDisplay/Box/Top" unique_id=912393179]
@@ -188,5 +190,6 @@ horizontal_alignment = 1
 unique_name_in_owner = true
 custom_minimum_size = Vector2(220, 10)
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/outline_size = 4
 theme_override_fonts/font = ExtResource("2_x4jx1")

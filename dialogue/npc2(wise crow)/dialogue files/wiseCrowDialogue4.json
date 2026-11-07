@@ -13,7 +13,7 @@
 		{"name": "You", "text": "Ok, just tell me what I need to do."},
 		{"name": "Wise Crow", "text": "You need to press (G) to enter fly mode."},
 		{"name": "Wise Crow", "text": "When you are in the air use the arrow keys to control your flight"},
-		{"name": "Wise Crow", "text": "Also, if needed press (X) to boost your flight."},
+		{"name": "Wise Crow", "text": "The flight can also follow your mouse, if that works for you better."},
 		{"name": "Wise Crow", "text": "Did you get all of that?"},
 		{"name": "You", "text": "Yes, I think I'm ready."},
 		{"name": "Wise Crow", "text": "Good luck."}

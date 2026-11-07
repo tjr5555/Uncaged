@@ -17,6 +17,7 @@ func _process(delta: float) -> void:
 	if Input.is_action_just_pressed("augment") and playernear == true:
 		if current_shop == null:
 			var shop_instance = shop_scene.instantiate()
+			Global.INPUT_LOCKED = true #locks player input when opening the shop
 			current_shop = CanvasLayer.new()
 			current_shop.add_child(shop_instance)
 			add_child(current_shop)

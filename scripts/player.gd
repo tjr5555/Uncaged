@@ -238,7 +238,7 @@ func _physics_process(delta: float) -> void:
 		_update_wind(delta)
 		return
 
-	if Input.is_action_just_pressed("toggle_fly"):
+	if Input.is_action_just_pressed("toggle_fly") and not Global.INPUT_LOCKED:
 		_set_mode(Global.Mode.GROUND if Global.mode == Global.Mode.FLY else Global.Mode.FLY)
 
 	is_boosting = false
@@ -251,7 +251,7 @@ func _physics_process(delta: float) -> void:
 
 	_update_boost(delta)
 	_update_wind(delta)
-	if Input.is_action_just_pressed("reset"):
+	if Input.is_action_just_pressed("reset") and not Global.INPUT_LOCKED:
 		reset()
 
 func _input(event: InputEvent) -> void:
@@ -315,8 +315,8 @@ func _speed_zoom_allowed() -> bool:
 	return not NO_SPEED_ZOOM_SCENES.has(scene_name)
 
 func _ground_physics(delta: float) -> void:
-	var dir := Input.get_axis("ui_left", "ui_right")
-	var ydir := Input.get_axis("ui_up", "ui_down")
+	var dir := 0.0 if Global.INPUT_LOCKED else Input.get_axis("ui_left", "ui_right")
+	var ydir := 0.0 if Global.INPUT_LOCKED else Input.get_axis("ui_up", "ui_down")
 	var on_floor := is_on_floor()
 	var on_wall := is_on_wall_only()
 	
@@ -337,7 +337,7 @@ func _ground_physics(delta: float) -> void:
 	wall_lock_timer = maxf(wall_lock_timer - delta, 0.0)
 	jump_buffer_timer = maxf(jump_buffer_timer - delta, 0.0)
 	
-	if Input.is_action_just_pressed("ui_accept"):
+	if Input.is_action_just_pressed("ui_accept") and not Global.INPUT_LOCKED:
 		jump_buffer_timer = JUMP_BUFFER
 	
 	var jumped := false
@@ -367,10 +367,10 @@ func _ground_physics(delta: float) -> void:
 	
 	if velocity.y >= 0.0:
 		jump_cut_available = false
-	if Input.is_action_just_released("ui_accept") and jump_cut_available and velocity.y < 0.0:
+	if Input.is_action_just_released("ui_accept") and jump_cut_available and velocity.y < 0.0 and not Global.INPUT_LOCKED:
 		velocity.y *= JUMP_CUT
 		jump_cut_available = false
-	if Input.is_action_pressed("ui_accept") and not on_floor:
+	if Input.is_action_pressed("ui_accept") and not on_floor and not Global.INPUT_LOCKED:
 		hold_timer += delta
 		if hold_timer >= HOLD_DURATION and velocity.y > 0.0:
 			is_gliding = true
@@ -404,7 +404,7 @@ func _ground_physics(delta: float) -> void:
 		var accel := FRICTION if on_floor else AIR_FRICTION
 		velocity.x = move_toward(velocity.x, dir * SPEED, accel * delta)
 	
-	if Input.is_action_just_pressed("Dash") and Global.dashes > 0:
+	if Input.is_action_just_pressed("Dash") and Global.dashes > 0 and not Global.INPUT_LOCKED:
 		var dash_dir := Vector2(dir, ydir)
 		if dash_dir == Vector2.ZERO:
 			dash_dir = Vector2(current_dir, 0)
@@ -436,13 +436,13 @@ func _ground_physics(delta: float) -> void:
 			_on_landed(incoming_speed_y)
 		hop_airborne = false
 	
-	if is_on_floor() and incoming_speed_y > 50.0 and Input.is_action_pressed("ui_down") and Input.is_action_pressed("augment"):
+	if is_on_floor() and incoming_speed_y > 50.0 and Input.is_action_pressed("ui_down") and Input.is_action_pressed("augment") and not Global.INPUT_LOCKED:
 		velocity.y = incoming_speed_y * 1.1 * -1.0
 		jump_cut_available = false
 		velocity.x = 0.0
 		Global.dashes = Global.max_dashes
 	
-	if is_on_floor() and Input.is_action_pressed("augment") and velocity.y > 50.0:
+	if is_on_floor() and Input.is_action_pressed("augment") and velocity.y > 50.0 and not Global.INPUT_LOCKED:
 		velocity.x += velocity.y
 	
 	_update_ground_animation()
@@ -521,14 +521,14 @@ func _ledge_near(direction: float) -> bool:
 	return false
 
 func _fly_physics(delta: float) -> void:
-	var braking := Input.is_action_pressed(FLY_BRAKE_ACTION)
+	var braking := Input.is_action_pressed(FLY_BRAKE_ACTION) 
 	
 	if boost <= 0.0:
 		boost_exhausted = true
 	elif boost >= BOOST_RESTART_AMOUNT:
 		boost_exhausted = false
 	
-	var boosting := Input.is_action_pressed(FLY_BOOST_ACTION) and not boost_exhausted
+	var boosting := Input.is_action_pressed(FLY_BOOST_ACTION) and not boost_exhausted 
 	is_boosting = boosting
 	
 	speed_floor = move_toward(speed_floor, FLY_MIN_SPEED, FLY_BOUNCE_RECOVERY * delta)
@@ -590,6 +590,12 @@ func _fly_physics(delta: float) -> void:
 	velocity = velocity.lerp(heading_vec * speed, 1.0 - exp(-vel_smooth * delta))
 	
 	move_and_slide()
+	
+	if _touching_hazard():
+		respawn()
+		return
+	
+	
 	
 	if get_slide_collision_count() > 0:
 		var normal := get_last_slide_collision().get_normal()

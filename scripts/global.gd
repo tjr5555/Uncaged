@@ -3,7 +3,7 @@ extends Node
 enum Mode { GROUND, FLY }
 
 var mode: Mode = Mode.GROUND
-
+var INPUT_LOCKED = false 
 
 #shop variables
 var total_coins = 0
