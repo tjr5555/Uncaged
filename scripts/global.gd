@@ -6,14 +6,15 @@ var mode: Mode = Mode.GROUND
 
 
 #shop variables
-var total_coins = 99999
+var total_coins = 0
 var base_flight_speed: int = 800.0
 var base_turn_speed: float = 4.2
 var brake_turn_bonus := 1.6   #added to the turn boost while braking (base is 1.6)
 var brake_decel_scale := 1.0  #multiplies brake strength (higher = stops faster)
 var gravity_scale := 1.0      #multiplies flight gravity (lower = steadier speed in climbs and dives)
 var turn_accel_scale := 1.0   #multiplies how fast the bird reaches full turn speed (higher = snappier)
-
+var magnet_radius := 0.0
+var upgrade_levels: Dictionary = {}
 
 
 

@@ -1,10 +1,11 @@
 [gd_scene format=3 uid="uid://c7a3i1188tjny"]
 
-[ext_resource type="Script" uid="uid://glwsi83k70dk" path="res://scripts/shop_1.gd" id="1_vr6tn"]
+[ext_resource type="Script" uid="uid://glwsi83k70dk" path="res://scripts/shop.gd" id="1_vr6tn"]
 [ext_resource type="FontFile" uid="uid://31a0pllxp1ya" path="res://fonts/Play/Play-Bold.ttf" id="2_cyb0u"]
 [ext_resource type="AudioStream" uid="uid://dkxucyotn1yhl" path="res://audio/freesoundeffects-button-click-289742.mp3" id="2_qu5gy"]
 [ext_resource type="AudioStream" uid="uid://ir3c4ch6ieih" path="res://audio/denielcz-immersivecontrol-button-click-sound-463065.mp3" id="2_wfx2d"]
 [ext_resource type="FontFile" uid="uid://eus6nd3e135o" path="res://fonts/Inter/static/Inter_24pt-Bold.ttf" id="5_qu5gy"]
+[ext_resource type="FontFile" uid="uid://b18ofjevqi05d" path="res://fonts/Elms_Sans/static/ElmsSans-SemiBold.ttf" id="6_8r1wq"]
 
 [sub_resource type="Gradient" id="Gradient_wfx2d"]
 colors = PackedColorArray(0.8808251, 0.1897483, 0, 1, 1, 1, 0, 1)
@@ -13,7 +14,7 @@ colors = PackedColorArray(0.8808251, 0.1897483, 0, 1, 1, 1, 0, 1)
 gradient = SubResource("Gradient_wfx2d")
 fill_from = Vector2(0.26956522, 1)
 
-[node name="shop1" type="Control" unique_id=1976378373]
+[node name="shop" type="Control" unique_id=1976378373]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -24,7 +25,7 @@ script = ExtResource("1_vr6tn")
 hover_sound = ExtResource("2_qu5gy")
 click_sound = ExtResource("2_wfx2d")
 
-[node name="bg" type="TextureRect" parent="." unique_id=1781888682]
+[node name="back" type="TextureRect" parent="." unique_id=1781888682]
 layout_mode = 0
 offset_right = 1920.0
 offset_bottom = 1080.0
@@ -121,6 +122,34 @@ offset_bottom = 178.0
 theme_override_fonts/font = ExtResource("5_qu5gy")
 theme_override_font_sizes/font_size = 40
 horizontal_alignment = 1
+
+[node name="brakeStrengthButton" type="Button" parent="PanelContainer/MarginContainer/GridContainer" unique_id=380025888]
+custom_minimum_size = Vector2(354, 98)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("6_8r1wq")
+theme_override_font_sizes/font_size = 40
+text = "Brake Strength"
+
+[node name="brakeStrengthAmount" type="Label" parent="PanelContainer/MarginContainer/GridContainer/brakeStrengthButton" unique_id=1080225756]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 114.0
+offset_right = 354.0
+offset_bottom = 178.0
+
+[node name="magnetButton" type="Button" parent="PanelContainer/MarginContainer/GridContainer" unique_id=942243450]
+custom_minimum_size = Vector2(354, 92)
+layout_mode = 2
+theme_override_fonts/font = ExtResource("6_8r1wq")
+theme_override_font_sizes/font_size = 35
+text = "Magnet Strength"
+
+[node name="magnetAmount" type="Label" parent="PanelContainer/MarginContainer/GridContainer/magnetButton" unique_id=761267529]
+layout_mode = 0
+offset_left = 2.0
+offset_top = 114.0
+offset_right = 354.0
+offset_bottom = 178.0
 
 [node name="backButton" type="Button" parent="." unique_id=1558949517]
 custom_minimum_size = Vector2(354, 98)

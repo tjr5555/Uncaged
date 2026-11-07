@@ -33,6 +33,14 @@ var WALL_JUMP_PUSH = 550.0
 var WALL_JUMP_HEIGHT = -520.0
 var WALL_JUMP_LOCK = 0.18
 
+const SHAKE_MAX_OFFSET = 28.0
+const SHAKE_DECAY = 1.8
+const WALL_SHAKE = 0.9
+const WALL_SHAKE_MIN_SPEED = 300.0
+
+var camera_look := Vector2.ZERO
+var shake_trauma := 0.0
+
 const LAND_MIN_IMPACT = 250.0
 const LAND_MAX_IMPACT = 1600.0
 const LAND_SQUASH = 0.28
@@ -114,11 +122,13 @@ const FLY_CAMERA_MAX_OFFSET = 300.0
 
 const WIND_START_SPEED = 900.0
 const WIND_FULL_SPEED = 2000.0
-const WIND_OFFSET = 18.0
 const WIND_COLOR = Color(1.0, 1.0, 1.0, 0.5)
 const WIND_FADE_SPEED = 3.0
 
-var WIND_LANE_OFFSETS: PackedFloat32Array = PackedFloat32Array([-34.0, -17.0, 0.0, 17.0, 34.0])
+const WIND_BODY_HALF = Vector2(26.0, 30.0)
+const WIND_BODY_CENTER = Vector2.ZERO
+const WIND_INSET = 0.55
+var WIND_LANE_FRACTIONS: PackedFloat32Array = PackedFloat32Array([-0.8, -0.4, 0.0, 0.4, 0.8])
 var WIND_LANE_LENGTHS: PackedInt32Array = PackedInt32Array([8, 12, 18, 12, 8])
 var WIND_LANE_WIDTHS: PackedFloat32Array = PackedFloat32Array([6.0, 9.0, 12.0, 9.0, 6.0])
 
@@ -142,6 +152,12 @@ var last_emitted_boost: float = -1.0
 @onready var base_scale: Vector2 = bird.scale
 @onready var camera: Camera2D = get_node_or_null("Camera")
 @onready var base_zoom: Vector2 = camera.zoom if camera else Vector2.ONE
+
+const MAGNET_PULL_SPEED = 900.0
+const BASE_FLY_BRAKE_DECEL = 900.0
+
+var magnet_area: Area2D
+var magnet_shape: CircleShape2D
 
 var flaps = 1
 var current_dir = 1
@@ -173,18 +189,19 @@ const EMERGE_TIME = 0.5
 
 func _ready() -> void:
 	last_grounded_pos = global_position
-	
+
 	var width_curve := Curve.new()
-	width_curve.add_point(Vector2(0.0, 1.0))
-	width_curve.add_point(Vector2(0.35, 0.8))
+	width_curve.add_point(Vector2(0.0, 0.35))
+	width_curve.add_point(Vector2(0.18, 1.0))
 	width_curve.add_point(Vector2(1.0, 0.0))
-	
+
 	var gradient := Gradient.new()
-	gradient.set_color(0, WIND_COLOR)
+	gradient.set_color(0, Color(WIND_COLOR, 0.0))
 	gradient.set_color(1, Color(WIND_COLOR, 0.0))
-	gradient.add_point(0.4, Color(WIND_COLOR, WIND_COLOR.a * 0.5))
-	
-	for i in WIND_LANE_OFFSETS.size():
+	gradient.add_point(0.15, WIND_COLOR)
+	gradient.add_point(0.45, Color(WIND_COLOR, WIND_COLOR.a * 0.5))
+
+	for i in WIND_LANE_FRACTIONS.size():
 		var line := Line2D.new()
 		line.width = WIND_LANE_WIDTHS[i]
 		line.width_curve = width_curve
@@ -197,18 +214,22 @@ func _ready() -> void:
 		line.show_behind_parent = true
 		add_child(line)
 		wind_lines.append(line)
+
+	_build_magnet()
+
 	SignalBus.finishquest1.connect(_give_medallion)
 	if Global.has_medallion:
 		_give_medallion()
 
 func _physics_process(delta: float) -> void:
-	#set shop variables constantly (Player specfic ones)
+	#set shop variables constantly (Player specific ones)
 	FLY_CRUISE_SPEED = Global.base_flight_speed
 	FLY_TURN_RATE = Global.base_turn_speed
-	FLY_BRAKE_DECEL = Global.brake_decel_scale
+	FLY_BRAKE_DECEL = BASE_FLY_BRAKE_DECEL * Global.brake_decel_scale
 	FLY_BRAKE_TURN_MULT = Global.brake_turn_bonus
-	FLY_TURN_ACCEL = Global.turn_accel_scale
 	FLY_TURN_ACCEL = BASE_FLY_TURN_ACCEL * Global.turn_accel_scale
+	_update_magnet(delta)
+
 	if autopilot:
 		_autopilot_physics(delta)
 		_update_wind(delta)
@@ -217,18 +238,18 @@ func _physics_process(delta: float) -> void:
 		_emerge_physics(delta)
 		_update_wind(delta)
 		return
-	
+
 	if Input.is_action_just_pressed("toggle_fly"):
 		_set_mode(Global.Mode.GROUND if Global.mode == Global.Mode.FLY else Global.Mode.FLY)
-	
+
 	is_boosting = false
-	
+
 	match Global.mode:
 		Global.Mode.GROUND:
 			_ground_physics(delta)
 		Global.Mode.FLY:
 			_fly_physics(delta)
-	
+
 	_update_boost(delta)
 	_update_wind(delta)
 	if Input.is_action_just_pressed("reset"):
@@ -268,8 +289,6 @@ func _set_mode(new_mode: Global.Mode) -> void:
 		bird.flip_v = false
 		_face(current_dir)
 
-
-
 func _update_camera(delta: float, look: Vector2 = Vector2.ZERO, zoom_multiplier: float = 1.0) -> void:
 	if camera == null:
 		return
@@ -279,8 +298,15 @@ func _update_camera(delta: float, look: Vector2 = Vector2.ZERO, zoom_multiplier:
 	if _speed_zoom_allowed():
 		speed_t = smoothstep(CAMERA_ZOOM_START_SPEED, CAMERA_ZOOM_END_SPEED, velocity.length())
 	var target_zoom := base_zoom * lerpf(1.0, CAMERA_MIN_ZOOM, speed_t) * zoom_multiplier
-	camera.offset = camera.offset.lerp(look, move_weight)
+	
+	camera_look = camera_look.lerp(look, move_weight)
+	shake_trauma = maxf(shake_trauma - delta * SHAKE_DECAY, 0.0)
+	var shake := shake_trauma * shake_trauma * SHAKE_MAX_OFFSET * Settings.screen_shake
+	camera.offset = camera_look + Vector2(randf_range(-1.0, 1.0), randf_range(-1.0, 1.0)) * shake
 	camera.zoom = camera.zoom.lerp(target_zoom, zoom_weight)
+
+func add_shake(amount: float) -> void:
+	shake_trauma = minf(shake_trauma + amount, 1.0)
 
 func _speed_zoom_allowed() -> bool:
 	var scene := get_tree().current_scene
@@ -565,20 +591,14 @@ func _fly_physics(delta: float) -> void:
 		var normal := get_last_slide_collision().get_normal()
 		var impact := -heading_vec.dot(normal)
 		if impact > 0.0:
+			var impact_speed := speed
 			heading_vec = heading_vec.bounce(normal)
 			heading = heading_vec.angle()
 			speed = maxf(speed * lerpf(1.0, FLY_BOUNCE_LOSS, impact), FLY_BOUNCE_MIN_SPEED)
 			speed_floor = FLY_BOUNCE_MIN_SPEED
 			velocity = heading_vec * speed
-	
-	var facing := 1.0 if cos(heading) >= 0.0 else -1.0
-	flip_amount = move_toward(flip_amount, facing, FLY_FLIP_SPEED * delta)
-	bird.rotation = heading
-	bird.flip_h = SPRITE_FACES_LEFT
-	bird.flip_v = false
-	bird.scale = Vector2(base_scale.x, base_scale.y * flip_amount)
-	
-	_update_camera(delta, (velocity * FLY_CAMERA_LOOK).limit_length(FLY_CAMERA_MAX_OFFSET))
+			if impact_speed > WALL_SHAKE_MIN_SPEED:
+				add_shake(WALL_SHAKE * impact * clampf(impact_speed / FLY_MAX_SPEED, 0.0, 1.0))
 
 func _touching_hazard() -> bool:
 	for i in get_slide_collision_count():
@@ -630,6 +650,8 @@ func respawn() -> void:
 	bird.rotation = 0.0
 	bird.play("idle")
 	
+	camera_look = Vector2.ZERO
+	shake_trauma = 0.0
 	if camera:
 		camera.offset = Vector2.ZERO
 		camera.reset_smoothing()
@@ -640,28 +662,33 @@ func _update_wind(delta: float) -> void:
 	if Global.mode == Global.Mode.FLY:
 		target = smoothstep(WIND_START_SPEED, WIND_FULL_SPEED, speed)
 	wind_amount = move_toward(wind_amount, target, WIND_FADE_SPEED * delta)
-	
+
 	var emitting := wind_amount > 0.02
 	var forward := Vector2.from_angle(heading)
 	var side := forward.orthogonal()
 	var time := Time.get_ticks_msec() * 0.008
-	
+	var body := WIND_BODY_HALF * base_scale.abs()
+	var flip := 1.0 if flip_amount >= 0.0 else -1.0
+	var center := global_position + Vector2(WIND_BODY_CENTER.x, WIND_BODY_CENTER.y * flip).rotated(heading)
+
 	for i in wind_lines.size():
 		var line: Line2D = wind_lines[i]
 		line.global_transform = Transform2D.IDENTITY
 		line.modulate.a = wind_amount
-		
+
 		if not emitting:
 			line.clear_points()
 			continue
-		
-		var lane_offset: float = WIND_LANE_OFFSETS[i]
+
+		var fraction: float = WIND_LANE_FRACTIONS[i]
 		var lane_length: int = WIND_LANE_LENGTHS[i]
 		var spread: float = lerpf(0.55, 1.0, wind_amount)
 		var wobble: float = sin(time + i * 1.7) * 2.5 * wind_amount
-		var head: Vector2 = global_position - forward * WIND_OFFSET + side * (lane_offset * spread + wobble)
+		var back := body.x * sqrt(maxf(1.0 - fraction * fraction, 0.0)) * WIND_INSET
+		var lateral := fraction * body.y * spread + wobble
+		var head: Vector2 = center - forward * back + side * lateral
 		line.add_point(head, 0)
-		
+
 		var allowed: int = int(lane_length * lerpf(0.4, 1.0, wind_amount))
 		while line.get_point_count() > allowed:
 			line.remove_point(line.get_point_count() - 1)
@@ -708,6 +735,8 @@ func hold_at(pos: Vector2) -> void:
 	wind_amount = 0.0
 	for line in wind_lines:
 		line.clear_points()
+	camera_look = Vector2.ZERO
+	shake_trauma = 0.0
 	if camera:
 		camera.offset = Vector2.ZERO
 		camera.reset_smoothing()
@@ -768,18 +797,18 @@ func _emerge_physics(delta: float) -> void:
 func _on_landed(impact: float) -> void:
 	var t := clampf(inverse_lerp(LAND_MIN_IMPACT, LAND_MAX_IMPACT, impact), 0.0, 1.0)
 	var squash := lerpf(0.08, LAND_SQUASH, t)
-	
+
 	if land_tween and land_tween.is_valid():
 		land_tween.kill()
 	bird.scale = Vector2(base_scale.x * (1.0 + squash), base_scale.y * (1.0 - squash))
 	land_tween = create_tween()
 	land_tween.tween_property(bird, "scale", base_scale, 0.28).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-	
-	if camera:
-		camera.offset.y += LAND_CAMERA_DIP * t * Settings.screen_shake
-	
+
+	camera_look.y += LAND_CAMERA_DIP * t * Settings.screen_shake
+	add_shake(0.25 * t)
+
 	_spawn_dust(_floor_contact_point(), t)
-	
+
 	var sound := get_node_or_null("LandSound") as AudioStreamPlayer2D
 	if sound:
 		sound.pitch_scale = lerpf(1.15, 0.85, t)
@@ -869,3 +898,29 @@ func _steer_turn_target(turn_rate: float) -> float:
 		return 0.0
 	var diff := angle_difference(heading, to_mouse.angle())
 	return clamp(diff * MOUSE_TURN_GAIN, -turn_rate, turn_rate)
+
+func _build_magnet() -> void:
+	magnet_area = Area2D.new()
+	magnet_area.collision_layer = 0
+	magnet_area.collision_mask = 0xFFFFFFFF
+	magnet_area.monitorable = false
+	magnet_area.monitoring = false
+	magnet_shape = CircleShape2D.new()
+	magnet_shape.radius = 1.0
+	var shape := CollisionShape2D.new()
+	shape.shape = magnet_shape
+	magnet_area.add_child(shape)
+	add_child(magnet_area)
+
+func _update_magnet(delta: float) -> void:
+	var radius: float = Global.magnet_radius
+	var enabled := radius > 0.0
+	if magnet_area.monitoring != enabled:
+		magnet_area.set_deferred("monitoring", enabled)
+	if not enabled:
+		return
+	if not is_equal_approx(magnet_shape.radius, radius):
+		magnet_shape.radius = radius
+	for area in magnet_area.get_overlapping_areas():
+		if area.has_method("magnet_pull"):
+			area.magnet_pull(global_position, radius, MAGNET_PULL_SPEED, delta)

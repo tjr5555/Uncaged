@@ -29,7 +29,7 @@ func _ready() -> void:
 	resume_button.pressed.connect(close)
 	settings_button.pressed.connect(_open_settings)
 	menu_button.pressed.connect(_return_to_menu)
-	quit_button.pressed.connect(get_tree().quit)
+	quit_button.pressed.connect(_quit)
 	settings_panel.closed.connect(_on_settings_closed)
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -59,7 +59,6 @@ func open() -> void:
 	tween.tween_property(pause_panel, "scale", Vector2.ONE, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	resume_button.grab_focus()
 
-
 func close() -> void:
 	if not is_open:
 		return
@@ -71,7 +70,6 @@ func close() -> void:
 	tween.tween_method(_set_blur, _get_blur(), 0.0, 0.2)
 	tween.tween_property(pause_panel, "modulate:a", 0.0, 0.15)
 	tween.chain().tween_callback(func(): visible = false)
-
 
 func _setup_layout() -> void:
 	root.theme = UiTheme.build()
@@ -94,13 +92,11 @@ func _setup_layout() -> void:
 	for button: Button in [resume_button, settings_button, menu_button, quit_button]:
 		button.custom_minimum_size.y = button_height
 
-
 func _open_settings() -> void:
 	_restart_tween()
 	tween.tween_property(pause_panel, "modulate:a", 0.0, 0.12)
 	tween.chain().tween_callback(func(): pause_panel.visible = false)
 	settings_panel.open()
-
 
 func _on_settings_closed() -> void:
 	if not is_open:
@@ -110,19 +106,17 @@ func _on_settings_closed() -> void:
 	tween.tween_property(pause_panel, "modulate:a", 1.0, 0.15)
 	settings_button.grab_focus()
 
-
 func _return_to_menu() -> void:
+	SaveManager.save_game()
 	is_open = false
 	get_tree().paused = false
 	Engine.time_scale = 1.0
 	SceneFader.change_scene(menu_scene)
 
-
 func _restart_tween() -> void:
 	if tween and tween.is_valid():
 		tween.kill()
 	tween = create_tween().set_parallel()
-
 
 func _set_blur(value: float) -> void:
 	var mat := backdrop.material as ShaderMaterial
@@ -130,7 +124,10 @@ func _set_blur(value: float) -> void:
 		mat.set_shader_parameter("amount", value)
 	backdrop.visible = value > 0.001
 
-
 func _get_blur() -> float:
 	var mat := backdrop.material as ShaderMaterial
 	return float(mat.get_shader_parameter("amount")) if mat else 0.0
+
+func _quit() -> void:
+	SaveManager.save_game()
+	get_tree().quit()

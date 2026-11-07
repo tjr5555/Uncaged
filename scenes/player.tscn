@@ -75,7 +75,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_fulsm")
 }],
-"loop": 1,
+"loop": true,
 "name": &"fall",
 "speed": 12.0
 }, {
@@ -98,7 +98,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_jej6c")
 }],
-"loop": 1,
+"loop": true,
 "name": &"hop",
 "speed": 12.0
 }, {
@@ -115,7 +115,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_qfm1y")
 }],
-"loop": 1,
+"loop": true,
 "name": &"idle",
 "speed": 6.0
 }]
@@ -140,7 +140,6 @@ position = Vector2(-1.9073486e-06, 0)
 scale = Vector2(3.0000002, 3)
 sprite_frames = SubResource("SpriteFrames_0jsi4")
 animation = &"fall"
-frame_progress = 0.44264525
 metadata/_edit_lock_ = true
 
 [node name="LandSound" type="AudioStreamPlayer2D" parent="." unique_id=861012951]

@@ -12,6 +12,15 @@ var coins_display: float = 0.0
 var coins_target: float = 0.0
 var coins_tween: Tween
 
+const BOOST_RESTART = 20.0
+const EMPTY_COLOR = Color(1.0, 0.35, 0.35)
+
+var boost_empty := false
+var last_boost := 100.0
+var boost_base_x := 0.0
+var boost_fx_tween: Tween
+var boost_audio := AudioStreamPlayer.new()
+
 const POP_SCALE = 1.2
 const POP_UP_TIME = 0.12
 const POP_DOWN_TIME = 0.45
@@ -21,6 +30,7 @@ var pop_tween: Tween
 var label_base_modulate: Color = Color.WHITE
 
 func _ready() -> void:
+	add_child(boost_audio)
 	dash_bar.max_value = Global.max_dashes
 	dash_display = float(Global.dashes)
 	dash_bar.value = dash_display
@@ -34,6 +44,11 @@ func _ready() -> void:
 func set_boost(current: float, maximum: float) -> void:
 	boost_bar.max_value = maximum
 	target_value = current
+	if current <= 0.0 and last_boost > 0.0:
+		_on_boost_emptied()
+	elif boost_empty and current >= BOOST_RESTART:
+		_on_boost_recovered()
+	last_boost = current
 
 func _set_layout(mode: Global.Mode, instant:bool) -> void:
 	var boost_y := 25.0 if mode == Global.Mode.FLY else 150.0
@@ -53,6 +68,11 @@ func _set_layout(mode: Global.Mode, instant:bool) -> void:
 
 func _process(delta: float) -> void:
 	boost_bar.value = lerpf(boost_bar.value, target_value, 1.0 - exp(-15.0 * delta))
+	if boost_empty:
+		var t := Time.get_ticks_msec() / 1000.0
+		boost_bar.modulate = Color.WHITE.lerp(EMPTY_COLOR, 0.65 + 0.35 * sin(t * 10.0))
+	else:
+		boost_bar.modulate = boost_bar.modulate.lerp(Color.WHITE, 1.0 - exp(-8.0 * delta))
 	
 	dash_bar.max_value = Global.max_dashes
 	dash_display = lerpf(dash_display, float(Global.dashes), 1.0 - exp(-12.0 * delta))
@@ -96,3 +116,24 @@ func _pop_label() -> void:
 	pop_tween.tween_property(label, "modulate", GAIN_COLOR, POP_UP_TIME)
 	pop_tween.chain().tween_property(label, "scale", Vector2.ONE, POP_DOWN_TIME).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN_OUT)
 	pop_tween.tween_property(label, "modulate", label_base_modulate, POP_DOWN_TIME)
+
+func _on_boost_emptied() -> void:
+	boost_empty = true
+	if boost_fx_tween and boost_fx_tween.is_valid() and boost_fx_tween.is_running():
+		boost_fx_tween.kill()
+	else:
+		boost_base_x = boost_bar.position.x
+
+	var strength := 10.0 * Settings.screen_shake
+	boost_fx_tween = create_tween()
+	for i in 6:
+		var dir := 1.0 if i % 2 == 0 else -1.0
+		boost_fx_tween.tween_property(boost_bar, "position:x", boost_base_x + dir * strength * (1.0 - float(i) / 6.0), 0.035)
+	boost_fx_tween.tween_property(boost_bar, "position:x", boost_base_x, 0.035)
+
+func _on_boost_recovered() -> void:
+	boost_empty = false
+	boost_bar.pivot_offset = boost_bar.size * 0.5
+	var t := create_tween()
+	t.tween_property(boost_bar, "scale", Vector2(1.06, 1.25), 0.08)
+	t.tween_property(boost_bar, "scale", Vector2.ONE, 0.2).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)

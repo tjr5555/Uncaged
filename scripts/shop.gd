@@ -24,36 +24,39 @@ const UPGRADES = [
 	{
 		"id": "flight_speed", "title": "Flight Speed", "var": "base_flight_speed",
 		"button": "flightSpeedButton", "label": "flightSpeedAmount",
-		"step": 20.0, "mode": "add", "price": 100.0, "price_scale": 1.25, "decimals": 0,
+		"step": 30.0, "mode": "add", "price": 150.0, "price_scale": 1.3, "decimals": 0, "limit": 1100.0,
 	},
 	{
 		"id": "coin_mult", "title": "Coin Multiplier", "var": "base_coin_mult",
 		"button": "coinMultiplierButton", "label": "coinMultLabel",
-		"step": 0.5, "mode": "add", "price": 100.0, "price_scale": 1.6, "decimals": 2,
+		"step": 0.25, "mode": "add", "price": 300.0, "price_scale": 1.55, "decimals": 2, "limit": 3.0,
 	},
 	{
-		"id": "turn_rate", "title": "Flight turn rate", "var": "base_turn_speed",
+		"id": "turn_rate", "title": "Turn Rate", "var": "base_turn_speed",
 		"button": "flightControlButton", "label": "flightControlAmount",
-		"step": 0.2, "mode": "add", "price": 100.0, "price_scale": 1.25, "decimals": 1,
+		"step": 0.2, "mode": "add", "price": 150.0, "price_scale": 1.3, "decimals": 1, "limit": 6.2,
 	},
 	{
 		"id": "brake_turn", "title": "Brake Turn Bonus", "var": "brake_turn_bonus",
 		"button": "BrakeTurnBonusButton", "label": "brakeTurnBonusAmount",
-		"step": 0.2, "mode": "add", "price": 100.0, "price_scale": 1.25, "decimals": 1,
+		"step": 0.2, "mode": "add", "price": 120.0, "price_scale": 1.3, "decimals": 1, "limit": 2.6,
 	},
 	{
 		"id": "brake_strength", "title": "Brake Strength", "var": "brake_decel_scale",
 		"button": "brakeStrengthButton", "label": "brakeStrengthAmount",
 		"step": 0.15, "mode": "add", "price": 150.0, "price_scale": 1.3, "decimals": 2, "limit": 1.6,
-	}
+	},
+	{
+		"id": "magnet", "title": "Balloon Magnet", "var": "magnet_radius",
+		"button": "magnetButton", "label": "magnetAmount",
+		"step": 70.0, "mode": "add", "price": 250.0, "price_scale": 1.6, "decimals": 0, "limit": 350.0,
+	},
 ]
 
 var _audio := AudioStreamPlayer.new()
-var _prices := {} #upgrade id -> current price
-var _nodes := {} #upgrade id -> {"button": Button, "label": Label}
+var _nodes := {} #upgrade id -> {"button": Button, "label: Label}
 
 @onready var grid: Control = $PanelContainer/MarginContainer/GridContainer
-
 
 func _ready() -> void:
 	add_child(_audio)
@@ -66,14 +69,13 @@ func _ready() -> void:
 		if button == null:
 			print("ERROR: Could not find button node named: ", u["button"], " for upgrade: ", u["id"])
 			continue
-			
+		
 		var label := button.get_node_or_null(u["label"]) as Label
 		if label == null:
 			print("ERROR: Could not find label node named: ", u["label"], " inside button: ", u["button"])
 			continue
-			
+		
 		_nodes[u["id"]] = {"button": button, "label": label}
-		_prices[u["id"]] = float(u["price"])
 		button.pressed.connect(_buy.bind(u))
 		_refresh(u)
 
@@ -102,24 +104,34 @@ func _grow(b: BaseButton, amount: float, sound: AudioStream) -> void:
 		_audio.play()
 
 
+func _level(u: Dictionary) -> int:
+	return int(Global.upgrade_levels.get(u["id"], 0))
+
+
+func _price(u: Dictionary) -> int:
+	var raw := float(u["price"]) * pow(float(u["price_scale"]), _level(u))
+	return int(snappedf(raw, 5.0))
+
+
 func _buy(u: Dictionary) -> void:
 	var id: String = u["id"]
-	var price := int(_prices[id])
+	var price := _price(u)
 	if _is_maxed(u) or Global.total_coins < price:
 		return
-	
+
 	var current: Variant = Global.get(u["var"])
 	var old := float(current)
 	var next := _next_value(u, old)
-	
+
 	Global.total_coins -= price
 	#keep integer variables as integers
 	Global.set(u["var"], int(roundf(next)) if typeof(current) == TYPE_INT else next)
-	_prices[id] = float(_prices[id]) * float(u["price_scale"])
-	
+	Global.upgrade_levels[id] = _level(u) + 1
+
 	_refresh_button(u)
 	_roll(u, old, next)
 	_pop(_nodes[id]["label"])
+	SaveManager.save_game()
 
 
 func _next_value(u: Dictionary, current: float) -> float:
@@ -152,7 +164,7 @@ func _refresh_button(u: Dictionary) -> void:
 		button.text = u["title"] + "\nMAX"
 		button.disabled = true
 	else:
-		button.text = u["title"] + "\nPrice: " + str(int(_prices[u["id"]]))
+		button.text = u["title"] + "\nPrice: " + str(_price(u))
 		button.disabled = false
 
 

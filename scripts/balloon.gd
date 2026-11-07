@@ -13,11 +13,13 @@ var coin_value = 10
 var tint := Color(0, 0, 0, 0)
 var current_regen_time := 0.0
 var is_popped := false
+var home_position := Vector2.ZERO
 
 var tier_index := -1
 var shine_material: Material
 
 func _ready() -> void:
+	home_position = position
 	anim.frame = 0
 	if not anim.animation_finished.is_connected(_on_animation_finished):
 		anim.animation_finished.connect(_on_animation_finished)
@@ -65,10 +67,11 @@ func _on_animation_finished() -> void:
 
 func respawn() -> void:
 	is_popped = false
+	position = home_position
 	anim.visible = true
 	anim.frame = 0
 	anim.material = shine_material
-	collision.set_deferred("disabled", false)
+	collision.set_deferred("disabled",false)
 	set_physics_process(false)
 
 func _on_body_entered(body: Node2D) -> void:
@@ -93,3 +96,14 @@ func _spawn_pop_effect(reward: int) -> void:
 	effect.reward = reward
 	get_tree().current_scene.add_child(effect)
 	effect.global_position = global_position
+
+func magnet_pull(target: Vector2, radius: float, pull_speed: float, delta: float) -> void:
+	if is_popped:
+		return
+	var to_target := target - global_position
+	var dist := to_target.length()
+	if dist < 1.0:
+		return
+	var closeness := 1.0 - clampf(dist / radius, 0.0, 1.0)
+	var step := pull_speed * lerpf(0.35, 1.6, closeness * closeness) * delta
+	global_position += to_target / dist * minf(step, dist)
