@@ -1,7 +1,7 @@
 extends Node2D
 
 var playernear: bool = false
-var shop_scene = preload("res://scenes/shop_1.tscn")
+var shop_scene = preload("res://scenes/shop.tscn")
 
 var current_shop = null
 

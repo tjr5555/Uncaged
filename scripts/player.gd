@@ -51,21 +51,20 @@ const HOP_LAND_VOLUME_DB = -26.0
 
 var land_tween: Tween
 var hop_airborne := false
-var jump_cut_available := false #true only while rising from a real jump, so releasing the button can shorten it
+var jump_cut_available := false 
 
-const FALL_ANIM_SPEED = 350.0 #downward speed that counts as falling (a normal hop lands at ~270)
-const SPRITE_FACES_LEFT = true #which way the art is drawn; flip this if the bird faces backwards
+const FALL_ANIM_SPEED = 350.0 
+const SPRITE_FACES_LEFT = true 
 
-const HAZARD_DATA_NAMES = ["hazards", "hazard"] #accepted names for the bool custom data layer that marks hazard tiles
-const DEBUG_HAZARDS = true #prints what the hazard check sees; set to false once it works
-const NO_SPEED_ZOOM_SCENES = ["tutorial"] #scene file names (no extension, lowercase) where the camera doesn't zoom out with speed
-
+const HAZARD_DATA_NAMES = ["hazards", "hazard"] 
+const DEBUG_HAZARDS = true 
+const NO_SPEED_ZOOM_SCENES = ["tutorial"] 
 var FLY_CCW_ACTION = "ui_left"
 var FLY_CW_ACTION = "ui_right"
-var FLY_UP_ACTION = "ui_up" #pitch the nose up
-var FLY_DOWN_ACTION = "ui_down" #pitch the nose down (hold it to dive straight down)
+var FLY_UP_ACTION = "ui_up" 
+var FLY_DOWN_ACTION = "ui_down" 
 var FLY_BOOST_ACTION = "Dash"
-var FLY_BRAKE_ACTION = "brake" #moved off ui_down so the down arrow can dive
+var FLY_BRAKE_ACTION = "brake" 
 
 
 
@@ -84,13 +83,13 @@ var FLY_TURN_RATE = 4.2
 var FLY_TURN_ACCEL = 45.0
 var FLY_BRAKE_TURN_MULT = 1.6
 const FLY_FAST_TURN_MULT = 0.85
-const FLY_AUTO_LEVEL = 0.1 #0 = never levels itself out; raise it (0.9 was the old value) to bring auto-leveling back
-const FLY_LEVEL_FADE_START = 0.3 #auto-level is full strength below this pitch (sin of the angle, 0.3 is about 17 degrees)
-const FLY_LEVEL_FADE_END = 0.6 #and fully off above this one (about 37 degrees), so steep dives and climbs hold their angle
+const FLY_AUTO_LEVEL = 0.1 #0 = never levels itself out. Set to 0.9 to bring it back
+const FLY_LEVEL_FADE_START = 0.3
+const FLY_LEVEL_FADE_END = 0.6 
 const FLY_VELOCITY_SMOOTH = 24.0
 const FLY_DASH_BOOST = 700.0
 const FLY_STALL_TURN = 1.2
-const CONTROL_MAX_BONUS = 0.5 #flight control upgrades are maxed out at +50% turn rate
+const CONTROL_MAX_BONUS = 0.5
 const FLY_FLIP_SPEED = 14.0
 const FLY_BOOST_BONUS = 500.0
 const FLY_DIVE_GAIN = 900.0
@@ -449,6 +448,11 @@ func _ground_physics(delta: float) -> void:
 	_update_ground_animation()
 
 func _update_ground_animation() -> void:
+	if is_gliding and not is_on_floor():
+		if bird.animation != "glide":
+			bird.play("glide")
+		return
+
 	var standing := is_on_floor() and absf(velocity.x) <= 20.0
 	var falling := not is_on_floor() and velocity.y > 0.0 and (not hop_airborne or velocity.y > FALL_ANIM_SPEED)
 	
@@ -459,12 +463,12 @@ func _update_ground_animation() -> void:
 	
 	var anim := ""
 	if is_on_floor():
-		#still moving along the ground: the next hop starts within a few frames,
+		#still moving along the ground. the next hop starts within a few frames,
 		#so hold the last hop frame instead of flickering to idle between hops
 		if not standing:
 			return
 		anim = "idle"
-	elif falling:
+	elif falling and velocity.y > 500:
 		anim = "fall"
 	elif bird.animation == "idle" and coyote_timer > 0.08:
 		anim = "hop" #left the ground from standing still (a jump or a real drop, not a one-frame floor flicker)
@@ -877,6 +881,10 @@ func _place_medallion() -> void:
 	medallion.position = Vector2(x, MEDALLION_NECK.y)
 
 func _process(_delta: float) -> void:
+	if Global.mode == Global.Mode.FLY:
+		bird.play("fly")
+	
+	
 	_place_medallion()
 
 func _steer_turn_target(turn_rate: float) -> float:
