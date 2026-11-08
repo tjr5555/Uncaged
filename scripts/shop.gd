@@ -191,7 +191,8 @@ func _pop(c: Control) -> void:
 
 func _on_back_button_pressed() -> void:
 	if get_parent() is CanvasLayer:
-		get_parent().hide
+		get_parent().hide()
+		Global.INPUT_LOCKED = false
 	var boost_bar = get_node_or_null("/root/main/UI/MarginContainer/BoostBar")
 	if boost_bar:
 		boost_bar.visible = true
