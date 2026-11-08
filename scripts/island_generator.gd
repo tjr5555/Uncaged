@@ -68,6 +68,12 @@ var popped_until: Dictionary = {}
 func _ready() -> void:
 	if player == null:
 		player = get_tree().get_first_node_in_group("player") as Node2D
+	if player == null:
+		push_error("IslandGenerator: no player found in Exports")
+	if island_scenes.is_empty():
+		push_error("IslandGenerator: Island Scenes export is empty")
+	if balloon_scene == null:
+		push_warning("IslandGenerator: Balloon Scene not set in Exports")
 	
 	islands_root = Node2D.new()
 	islands_root.name = "Islands"

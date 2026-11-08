@@ -67,12 +67,12 @@ func _ready() -> void:
 	for u in UPGRADES:
 		var button := grid.get_node_or_null(u["button"]) as Button
 		if button == null:
-			print("ERROR: Could not find button node named: ", u["button"], " for upgrade: ", u["id"])
+			push_error("Shop: could not find button node named: ", u["button"], " for upgrade: ", u["id"])
 			continue
 		
 		var label := button.get_node_or_null(u["label"]) as Label
 		if label == null:
-			print("ERROR: Could not find label node named: ", u["label"], " inside button: ", u["button"])
+			push_error("Shop: could not find label node named: ", u["label"], " inside button: ", u["button"])
 			continue
 		
 		_nodes[u["id"]] = {"button": button, "label": label}
@@ -190,11 +190,10 @@ func _pop(c: Control) -> void:
 
 
 func _on_back_button_pressed() -> void:
-	Global.INPUT_LOCKED = false
 	if get_parent() is CanvasLayer:
-		get_parent().hide()
-	var main_node = get_node_or_null("/root/main")
-	if main_node:
-		var boost_bar = main_node.get_node_or_null("UI/MarginContainer/BoostBar")
-		if boost_bar:
-			boost_bar.visible = true
+		get_parent().hide
+	var boost_bar = get_node_or_null("/root/main/UI/MarginContainer/BoostBar")
+	if boost_bar:
+		boost_bar.visible = true
+	else:
+		push_error("Shop: couldn't find /root/main/UI/MarginContainer")

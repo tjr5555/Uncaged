@@ -39,6 +39,8 @@ var sparkles: CPUParticles2D
 
 func _ready() -> void:
 	add_to_group("portals")
+	if not leads_to_hub and destination_scene == null:
+		push_error("Portal '&s': no Destination Scene is set in the inspector" % name)
 	var facing := -1.0 if face_left else 1.0
 	
 	_build_fog(facing)
@@ -52,10 +54,8 @@ func _ready() -> void:
 	waypoint.hide_within = capture_depth
 	add_child(waypoint)
 
-
 func get_front() -> Vector2:
 	return Vector2.from_angle(global_rotation) * (-1.0 if face_left else 1.0)
-
 
 func get_entry_point(from: Vector2) -> Vector2:
 	var up := get_front().orthogonal()

@@ -57,7 +57,7 @@ const FALL_ANIM_SPEED = 350.0
 const SPRITE_FACES_LEFT = true 
 
 const HAZARD_DATA_NAMES = ["hazards", "hazard"] 
-const DEBUG_HAZARDS = true 
+const DEBUG_HAZARDS = false
 const NO_SPEED_ZOOM_SCENES = ["tutorial"] 
 var FLY_CCW_ACTION = "ui_left"
 var FLY_CW_ACTION = "ui_right"
@@ -188,6 +188,8 @@ const EMERGE_TIME = 0.5
 
 func _ready() -> void:
 	last_grounded_pos = global_position
+	if camera == null:
+		push_error("Player: no child node named 'camera' found")
 
 	var width_curve := Curve.new()
 	width_curve.add_point(Vector2(0.0, 0.35))
@@ -595,8 +597,6 @@ func _fly_physics(delta: float) -> void:
 		respawn()
 		return
 	
-	
-	
 	if get_slide_collision_count() > 0:
 		var normal := get_last_slide_collision().get_normal()
 		var impact := -heading_vec.dot(normal)
@@ -609,6 +609,15 @@ func _fly_physics(delta: float) -> void:
 			velocity = heading_vec * speed
 			if impact_speed > WALL_SHAKE_MIN_SPEED:
 				add_shake(WALL_SHAKE * impact * clampf(impact_speed / FLY_MAX_SPEED, 0.0, 1.0))
+	
+	var facing := 1.0 if cos(heading) >= 0.0 else -1.0
+	flip_amount = move_toward(flip_amount, facing, FLY_FLIP_SPEED * delta)
+	bird.rotation = heading
+	bird.flip_h = SPRITE_FACES_LEFT
+	bird.flip_v = false
+	bird.scale = Vector2(base_scale.x, base_scale.y * flip_amount)
+	
+	_update_camera(delta, (velocity * FLY_CAMERA_LOOK).limit_length(FLY_CAMERA_MAX_OFFSET))
 
 func _touching_hazard() -> bool:
 	for i in get_slide_collision_count():
@@ -876,9 +885,13 @@ func _give_medallion() -> void:
 	if medallion != null:
 		return
 	Global.has_medallion = true
+	if medallion_scene == null:
+		push_error("Player: medallion_scene not set in inspector")
+		return
 	medallion = medallion_scene.instantiate()
 	bird.add_child(medallion)
 	_place_medallion()
+
 
 func _place_medallion() -> void:
 	if medallion == null:

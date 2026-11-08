@@ -41,6 +41,13 @@ var spawn_timer := 0.0
 var mouse_offset := Vector2.ZERO
 
 func _ready() -> void:
+	if island_scenes.is_empty():
+		push_warning("MenuWorld: Island Scenes is empty in Exports")
+	if balloon_scene == null:
+		push_warning("MenuWorld: Balloon scene not set in Exports")
+	if portal_scene == null:
+		push_warning("MenuWorld: Portal scene not set in Exports")
+	
 	var view := get_viewport_rect().size
 	
 	for i in LAYERS.size():

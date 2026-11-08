@@ -68,7 +68,9 @@ func save_game() -> void:
 	config.set_value("meta", "saved_at", Time.get_datetime_string_from_system())
 	for key in SAVED_GLOBALS:
 		config.set_value("global", key, Global.get(key))
-	config.save(PATH)
+	var err := config.save(PATH)
+	if err != OK:
+		push_error("SaveManager: saving to %s failed (error %d)." % [PATH, err])
 	saved.emit()
 
 func _on_autosave() -> void:

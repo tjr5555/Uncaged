@@ -38,10 +38,12 @@ func _setup_save_buttons() -> void:
 		continue_button.visible = has_save
 		if not continue_button.pressed.is_connected(_on_continue_button_pressed):
 			continue_button.pressed.connect(_on_continue_button_pressed)
-		if has_save:
-			continue_button.grab_focus()
+	else:
+		push_error("MainMenu: no node named 'continueButton' found")
 	if enter_button:
 		enter_button.text = "New Game" if has_save else "Play"
+	else:
+		push_error("MainMenu: no node named 'enterButton' was found")
 
 func _cycle_sky() -> void:
 	var from: Dictionary = SKY_PALETTES[palette_index]

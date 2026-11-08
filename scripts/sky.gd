@@ -1,6 +1,8 @@
 extends ColorRect
 
 func _ready() -> void:
+	if not (material is ShaderMaterial):
+		push_error("Sky: Material not set to a new ShaderMaterial with sky.gdshader")
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 

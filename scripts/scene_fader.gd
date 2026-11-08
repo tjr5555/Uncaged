@@ -42,6 +42,8 @@ func change_scene(path: String) -> void:
 	var packed: PackedScene = await _finish_loading(path)
 	if packed != null:
 		get_tree().change_scene_to_packed(packed)
+	else:
+		push_error("SceneFader: couldn't load scene '%s'." % path)
 	await _wait_for_world()
 	await _fog_to(0.0, fog_out_time).finished
 	

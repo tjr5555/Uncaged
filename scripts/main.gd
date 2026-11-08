@@ -30,6 +30,8 @@ func _ready() -> void:
 	if world_root.get_child_count() > 0:
 		hub = world_root.get_child(0) as Node2D
 	current_world = hub
+	if hub == null:
+		push_error("main: World has no child")
 	_create_fog()
 
 
