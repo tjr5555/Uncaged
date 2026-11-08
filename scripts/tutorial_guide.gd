@@ -86,13 +86,10 @@ var audio := AudioStreamPlayer.new()
 func _ready() -> void:
 	layer = 20
 	add_to_group("tutorial_guide")
-	level = get_node_or_null(level_path)
-	if level == null:
-		push_error("TutorialGuide: Level Path doesn't point to a node, so NPCs can't be found.")
+	level = _resolve_level()
 	add_child(audio)
 	_build_ui()
 	_set_stage(0)
-
 
 func _process(_delta: float) -> void:
 	if stage_index < 0 or stage_index >= STAGES.size():
@@ -186,7 +183,9 @@ func _find_npc(npc_name: String) -> Node:
 		return null
 	var npc := level.get_node_or_null(npc_name)
 	if npc == null:
-		push_error("TutorialGuide: no node named '%s' in the tutorial scene." % npc_name)
+		npc = level.find_child(npc_name, true, false)
+	if npc == null:
+		push_error("TutorialGuide: no node named '%s' in the tutorial scene" % npc_name)
 	return npc
 
 
@@ -384,3 +383,17 @@ func _make_label(text: String, font_size: int, color: Color) -> Label:
 func _play(stream: AudioStream) -> void:
 	audio.stream = stream
 	audio.play()
+
+func _resolve_level() -> Node:
+	if not level_path.is_empty():
+		var node := get_node_or_null(level_path)
+		if node:
+			return node
+	if owner:
+		return owner
+	if get_parent():
+		return get_parent()
+	if get_tree().current_scene:
+		return get_tree().current_scene
+	push_error("TutorialGuide: could not find tutorial scene")
+	return null
