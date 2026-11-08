@@ -27,6 +27,10 @@ signal give_quest(quest_id, title, description, target_count)
 @export var quest_description: String = "Collect coins"
 @export var quest_target: int = 500
 
+
+@onready var wise_sprite: AnimatedSprite2D = $"../AnimatedSprite2D"
+
+
 const LETTER_TIME: float = 0.04
 const PUNCTUATION_TIME: float = 0.3
 
@@ -110,6 +114,8 @@ func next_script():
 
 	var current_data = dialogue[current_dialogue_id]
 	var speaker_name = current_data['name']
+
+	change_sprite(current_data.get("anim", ""))
 
 	$NinePatchRect/Name.text = speaker_name
 
@@ -237,3 +243,12 @@ func close():
 	$NinePatchRect.visible = false
 	$NinePatchRect.position.y = _base_box_pos_y
 	$NinePatchRect.size.y = _base_box_height
+
+
+
+
+func change_sprite(anim_name: String):
+	if anim_name == "" or not wise_sprite:
+		return
+	if wise_sprite.sprite_frames.has_animation(anim_name):
+		wise_sprite.play(anim_name)

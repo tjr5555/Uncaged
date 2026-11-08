@@ -1,9 +1,37 @@
 [gd_scene format=3 uid="uid://ctkyv851vfgc2"]
 
 [ext_resource type="Script" uid="uid://cefyuta5vequl" path="res://scripts/npc_2.gd" id="1_362ta"]
-[ext_resource type="Texture2D" uid="uid://tcenjagh32p2" path="res://sprites/icon.svg" id="2_362ta"]
+[ext_resource type="Texture2D" uid="uid://bjgllcvms3whf" path="res://assets/animations/wise_crow_happy.png" id="2_g3a73"]
 [ext_resource type="FontFile" uid="uid://cdg3t3h158oga" path="res://fonts/Michroma/Michroma-Regular.ttf" id="3_2dwi7"]
+[ext_resource type="Texture2D" uid="uid://cux0kussqkl5w" path="res://assets/animations/wise_crow_normal.png" id="3_2uon2"]
 [ext_resource type="PackedScene" uid="uid://cf81457n1ifjd" path="res://scenes/npc_2_dialouge_ui.tscn" id="4_2dwi7"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_gljsd"]
+atlas = ExtResource("2_g3a73")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_7geqr"]
+atlas = ExtResource("3_2uon2")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_0jsi4"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_gljsd")
+}],
+"loop": 1,
+"name": &"happy",
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_7geqr")
+}],
+"loop": 1,
+"name": &"sleepy",
+"speed": 1.0
+}]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_0jsi4"]
 radius = 262.0687
@@ -11,15 +39,19 @@ radius = 262.0687
 [node name="npc2" type="CharacterBody2D" unique_id=924465278]
 script = ExtResource("1_362ta")
 
-[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1460533927]
-scale = Vector2(0.63, 0.63)
-texture = ExtResource("2_362ta")
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=770269897]
+position = Vector2(-7.9999995, -8)
+scale = Vector2(2.875, 2.875)
+sprite_frames = SubResource("SpriteFrames_0jsi4")
+animation = &"sleepy"
 
 [node name="detectionArea" type="Area2D" parent="." unique_id=82948314]
+metadata/_edit_lock_ = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="detectionArea" unique_id=1681579887]
-position = Vector2(0, 3)
+position = Vector2(0, 8)
 shape = SubResource("CircleShape2D_0jsi4")
+metadata/_edit_lock_ = true
 
 [node name="Timer" type="Timer" parent="." unique_id=968683325]
 
@@ -39,6 +71,7 @@ offset_top = -7.0
 offset_right = 6.0
 offset_bottom = -7.0
 scale = Vector2(0.71, 0.71)
+metadata/_edit_lock_ = true
 
 [connection signal="body_entered" from="detectionArea" to="." method="_on_detection_area_body_entered"]
 [connection signal="body_exited" from="detectionArea" to="." method="_on_detection_area_body_exited"]

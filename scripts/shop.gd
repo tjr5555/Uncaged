@@ -24,7 +24,7 @@ const UPGRADES = [
 	{
 		"id": "flight_speed", "title": "Flight Speed", "var": "base_flight_speed",
 		"button": "flightSpeedButton", "label": "flightSpeedAmount",
-		"step": 50.0, "mode": "add", "price": 150.0, "price_scale": 1.3, "decimals": 0, "limit": 2500.0,
+		"step": 50.0, "mode": "add", "price": 150.0, "price_scale": 1.3, "decimals": 0, "limit": 1700,
 	},
 	{
 		"id": "coin_mult", "title": "Coin Multiplier", "var": "base_coin_mult",

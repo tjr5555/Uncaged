@@ -1,15 +1,16 @@
 
 [
-		{"name": "Wise Crow", "text": "Woah good job"},
-		{"name": "Wise Crow", "text": "looks like you found the shovel!"},
-		{"name": "You", "text": "Wha- How did you"},
-		{"name": "You", "text": "how did you"},
-		{"name": "You", "text": "get here faster than me?"},
-		{"name": "You", "text": "I never"},
-		{"name": "You", "text": "even"},
-		{"name": "You", "text": "saw you pass me once!"},
-		{"name": "You", "text": "ALSO, I thought you were trapped!"},
-		{"name": "Wise Crow", "text": "Trapped?"},
-		{"name": "Wise Crow", "text": "Ha. You're funny! I just wanted to see if you could get around."},
-		{"name": "Wise Crow", "text": "After jumping, keep holding (Z)! See what happens"}
+		{"name": "Wise Crow", "text": "Woah good job", "anim": "happy"},
+		{"name": "Wise Crow", "text": "looks like you found the shovel!", "anim": "happy"},
+		{"name": "You", "text": "Wha- How did you", "anim": "sleepy"},
+		{"name": "You", "text": "how did you", "anim": "sleepy"},
+		{"name": "You", "text": "get here faster than me?", "anim": "sleepy"},
+		{"name": "You", "text": "I never", "anim": "sleepy"},
+		{"name": "You", "text": "even", "anim": "sleepy"},
+		{"name": "You", "text": "saw you pass me once!", "anim": "sleepy"},
+		{"name": "You", "text": "ALSO, I thought you were trapped!", "anim": "sleepy"},
+		{"name": "Wise Crow", "text": "Trapped?", "anim": "sleepy"},
+		{"name": "Wise Crow", "text": "Ha. You're funny! I just wanted to see if you could get around.", "anim": "happy"},
+		{"name": "Wise Crow", "text": "After jumping, keep holding (Z)! See what happens", "anim": "happy"},
+		{"name": "Wise Crow", "text": "Oh yeah and those spikes kill you", "anim": "sleepy"}
 ]

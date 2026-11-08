@@ -12,6 +12,8 @@ signal give_quest(quest_id, title, description, target_count)
 const LETTER_TIME: float = 0.04
 const PUNCTUATION_TIME: float = 0.3
 
+@onready var parrot_sprite: AnimatedSprite2D = $"../AnimatedSprite2D"
+
 var dialogue = []
 var current_dialogue_id = 0
 var d_active = false
@@ -81,6 +83,8 @@ func next_script():
 
 	var current_data = dialogue[current_dialogue_id]
 	var speaker_name = current_data['name']
+
+	change_sprite(current_data.get("anim", ""))#change the sprite of the npc for some some uniqueness
 
 	$NinePatchRect/Name.text = speaker_name
 
@@ -157,3 +161,9 @@ func play_sound():
 func stop_sound():
 	if audio_stream_player and audio_stream_player.playing:
 		audio_stream_player.stop()
+
+func change_sprite(anim_name: String):
+	if anim_name == "" or not parrot_sprite:
+		return
+	if parrot_sprite.sprite_frames.has_animation(anim_name):
+		parrot_sprite.play(anim_name)

@@ -8,7 +8,6 @@ var dir = Vector2.ZERO
 var start_pos: Vector2
 
 
-
 var is_roaming = true
 var is_chatting = false 
 var player_is_in_chat_zone = false
@@ -19,6 +18,7 @@ enum {
 }
 
 func _ready() -> void:
+	
 	$".".connect("give_quest", Callable(QuestManager, "add_quest"))
 	$Label.visible = false
 	randomize()
@@ -32,8 +32,6 @@ func _physics_process(delta: float) -> void:
 		match current_state:
 			IDLE:
 				target_velocity = Vector2.ZERO
-			MOVE:
-				target_velocity = dir * SPEED
 	velocity = velocity.move_toward(target_velocity, ACCELERATION * delta)
 
 	move_and_slide()

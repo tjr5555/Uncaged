@@ -456,7 +456,7 @@ func _update_ground_animation() -> void:
 		return
 
 	var standing := is_on_floor() and absf(velocity.x) <= 20.0
-	var falling := not is_on_floor() and velocity.y > 0.0 and (not hop_airborne or velocity.y > FALL_ANIM_SPEED)
+	var falling := not is_on_floor() and velocity.y > 750
 	
 	#let the hop windup finish before anything else takes over,
 	#unless we've come to rest or started falling

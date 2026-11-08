@@ -1,10 +1,10 @@
 
 [
-		{"name": "Wise Crow", "text": "Hello there! Is there any chance you could help me out of this hole?"},
-		{"name": "You", "text": "Well uhhh"},
-		{"name": "You", "text": "you see"},
-		{"name": "You", "text": "I also don't know how to get out of this hole..."},
-		{"name": "Wise Crow", "text": "Hey don't worry about it! We all started trapped in a hole..."},
-		{"name": "Wise Crow", "text": "Start off by jumping by pressing (Z), you can also jump off walls. Try it out!"},
-		{"name": "Wise Crow", "text": "(Maybe a shovel would help...)"}
+		{"name": "Wise Crow", "text": "Hello there! Is there any chance you could help me out of this hole?", "anim": "happy"},
+		{"name": "You", "text": "Well uhhh", "anim": "sleepy"},
+		{"name": "You", "text": "you see", "anim": "sleepy"},
+		{"name": "You", "text": "I also don't know how to get out of this hole...", "anim": "happy"},
+		{"name": "Wise Crow", "text": "Hey don't worry about it! We all started trapped in a hole...", "anim": "happy"},
+		{"name": "Wise Crow", "text": "Start off by jumping by pressing (Z), you can also jump off walls. Try it out!", "anim": "happy"},
+		{"name": "Wise Crow", "text": "(Maybe a shovel would help...)", "anim": "sleepy"}
 ]

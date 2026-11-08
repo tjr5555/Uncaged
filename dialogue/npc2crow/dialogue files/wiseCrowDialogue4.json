@@ -1,20 +1,20 @@
 
 [
-		{"name": "Wise Crow", "text": "Oh geez"},
+		{"name": "Wise Crow", "text": "Oh geez", "anim": "sleepy"},
 		{"name": "You", "text": "What?"},
-		{"name": "Wise Crow", "text": "Look ahead, those are spikes."},
-		{"name": "Wise Crow", "text": "It's time."},
+		{"name": "Wise Crow", "text": "Look ahead, those are spikes.", "anim": "sleepy"},
+		{"name": "Wise Crow", "text": "It's time.", "anim": "sleepy"},
 		{"name": "You", "text": "What? Why are talking like that? Can't I just jump over them?"}, 
-		{"name": "Wise Crow", "text": "No."},
-		{"name": "Wise Crow", "text": "You're going to have to get off the ground"},
-		{"name": "Wise Crow", "text": "and fly."},
+		{"name": "Wise Crow", "text": "No.", "anim": "sleepy"},
+		{"name": "Wise Crow", "text": "You're going to have to get off the ground", "anim": "sleepy"},
+		{"name": "Wise Crow", "text": "and fly.", "anim": "sleepy"},
 		{"name": "You", "text": "What? Fly? I'm not ready! I can barely get off the ground! There must be another way."},
-		{"name": "Wise Crow", "text": "There isn't, the hall if full of spikes."},  
+		{"name": "Wise Crow", "text": "There isn't, the hall if full of spikes.", "anim": "sleepy"},  
 		{"name": "You", "text": "Ok, just tell me what I need to do."},
-		{"name": "Wise Crow", "text": "You need to press (G) to enter fly mode."},
-		{"name": "Wise Crow", "text": "When you are in the air use the arrow keys to control your flight"},
-		{"name": "Wise Crow", "text": "The flight can also follow your mouse, if that works for you better."},
-		{"name": "Wise Crow", "text": "Did you get all of that?"},
+		{"name": "Wise Crow", "text": "You need to press (G) to enter fly mode.", "anim": "sleepy"},
+		{"name": "Wise Crow", "text": "When you are in the air use the arrow keys to control your flight", "anim": "sleepy"},
+		{"name": "Wise Crow", "text": "The flight can also follow your mouse, if that works for you better.", "anim": "happy"},
+		{"name": "Wise Crow", "text": "Did you get all of that?", "anim": "happy"},
 		{"name": "You", "text": "Yes, I think I'm ready."},
-		{"name": "Wise Crow", "text": "Good luck."}
+		{"name": "Wise Crow", "text": "Good luck.", "anim": "happy"}
 ]
