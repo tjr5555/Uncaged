@@ -25,11 +25,13 @@ func _ready() -> void:
 	randomize()
 	start_pos = position
 	$Timer.start()
-
-	# Pass this instance's settings to its dialogue UI
+	
+	var ui = $npc2DialougeUI
 	if dialogue_file != "":
-		$npc2DialougeUI.d_file = dialogue_file
-	$npc2DialougeUI.npc_name = npc_name
+		ui.d_file = dialogue_file
+	ui.npc_name = npc_name
+	if not ui.dialogue_finished.is_connected(_on_npc_1_dialouge_ui_dialogue_finished):
+		ui.dialogue_finished.connect(_on_npc_1_dialouge_ui_dialogue_finished)
 
 func _physics_process(delta: float) -> void:
 	var target_velocity = Vector2.ZERO

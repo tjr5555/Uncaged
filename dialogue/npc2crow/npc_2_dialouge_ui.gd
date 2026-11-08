@@ -43,6 +43,7 @@ var _base_box_height: float
 
 
 func _ready():
+	add_to_group("dialogue_ui")
 	$NinePatchRect.visible = false
 	_base_box_pos_y = $NinePatchRect.position.y
 	_base_box_height = $NinePatchRect.size.y
