@@ -6,6 +6,7 @@
 [ext_resource type="AudioStream" uid="uid://ir3c4ch6ieih" path="res://audio/denielcz-immersivecontrol-button-click-sound-463065.mp3" id="2_wfx2d"]
 [ext_resource type="FontFile" uid="uid://eus6nd3e135o" path="res://fonts/Inter/static/Inter_24pt-Bold.ttf" id="5_qu5gy"]
 [ext_resource type="FontFile" uid="uid://b18ofjevqi05d" path="res://fonts/Elms_Sans/static/ElmsSans-SemiBold.ttf" id="6_8r1wq"]
+[ext_resource type="AudioStream" uid="uid://doedcxhof6vby" path="res://audio/music/SHOP!.mp3" id="7_ajxib"]
 
 [sub_resource type="Gradient" id="Gradient_wfx2d"]
 colors = PackedColorArray(0.8808251, 0.1897483, 0, 1, 1, 1, 0, 1)
@@ -166,6 +167,13 @@ theme_override_constants/h_separation = 14
 theme_override_fonts/font = ExtResource("2_cyb0u")
 theme_override_font_sizes/font_size = 76
 text = "Back"
+
+[node name="MusicPlayer" type="AudioStreamPlayer" parent="." unique_id=780938061]
+stream = ExtResource("7_ajxib")
+volume_db = -5.0
+autoplay = true
+bus = &"Music"
+parameters/looping = true
 
 [connection signal="pressed" from="PanelContainer/MarginContainer/GridContainer/coinMultiplierButton" to="." method="_on_coin_multiplier_button_pressed"]
 [connection signal="pressed" from="PanelContainer/MarginContainer/GridContainer/flightControlButton" to="." method="_on_flight_control_button_pressed"]
