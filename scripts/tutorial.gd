@@ -18,6 +18,5 @@ func _on_npcdectzone_3_body_entered(body: Node2D) -> void:
 		$npc23.visible = false
 
 func _on_npcdectzone_4_body_entered(body: Node2D) -> void:
-	pass # Replace with function body.
 	if not body.is_in_group("tilemap"):
 		$npc24.visible = false

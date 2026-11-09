@@ -19,7 +19,9 @@
 [ext_resource type="PackedScene" uid="uid://fyhjy7sc5spb" path="res://island scenes/island_11.tscn" id="18_7boss"]
 [ext_resource type="PackedScene" uid="uid://bhnql6ieieyxu" path="res://island scenes/island_12.tscn" id="19_njkjy"]
 [ext_resource type="PackedScene" uid="uid://beplsivn2dg6g" path="res://scenes/portal.tscn" id="20_7n2o6"]
+[ext_resource type="PackedScene" uid="uid://d11ilb2rt7ac" path="res://island scenes/island_5.tscn" id="21_qrwm6"]
 [ext_resource type="PackedScene" uid="uid://v1tk33qddnlf" path="res://scenes/generated_world.tscn" id="21_rtbv5"]
+[ext_resource type="PackedScene" uid="uid://b7jjwmclj2y6d" path="res://dialogue/npc2crow/npc_2(hubversion).tscn" id="22_qrwm6"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_tipki"]
 texture = ExtResource("1_hlsmc")
@@ -570,3 +572,12 @@ position = Vector2(-2550, -3067)
 
 [node name="island17" parent="islands" unique_id=1052565196 instance=ExtResource("16_8rcoo")]
 position = Vector2(-119, -2846)
+
+[node name="island5" parent="." unique_id=2138228304 instance=ExtResource("21_qrwm6")]
+position = Vector2(2452, -2415)
+
+[node name="island6" parent="." unique_id=1388579117 instance=ExtResource("13_tmir4")]
+position = Vector2(1848, -3638)
+
+[node name="npc2(hubversion)" parent="." unique_id=1146437213 instance=ExtResource("22_qrwm6")]
+position = Vector2(-1655, -4440)

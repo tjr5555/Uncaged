@@ -92,31 +92,31 @@ theme_override_font_sizes/font_size = 55
 text = "Coins: 0"
 
 [node name="questArea" type="Panel" parent="." unique_id=26446695]
-offset_left = 1728.0
+offset_left = 1664.0
 offset_right = 1920.0
-offset_bottom = 192.0
+offset_bottom = 384.0
 script = ExtResource("5_p7vwb")
 
 [node name="quest1" type="RichTextLabel" parent="questArea" unique_id=40850454]
 layout_mode = 0
-offset_right = 192.0
-offset_bottom = 48.0
+offset_right = 256.0
+offset_bottom = 128.0
 theme_override_fonts/normal_font = ExtResource("4_gdt2y")
 text = "Quests go here:"
 
 [node name="quest2" type="RichTextLabel" parent="questArea" unique_id=1354492677]
 layout_mode = 0
-offset_top = 64.0
-offset_right = 192.0
-offset_bottom = 112.0
+offset_top = 129.0
+offset_right = 256.0
+offset_bottom = 256.0
 theme_override_fonts/normal_font = ExtResource("4_gdt2y")
 text = "Quests go here:"
 
 [node name="quest3" type="RichTextLabel" parent="questArea" unique_id=424300312]
 layout_mode = 0
-offset_top = 136.0
-offset_right = 192.0
-offset_bottom = 184.0
+offset_top = 257.0
+offset_right = 256.0
+offset_bottom = 384.0
 theme_override_fonts/normal_font = ExtResource("4_gdt2y")
 text = "Quests go here:"
 

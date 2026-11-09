@@ -241,7 +241,6 @@ scale = Vector2(0.75, 0.75)
 shape = SubResource("CapsuleShape2D_lnspb")
 
 [node name="Camera" type="Camera2D" parent="." unique_id=802923576]
-zoom = Vector2(0.855, 0.855)
 position_smoothing_enabled = true
 position_smoothing_speed = 10.0
 

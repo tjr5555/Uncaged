@@ -2,6 +2,15 @@ extends Node
 
 signal quests_updated(quest_texts: Array)
 signal quest_completed(quest_name: String)
+#Travel quests
+const TRAVEL_QUEST_ID = "travel_distance"
+const PIXELS_PER_METER = 10.0 #10 matches the distance the hint arrows use 
+const MAX_TRAVEL_SPEED = 2500.0
+
+var _last_player_pos := Vector2.ZERO
+var _has_last_pos := false #flag to make sure the distance can be measured 
+var _travel_remainder := 0.0 #fractional meters carried between frames
+
 
 var active_quests = {}
 
@@ -9,7 +18,8 @@ var active_quests = {}
 var _last_coins: int = -1
 
 
-func _process(_delta: float) -> void:
+func _process(delta: float) -> void:
+	_track_distance(delta)
 	var coins := int(Global.total_coins)
 	if _last_coins < 0:
 		_last_coins = coins
@@ -74,3 +84,27 @@ func _update_hud() -> void:
 		quest_texts.append(q["name"] + ": " + q["description"] + " (" + progress + ")")
 
 	quests_updated.emit(quest_texts)
+
+const MAX_STEP_PIXELS = 150.0
+
+func _track_distance(_delta: float) -> void:
+	if not active_quests.has(TRAVEL_QUEST_ID) or active_quests[TRAVEL_QUEST_ID]["completed"]:
+		_has_last_pos = false
+		return
+
+	var player := get_tree().get_first_node_in_group("player") as Node2D
+	if player == null or Global.in_transition:
+		_has_last_pos = false
+		return
+
+	var pos := player.global_position
+	if _has_last_pos:
+		var moved := pos.distance_to(_last_player_pos)
+		if moved <= MAX_STEP_PIXELS:
+			_travel_remainder += moved / PIXELS_PER_METER
+			var whole := int(_travel_remainder)
+			if whole > 0:
+				_travel_remainder -= whole
+				_add_progress(TRAVEL_QUEST_ID, whole)
+	_last_player_pos = pos
+	_has_last_pos = true

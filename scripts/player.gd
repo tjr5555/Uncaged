@@ -58,7 +58,7 @@ const SPRITE_FACES_LEFT = true
 
 const HAZARD_DATA_NAMES = ["hazards", "hazard"] 
 const DEBUG_HAZARDS = false
-const NO_SPEED_ZOOM_SCENES = ["tutorial"] 
+const NO_SPEED_ZOOM_SCENES = ["tutorial", "main"]
 var FLY_CCW_ACTION = "ui_left"
 var FLY_CW_ACTION = "ui_right"
 var FLY_UP_ACTION = "ui_up" 
