@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://b1x7fe72snv2m"]
+
+[ext_resource type="Script" uid="uid://cun45cen2ubli" path="res://running_npc.gd" id="1_rmjge"]
+[ext_resource type="Texture2D" uid="uid://tcenjagh32p2" path="res://sprites/icon.svg" id="2_xn5ls"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_0jsi4"]
+radius = 64.49806
+
+[node name="running_npc" type="CharacterBody2D" unique_id=745866023]
+script = ExtResource("1_rmjge")
+
+[node name="Sprite2D" type="Sprite2D" parent="." unique_id=1120782394]
+texture = ExtResource("2_xn5ls")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1728636049]
+shape = SubResource("CircleShape2D_0jsi4")
