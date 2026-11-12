@@ -1,11 +1,7 @@
 [gd_scene format=3 uid="uid://c7a3i1188tjny"]
 
 [ext_resource type="Script" uid="uid://glwsi83k70dk" path="res://scripts/shop.gd" id="1_vr6tn"]
-[ext_resource type="FontFile" uid="uid://31a0pllxp1ya" path="res://fonts/Play/Play-Bold.ttf" id="2_cyb0u"]
 [ext_resource type="AudioStream" uid="uid://dkxucyotn1yhl" path="res://audio/freesoundeffects-button-click-289742.mp3" id="2_qu5gy"]
-[ext_resource type="AudioStream" uid="uid://ir3c4ch6ieih" path="res://audio/denielcz-immersivecontrol-button-click-sound-463065.mp3" id="2_wfx2d"]
-[ext_resource type="FontFile" uid="uid://eus6nd3e135o" path="res://fonts/Inter/static/Inter_24pt-Bold.ttf" id="5_qu5gy"]
-[ext_resource type="FontFile" uid="uid://b18ofjevqi05d" path="res://fonts/Elms_Sans/static/ElmsSans-SemiBold.ttf" id="6_8r1wq"]
 [ext_resource type="AudioStream" uid="uid://doedcxhof6vby" path="res://audio/music/SHOP!.mp3" id="7_ajxib"]
 
 [sub_resource type="Gradient" id="Gradient_wfx2d"]
@@ -24,7 +20,6 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_vr6tn")
 hover_sound = ExtResource("2_qu5gy")
-click_sound = ExtResource("2_wfx2d")
 
 [node name="back" type="TextureRect" parent="." unique_id=1781888682]
 layout_mode = 0
@@ -32,150 +27,9 @@ offset_right = 1920.0
 offset_bottom = 1080.0
 texture = SubResource("GradientTexture2D_0jsi4")
 
-[node name="PanelContainer" type="PanelContainer" parent="." unique_id=1287147403]
-layout_mode = 0
-offset_left = 768.0
-offset_right = 1920.0
-offset_bottom = 1080.0
-
-[node name="MarginContainer" type="MarginContainer" parent="PanelContainer" unique_id=1664397242]
-layout_mode = 2
-theme_override_constants/margin_left = 60
-theme_override_constants/margin_top = 30
-
-[node name="GridContainer" type="GridContainer" parent="PanelContainer/MarginContainer" unique_id=581072559]
-layout_mode = 2
-theme_override_constants/h_separation = 248
-theme_override_constants/v_separation = 128
-columns = 2
-
-[node name="flightSpeedButton" type="Button" parent="PanelContainer/MarginContainer/GridContainer" unique_id=409555985]
-custom_minimum_size = Vector2(354, 98)
-layout_mode = 2
-theme_override_constants/h_separation = 14
-theme_override_fonts/font = ExtResource("6_8r1wq")
-theme_override_font_sizes/font_size = 40
-text = "Flight Speed"
-
-[node name="flightSpeedAmount" type="Label" parent="PanelContainer/MarginContainer/GridContainer/flightSpeedButton" unique_id=1566081587]
-layout_mode = 0
-offset_left = 2.0
-offset_top = 114.0
-offset_right = 354.0
-offset_bottom = 178.0
-theme_override_fonts/font = ExtResource("5_qu5gy")
-theme_override_font_sizes/font_size = 40
-horizontal_alignment = 1
-
-[node name="coinMultiplierButton" type="Button" parent="PanelContainer/MarginContainer/GridContainer" unique_id=949582818]
-custom_minimum_size = Vector2(354, 98)
-layout_mode = 2
-theme_override_constants/h_separation = 14
-theme_override_fonts/font = ExtResource("6_8r1wq")
-theme_override_font_sizes/font_size = 40
-text = "Coin Multiplier
-"
-
-[node name="coinMultLabel" type="Label" parent="PanelContainer/MarginContainer/GridContainer/coinMultiplierButton" unique_id=1556604065]
-layout_mode = 0
-offset_left = 2.0
-offset_top = 114.0
-offset_right = 354.0
-offset_bottom = 178.0
-theme_override_fonts/font = ExtResource("5_qu5gy")
-theme_override_font_sizes/font_size = 40
-horizontal_alignment = 1
-
-[node name="flightControlButton" type="Button" parent="PanelContainer/MarginContainer/GridContainer" unique_id=2099312546]
-custom_minimum_size = Vector2(354, 98)
-layout_mode = 2
-theme_override_constants/h_separation = 14
-theme_override_fonts/font = ExtResource("6_8r1wq")
-theme_override_font_sizes/font_size = 40
-text = "Flight Turn Speed"
-
-[node name="flightControlAmount" type="Label" parent="PanelContainer/MarginContainer/GridContainer/flightControlButton" unique_id=1550071591]
-layout_mode = 0
-offset_left = 2.0
-offset_top = 114.0
-offset_right = 354.0
-offset_bottom = 178.0
-theme_override_fonts/font = ExtResource("5_qu5gy")
-theme_override_font_sizes/font_size = 40
-horizontal_alignment = 1
-
-[node name="BrakeTurnBonusButton" type="Button" parent="PanelContainer/MarginContainer/GridContainer" unique_id=1384723965]
-custom_minimum_size = Vector2(354, 98)
-layout_mode = 2
-theme_override_constants/h_separation = 14
-theme_override_fonts/font = ExtResource("6_8r1wq")
-theme_override_font_sizes/font_size = 40
-text = "Brake Turn Mult"
-
-[node name="brakeTurnBonusAmount" type="Label" parent="PanelContainer/MarginContainer/GridContainer/BrakeTurnBonusButton" unique_id=2091395662]
-layout_mode = 0
-offset_left = 2.0
-offset_top = 114.0
-offset_right = 354.0
-offset_bottom = 178.0
-theme_override_fonts/font = ExtResource("5_qu5gy")
-theme_override_font_sizes/font_size = 40
-horizontal_alignment = 1
-
-[node name="brakeStrengthButton" type="Button" parent="PanelContainer/MarginContainer/GridContainer" unique_id=380025888]
-custom_minimum_size = Vector2(354, 98)
-layout_mode = 2
-theme_override_fonts/font = ExtResource("6_8r1wq")
-theme_override_font_sizes/font_size = 40
-text = "Brake Strength"
-
-[node name="brakeStrengthAmount" type="Label" parent="PanelContainer/MarginContainer/GridContainer/brakeStrengthButton" unique_id=1014745577]
-layout_mode = 0
-offset_left = 2.0
-offset_top = 114.0
-offset_right = 354.0
-offset_bottom = 178.0
-theme_override_fonts/font = ExtResource("5_qu5gy")
-theme_override_font_sizes/font_size = 40
-horizontal_alignment = 1
-
-[node name="magnetButton" type="Button" parent="PanelContainer/MarginContainer/GridContainer" unique_id=942243450]
-custom_minimum_size = Vector2(354, 92)
-layout_mode = 2
-theme_override_fonts/font = ExtResource("6_8r1wq")
-theme_override_font_sizes/font_size = 35
-text = "Magnet Strength"
-
-[node name="magnetAmount" type="Label" parent="PanelContainer/MarginContainer/GridContainer/magnetButton" unique_id=1713254270]
-layout_mode = 0
-offset_left = 2.0
-offset_top = 114.0
-offset_right = 354.0
-offset_bottom = 178.0
-theme_override_fonts/font = ExtResource("5_qu5gy")
-theme_override_font_sizes/font_size = 40
-horizontal_alignment = 1
-
-[node name="backButton" type="Button" parent="." unique_id=1558949517]
-custom_minimum_size = Vector2(354, 98)
-layout_mode = 0
-offset_left = 16.0
-offset_top = 938.0
-offset_right = 434.0
-offset_bottom = 1066.0
-theme_override_constants/h_separation = 14
-theme_override_fonts/font = ExtResource("2_cyb0u")
-theme_override_font_sizes/font_size = 76
-text = "Back"
-
 [node name="MusicPlayer" type="AudioStreamPlayer" parent="." unique_id=780938061]
 stream = ExtResource("7_ajxib")
 volume_db = -5.0
 autoplay = true
 bus = &"Music"
 parameters/looping = true
-
-[connection signal="pressed" from="PanelContainer/MarginContainer/GridContainer/coinMultiplierButton" to="." method="_on_coin_multiplier_button_pressed"]
-[connection signal="pressed" from="PanelContainer/MarginContainer/GridContainer/flightControlButton" to="." method="_on_flight_control_button_pressed"]
-[connection signal="pressed" from="PanelContainer/MarginContainer/GridContainer/BrakeTurnBonusButton" to="." method="_on_brake_turn_bonus_button_pressed"]
-[connection signal="pressed" from="backButton" to="." method="_on_back_button_pressed"]

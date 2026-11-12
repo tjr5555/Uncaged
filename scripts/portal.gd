@@ -12,6 +12,7 @@ const ELLIPSE = Vector2(0.16, 0.46)
 @export var destination_seed := 0
 @export var color := Color(0.55, 0.35, 1.0)
 @export var fog_tint := Color(0.93, 0.95, 1.0)
+@export var decorative := false
 
 @export_group("Shape")
 @export var face_left := false
@@ -35,18 +36,23 @@ var pulse_tween: Tween
 var fog_material: ShaderMaterial
 var motes: CPUParticles2D
 var sparkles: CPUParticles2D
-
+var entering := false
 
 func _ready() -> void:
 	add_to_group("portals")
-	if not leads_to_hub and destination_scene == null:
-		push_error("Portal: no Destination Scene is set in the inspector" % name)
 	var facing := -1.0 if face_left else 1.0
 	
 	_build_fog(facing)
 	_build_visual(facing)
 	motes = _build_motes(facing)
 	sparkles = _build_sparkles()
+	
+	if decorative:
+		set_physics_process(false)
+		return
+	
+	if not leads_to_hub and destination_scene == null:
+		push_error("Portal '%s': no desination scene is set in the inspector" % name)
 	
 	var waypoint := Waypoint.new()
 	waypoint.label_text = label_text
@@ -69,13 +75,13 @@ func _opening_half_height() -> float:
 
 
 func _physics_process(_delta: float) -> void:
-	if Global.in_transition:
+	if Global.in_transition or entering:
 		return
 	if not leads_to_hub and destination_scene == null:
 		return
 
 	var manager = get_tree().get_first_node_in_group("world_manager")
-	if manager == null or not manager.can_enter_portal():
+	if manager != null and not manager.can_enter_portal():
 		return
 
 	var player := get_tree().get_first_node_in_group("player") as CharacterBody2D
@@ -97,7 +103,10 @@ func _physics_process(_delta: float) -> void:
 	if rad_to_deg(absf(vel.angle_to(-front))) > max_entry_angle:
 		return
 
-	manager.enter_portal(self)
+	if manager == null:
+		_enter_without_manager(player)
+	else:
+		manager.enter_portal(self)
 
 
 func play_enter_effect() -> void:
@@ -249,3 +258,22 @@ func _additive_material() -> CanvasItemMaterial:
 	var mat := CanvasItemMaterial.new()
 	mat.blend_mode = CanvasItemMaterial.BLEND_MODE_ADD
 	return mat
+
+func _enter_without_manager(player: Node) -> void:
+	if SceneFader.busy:
+		return
+	if destination_scene == null:
+		push_error("Portal '%s': outside main.tscn, a portal needs a Destination Scene to load (Leads To Hub only works inside main)." % name)
+		return
+
+	entering = true
+	Global.in_transition = true
+	play_enter_effect()
+	player.begin_portal_entry(get_entry_point(player.global_position))
+	await player.portal_reached
+
+	if not SaveManager.active and not SaveManager.load_game():
+		SaveManager.new_game()
+	Global.mode = Global.Mode.GROUND
+	Global.in_transition = false
+	SceneFader.change_scene(destination_scene.resource_path)

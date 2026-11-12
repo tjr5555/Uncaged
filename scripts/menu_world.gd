@@ -119,6 +119,7 @@ func _place_portal(view: Vector2) -> void:
 	portal.set("color", portal_color)
 	portal.set("face_left", portal_face_left)
 	portal.set("label_text", "")
+	portal.set("decorative", true)
 	portal.position = Vector2(portal_anchor.x * view.x, portal_anchor.y * view.y)
 	portal.scale = Vector2.ONE * float(cfg["scale"])
 	layers[1].add_child(portal)
