@@ -1,0 +1,108 @@
+{
+	"start": "shopkeeper_intro",
+	"dialogues": {
+		"shopkeeper_intro": {
+			"lines": [
+				{"name": "Shopkeeper", "text": "Welcome to my shop!", "sprite": "happy"},
+				{"name": "Shopkeeper", "text": "Feel free to buy anything you want", "sprite": "normal"},
+				{"name": "You", "text": "Cool!", "sprite": "happy"}
+			],
+			"choices": [
+				{"text": "Ask name", "next": "shopkeeper_name"},
+				{"text": "Compliment monocle", "next": "compliment_monocle"}
+			]
+		},
+
+		"shopkeeper_name": {
+			"lines": [
+				{"name": "Shopkeeper", "text": "The name is Shop.", "sprite": "tophat"},
+				{"name": "You", "text": "Really? Shop? I mean it's cool I guess. Also, when did you get the hat?", "sprite": "tophat"},
+				{"name": "Shop Keeper", "text": "What hat?", "sprite": "happy"},
+				{"name": "Shop Keeper", "text": "Oh yeah and my last name is Keeper!", "sprite": "rotated"},
+				{"name": "You", "text": "Ohhh so you're Shop Keeper...", "sprite": "normal"}
+			],
+			"choices": [
+				{"text": "Ask to do something cool", "next": "something_cool"},
+				{"text": "Ask for a free gift", "next": "ask_for_gift"}
+			]
+		},
+
+		"compliment_monocle": {
+			"lines": [
+				{"name": "You", "text": "I love your monocle!!", "sprite": "normal"},
+				{"name": "Shopkeeper", "text": "Really?! Everyone else says it makes me look dumb...", "sprite": "happy"},
+				{"name": "You", "text": "No it's super cool!", "sprite": "happy"},
+				{"name": "Shopkeeper", "text": "Thanks!", "sprite": "happy"}
+			],
+			"choices": [
+				{"text": "Ask name", "next": "shopkeeper_name"}
+			]
+		},
+
+		"something_cool": {
+			"lines": [
+				{"name": "Shop Keeper", "text": "You wanna see something cool?", "sprite": "normal"},
+				{"name": "You", "text": "yes yes yes yes", "sprite": "miffed"},
+				{"name": "Shop Keeper", "text": "Okay are you ready?!", "sprite": "happy"},
+				{"name": "You", "text": "yes I am hyped for this", "sprite": "happy"},
+				{"name": "Shop Keeper", "text": "Look! I am SHADED now!", "sprite": "shaded"},
+				{"name": "You", "text": "Really? I can't really tell...", "sprite": "miffed"},
+				{"name": "Shop Keeper", "text": "WHAT? It wasn't cool enough for you?", "sprite": "miffed"},
+				{"name": "You", "text": "Yeah I need something cool...", "sprite": "normal"},
+				{"name": "Shop Keeper", "text": "Okay I don't think you are ready for this though...", "sprite": "normal"},
+				{"name": "Shop Keeper", "text": "BOOM! I have LONG legs!", "sprite": "long_legs"},
+				{"name": "You", "text": "Wow, okay, that was really cool!", "sprite": "long_legs"},
+				{"name": "Shop Keeper", "text": "Sweeeeeet", "sprite": "long_legs"}
+			],
+			"choices": [
+				{"text": "Leave", "next": "goodbye"},
+				{"text": "Ask for a free gift", "next": "ask_for_gift"}
+			]
+		},
+
+		"ask_for_gift": {
+			"lines": [
+				{"name": "Shop Keeper", "text": "You want a gift?", "sprite": "normal"},
+				{"name": "You", "text": "Yes please", "sprite": "normal"},
+				{"name": "Shop Keeper", "text": "If I could, I would, but I gotta make money somehow...", "sprite": "miffed"},
+				{"name": "You", "text": "How much does it cost to sell upgrades? It isn't really something that you manufacture", "sprite": "scared"},
+				{"name": "Shop Keeper", "text": "Uh well uh uh uh well...", "sprite": "scared", "hush_money": "1000"}
+			],
+			"choices": [
+				{"text": "Ask about portals", "next": "portal_talk"},
+				{"text": "Leave", "next": "goodbye"}
+			]
+		},
+
+		"portal_talk": {
+			"lines": [
+				{"name": "Shop Keeper", "text": "The portals?", "sprite": "normal"},
+				{"name": "Shop Keeper", "text": "I mean I really shouldn't tell you...", "sprite": "scared"},
+				{"name": "Shop Keeper", "text": "But you're pretty awesome, so I'll tell you what I know", "sprite": "scared"},
+				{"name": "Shop Keeper", "text": "I just want you to know I have only heard rumors from this parrot and what I say may or may not be true and cannot be used against me in court...", "sprite": "normal"},
+				{"name": "You", "text": "Ok yeah that sounds good.", "sprite": "normal"},
+				{"name": "Shop Keeper", "text": "Alright. When Parrot's grandfather was alive he saw something he couldn't describe...", "sprite": "scared"},
+				{"name": "Shop Keeper", "text": "He said he saw colors he had never seen before", "sprite": "normal"},
+				{"name": "Shop Keeper", "text": "Imagine that! New colors!", "sprite": "scared"},
+				{"name": "Shop Keeper", "text": "His grandfather hopped out of his nest and saw something whiz away", "sprite": "normal"},
+				{"name": "Shop Keeper", "text": "Again, he couldn't describe these things...", "sprite": "normal"},
+				{"name": "Shop Keeper", "text": "These portals have been here for generations, and they're just a part of life now...", "sprite": "normal"},
+				{"name": "Shop Keeper", "text": "But just imagine a world, with no evil portals that go to different dimensions...", "sprite": "normal"},
+				{"name": "You", "text": "DIFFERENT DIMENSONS!?", "sprite": "scared"},
+				{"name": "Shop Keeper", "text": "I have said too much, it was good chatting with you", "sprite": "normal"}
+			],
+			"choices": [
+				{"text": "Goodbye", "next": "goodbye"}
+			]
+		},
+
+		"goodbye": {
+			"lines": [
+				{"name": "Shop Keeper", "text": "Nice chatting with you!", "sprite": "happy"},
+				{"name": "Shop Keeper", "text": "Come back anytime!", "sprite": "rotated"},
+				{"name": "You", "text": "Thanks, bye!", "sprite": "happy"},
+			],
+			"next": null 
+		}
+	}
+}

@@ -497,7 +497,7 @@ scale = Vector2(1.4, 1.4)
 
 [node name="shopkeeper" parent="." unique_id=874633338 instance=ExtResource("4_2hkft")]
 z_index = -1
-position = Vector2(1602, 131)
+position = Vector2(1426, 129)
 
 [node name="npc1" parent="." unique_id=924465278 instance=ExtResource("5_4oyfp")]
 position = Vector2(-706, -676)
@@ -508,14 +508,14 @@ position = Vector2(635, -228)
 [node name="Portals" type="Node2D" parent="." unique_id=1977850601]
 
 [node name="PortalWest" parent="Portals" unique_id=199880354 instance=ExtResource("20_7n2o6")]
-position = Vector2(-6496, -1309)
+position = Vector2(-6488, -1487)
 portal_id = "west"
 label_text = "West Portal"
 destination_scene = ExtResource("21_rtbv5")
 color = Color(0.07857906, 0.5194961, 0.9007217, 1)
 
 [node name="PortalEast" parent="Portals" unique_id=226745374 instance=ExtResource("20_7n2o6")]
-position = Vector2(5932, -1236)
+position = Vector2(5932, -1291)
 portal_id = "east"
 label_text = "East Portal"
 destination_scene = ExtResource("21_rtbv5")
@@ -573,11 +573,32 @@ position = Vector2(-2550, -3067)
 [node name="island17" parent="islands" unique_id=1052565196 instance=ExtResource("16_8rcoo")]
 position = Vector2(-119, -2846)
 
-[node name="island5" parent="." unique_id=2138228304 instance=ExtResource("21_qrwm6")]
+[node name="island18" parent="islands" unique_id=2138228304 instance=ExtResource("21_qrwm6")]
 position = Vector2(2452, -2415)
 
-[node name="island6" parent="." unique_id=1388579117 instance=ExtResource("13_tmir4")]
+[node name="island19" parent="islands" unique_id=1388579117 instance=ExtResource("13_tmir4")]
 position = Vector2(1848, -3638)
+
+[node name="island20" parent="islands" unique_id=1146534043 instance=ExtResource("13_tmir4")]
+position = Vector2(-2239, 1407)
+
+[node name="island21" parent="islands" unique_id=714106335 instance=ExtResource("15_trb2f")]
+position = Vector2(1369, 1903)
+
+[node name="island22" parent="islands" unique_id=1600952096 instance=ExtResource("17_jjmck")]
+position = Vector2(-151, 1122)
+
+[node name="island23" parent="islands" unique_id=1719248064 instance=ExtResource("19_njkjy")]
+position = Vector2(3125, 1579)
+
+[node name="island24" parent="islands" unique_id=1235300831 instance=ExtResource("16_8rcoo")]
+position = Vector2(-1025, 2163)
+
+[node name="island25" parent="islands" unique_id=1087444873 instance=ExtResource("19_njkjy")]
+position = Vector2(-6570, -1152)
+
+[node name="island26" parent="islands" unique_id=1805035101 instance=ExtResource("11_0vypl")]
+position = Vector2(-6167, -2672)
 
 [node name="npc2(hubversion)" parent="." unique_id=1146437213 instance=ExtResource("22_qrwm6")]
 position = Vector2(-1655, -4440)
