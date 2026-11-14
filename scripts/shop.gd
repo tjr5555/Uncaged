@@ -83,19 +83,22 @@ func _ready() -> void:
 	_coin_texture_big = _make_coin_texture(30)
 	_coin_texture_small = _make_coin_texture(24)
 	_build_ui()
-	
+
+	var extra_button := get_node_or_null("Button")
+	if extra_button:
+		move_child(extra_button, -1)
+
 	for b in find_children("*", "BaseButton", true, false):
 		_setup(b)
 	get_tree().node_added.connect(_on_node_added)
-	
+
 	var layer := get_parent() as CanvasLayer
 	if layer:
 		layer.visibility_changed.connect(_on_layer_visibility_changed)
-	
+
 	for u in UPGRADES:
 		_refresh(u)
 	_set_coins_instant()
-
 func _process(delta: float) -> void:
 	var coins := float(Global.total_coins)
 	if is_equal_approx(coins, _coins_target):

@@ -1,0 +1,194 @@
+[gd_scene format=3 uid="uid://ju7bsmp2g40e"]
+
+[ext_resource type="Script" uid="uid://vp8rjtmk0epn" path="res://shopkeepertalk.gd" id="1_2m64p"]
+[ext_resource type="FontFile" uid="uid://donndj1us3mjo" path="res://fonts/richeze/Richeze.otf" id="1_nxrxn"]
+[ext_resource type="Texture2D" uid="uid://jr23jb33nqom" path="res://dialogue/shopkeeper/sprites/shopkeeper_happy.png" id="2_q1c2p"]
+[ext_resource type="Texture2D" uid="uid://dt246ptu3qmx" path="res://dialogue/shopkeeper/sprites/shopkeeper_long_legs.png" id="3_2m64p"]
+[ext_resource type="FontFile" uid="uid://3rkiirqmwonr" path="res://fonts/birdy_2/Birdy_DEMO.ttf" id="3_kr8ed"]
+[ext_resource type="Texture2D" uid="uid://cfgu2hgadwqp1" path="res://dialogue/shopkeeper/sprites/shopkeeper_miffed.png" id="4_kr8ed"]
+[ext_resource type="Texture2D" uid="uid://c6j0evchxgp1f" path="res://dialogue/shopkeeper/sprites/base_shopkeeper.png" id="5_131nq"]
+[ext_resource type="Texture2D" uid="uid://diiq4al76xb34" path="res://dialogue/shopkeeper/sprites/shopkeeper_rotated.png" id="6_vqovo"]
+[ext_resource type="Texture2D" uid="uid://bwjxnl3kp8hfe" path="res://dialogue/shopkeeper/sprites/shopkeeper_scared.png" id="7_iuut5"]
+[ext_resource type="Texture2D" uid="uid://cgbbqu5bt1dy" path="res://dialogue/shopkeeper/sprites/shopkeeper_SHADED.png" id="8_k1ox7"]
+[ext_resource type="Texture2D" uid="uid://b6rofs5co3oj6" path="res://dialogue/shopkeeper/sprites/shopkeeper_coolhat.png" id="9_kr3cm"]
+[ext_resource type="AudioStream" uid="uid://ir3c4ch6ieih" path="res://audio/denielcz-immersivecontrol-button-click-sound-463065.mp3" id="11_kr8ed"]
+
+[sub_resource type="Gradient" id="Gradient_wfx2d"]
+colors = PackedColorArray(0.5278267, 0.00050171494, 0.59879214, 1, 0, 0, 0, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_0jsi4"]
+gradient = SubResource("Gradient_wfx2d")
+fill_from = Vector2(0.26956522, 1)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j2uw4"]
+atlas = ExtResource("2_q1c2p")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_xqc7n"]
+atlas = ExtResource("3_2m64p")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_c6msw"]
+atlas = ExtResource("4_kr8ed")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j5uoi"]
+atlas = ExtResource("5_131nq")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_71elp"]
+atlas = ExtResource("6_vqovo")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ec6cj"]
+atlas = ExtResource("7_iuut5")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_6i5rd"]
+atlas = ExtResource("8_k1ox7")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_niwqa"]
+atlas = ExtResource("9_kr3cm")
+region = Rect2(0, 0, 32, 32)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_0jsi4"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_j2uw4")
+}],
+"loop": 1,
+"name": &"happy",
+"speed": 0.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_xqc7n")
+}],
+"loop": 1,
+"name": &"long_legs",
+"speed": 0.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_c6msw")
+}],
+"loop": 1,
+"name": &"miffed",
+"speed": 0.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_j5uoi")
+}],
+"loop": 1,
+"name": &"normal",
+"speed": 0.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_71elp")
+}],
+"loop": 1,
+"name": &"rotated",
+"speed": 0.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_ec6cj")
+}],
+"loop": 1,
+"name": &"scared",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_6i5rd")
+}],
+"loop": 1,
+"name": &"shaded",
+"speed": 0.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_niwqa")
+}],
+"loop": 1,
+"name": &"tophat",
+"speed": 0.0
+}]
+
+[node name="shopkeepertalk" type="TextureRect" unique_id=118166815 node_paths=PackedStringArray("audio_stream_player", "npc_sprite")]
+offset_right = 1920.0
+offset_bottom = 1080.0
+texture = SubResource("GradientTexture2D_0jsi4")
+script = ExtResource("1_2m64p")
+d_file = "res://dialogue/shopkeeper/dialogue files/shopKeeperDialogue.json"
+audio_stream_player = NodePath("AudioStreamPlayer")
+npc_sprite = NodePath("AnimatedSprite2D")
+npc_font = ExtResource("1_nxrxn")
+npc_font_size = 75
+player_font = ExtResource("3_kr8ed")
+player_font_size = 75
+
+[node name="Button" type="Button" parent="." unique_id=400342451]
+layout_mode = 0
+offset_left = 1512.0
+offset_top = 960.0
+offset_right = 1896.0
+offset_bottom = 1064.0
+theme_override_fonts/font = ExtResource("1_nxrxn")
+theme_override_font_sizes/font_size = 43
+text = "Return to shop"
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1150601508]
+position = Vector2(224, 784)
+scale = Vector2(18, 18)
+sprite_frames = SubResource("SpriteFrames_0jsi4")
+animation = &"happy"
+
+[node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=721032913]
+stream = ExtResource("11_kr8ed")
+
+[node name="Chatarea" type="RichTextLabel" parent="." unique_id=97162784]
+layout_mode = 0
+offset_left = 896.0
+offset_top = 216.0
+offset_right = 1856.0
+offset_bottom = 1024.0
+autowrap_mode = 2
+
+[node name="Name" type="RichTextLabel" parent="." unique_id=525387688]
+layout_mode = 0
+offset_left = 904.0
+offset_top = 56.0
+offset_right = 1864.0
+offset_bottom = 200.0
+theme_override_font_sizes/normal_font_size = 110
+text = "Name"
+
+[node name="choice2" type="Button" parent="." unique_id=1052128475]
+z_index = 3
+layout_mode = 0
+offset_left = 64.0
+offset_top = 336.0
+offset_right = 384.0
+offset_bottom = 512.0
+theme_override_fonts/font = ExtResource("1_nxrxn")
+theme_override_font_sizes/font_size = 42
+text = "Choice 2
+"
+
+[node name="choice1" type="Button" parent="." unique_id=1440304165]
+z_index = 3
+layout_mode = 0
+offset_left = 576.0
+offset_top = 336.0
+offset_right = 893.0
+offset_bottom = 512.0
+theme_override_fonts/font = ExtResource("1_nxrxn")
+theme_override_font_sizes/font_size = 42
+text = "Choice 1"
+
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

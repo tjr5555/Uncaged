@@ -3,7 +3,7 @@
 	"dialogues": {
 		"shopkeeper_intro": {
 			"lines": [
-				{"name": "Shopkeeper", "text": "Welcome to my shop!", "sprite": "happy"},
+				{"name": "Shopkeeper", "text": "Welcome to my shop! (Press V to continue)", "sprite": "happy"},
 				{"name": "Shopkeeper", "text": "Feel free to buy anything you want", "sprite": "normal"},
 				{"name": "You", "text": "Cool!", "sprite": "happy"}
 			],
@@ -66,7 +66,7 @@
 				{"name": "You", "text": "Yes please", "sprite": "normal"},
 				{"name": "Shop Keeper", "text": "If I could, I would, but I gotta make money somehow...", "sprite": "miffed"},
 				{"name": "You", "text": "How much does it cost to sell upgrades? It isn't really something that you manufacture", "sprite": "scared"},
-				{"name": "Shop Keeper", "text": "Uh well uh uh uh well...", "sprite": "scared", "hush_money": "1000"}
+				{"name": "Shop Keeper", "text": "Uh well uh uh uh well...", "sprite": "scared"}
 			],
 			"choices": [
 				{"text": "Ask about portals", "next": "portal_talk"},

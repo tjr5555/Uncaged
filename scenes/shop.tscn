@@ -1,11 +1,11 @@
 [gd_scene format=3 uid="uid://c7a3i1188tjny"]
 
 [ext_resource type="Script" uid="uid://glwsi83k70dk" path="res://scripts/shop.gd" id="1_vr6tn"]
-[ext_resource type="AudioStream" uid="uid://dkxucyotn1yhl" path="res://audio/freesoundeffects-button-click-289742.mp3" id="2_qu5gy"]
-[ext_resource type="AudioStream" uid="uid://doedcxhof6vby" path="res://audio/music/SHOP!.mp3" id="7_ajxib"]
+[ext_resource type="AudioStream" uid="uid://jl4rmvk5gm1u" path="res://audio/kenney_interface-sounds/Audio/back_001.ogg" id="2_1l46r"]
+[ext_resource type="FontFile" uid="uid://donndj1us3mjo" path="res://fonts/richeze/Richeze.otf" id="4_032fp"]
 
 [sub_resource type="Gradient" id="Gradient_wfx2d"]
-colors = PackedColorArray(0.8808251, 0.1897483, 0, 1, 1, 1, 0, 1)
+colors = PackedColorArray(1, 0.49803922, 0, 1, 0.2901961, 0, 0.627451, 1)
 
 [sub_resource type="GradientTexture2D" id="GradientTexture2D_0jsi4"]
 gradient = SubResource("Gradient_wfx2d")
@@ -19,7 +19,6 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_vr6tn")
-hover_sound = ExtResource("2_qu5gy")
 
 [node name="back" type="TextureRect" parent="." unique_id=1781888682]
 layout_mode = 0
@@ -28,8 +27,18 @@ offset_bottom = 1080.0
 texture = SubResource("GradientTexture2D_0jsi4")
 
 [node name="MusicPlayer" type="AudioStreamPlayer" parent="." unique_id=780938061]
-stream = ExtResource("7_ajxib")
-volume_db = -11.386
+stream = ExtResource("2_1l46r")
+volume_db = -3.176
 autoplay = true
 bus = &"Music"
 parameters/looping = true
+
+[node name="Button" type="Button" parent="." unique_id=380629037]
+layout_mode = 0
+offset_left = 1496.0
+offset_top = 936.0
+offset_right = 1864.0
+offset_bottom = 1040.0
+theme_override_fonts/font = ExtResource("4_032fp")
+theme_override_font_sizes/font_size = 43
+text = "Talk to Shopkeeper"
