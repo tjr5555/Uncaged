@@ -73,10 +73,9 @@ offset_bottom = -7.0
 scale = Vector2(0.71, 0.71)
 d_file = "res://dialogue/npc2crow/dialogue files/wiseCrowDialogue6.json"
 gives_quest = true
-quest_id = "travel_distance"
-quest_title = "10000 french fries"
+quest_title = "a lot of french fries"
 quest_description = "Explore the world for Wise Crow!"
-quest_target = 100000
+quest_target = 10
 metadata/_edit_lock_ = true
 
 [connection signal="body_entered" from="detectionArea" to="." method="_on_detection_area_body_entered"]

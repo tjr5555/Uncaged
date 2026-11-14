@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://c7a3i1188tjny"]
 
 [ext_resource type="Script" uid="uid://glwsi83k70dk" path="res://scripts/shop.gd" id="1_vr6tn"]
-[ext_resource type="AudioStream" uid="uid://jl4rmvk5gm1u" path="res://audio/kenney_interface-sounds/Audio/back_001.ogg" id="2_1l46r"]
+[ext_resource type="AudioStream" uid="uid://doedcxhof6vby" path="res://audio/music/SHOP!.mp3" id="2_1l46r"]
 [ext_resource type="FontFile" uid="uid://donndj1us3mjo" path="res://fonts/richeze/Richeze.otf" id="4_032fp"]
 
 [sub_resource type="Gradient" id="Gradient_wfx2d"]
@@ -42,3 +42,5 @@ offset_bottom = 1040.0
 theme_override_fonts/font = ExtResource("4_032fp")
 theme_override_font_sizes/font_size = 43
 text = "Talk to Shopkeeper"
+
+[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

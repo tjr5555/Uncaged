@@ -9,7 +9,8 @@ var medallion: Node2D
 const MEDALLION_NECK = Vector2(-3.0, 0)
 
 
-var SPEED = 400.0
+const BASE_SPEED = 400.0
+var SPEED: float = BASE_SPEED
 var JUMP_VELOCITY = -500.0
 var JUMP_CUT = 0.45
 var JUMP_BUFFER = 0.12
@@ -73,7 +74,8 @@ const DEFAULT_TURN_RATE = 4.2
 const FLY_ENTER_SPEED = 800.0
 var FLY_CRUISE_SPEED = 800.0
 const FLY_BOOST_SPEED = 1300.0
-const FLY_MAX_SPEED = 1700.0
+const BASE_FLY_MAX_SPEED = 1700.0
+var FLY_MAX_SPEED: float = BASE_FLY_MAX_SPEED
 const FLY_MIN_SPEED = 450.0
 const FLY_ACCEL = 700.0
 const FLY_BOOST_ACCEL = 1400.0
@@ -186,7 +188,10 @@ const ABSORB_SCALE = 0.15
 const ABSORB_SPIN = 9.0
 const EMERGE_TIME = 0.5
 
+const QUEST2_SPEED_MULT = 2.0
+
 func _ready() -> void:
+	SignalBus.finishquest2.connect(_on_quest2_finished)
 	last_grounded_pos = global_position
 	if camera == null:
 		push_error("Player: no child node named 'camera' found")
@@ -223,12 +228,12 @@ func _ready() -> void:
 		_give_medallion()
 
 func _physics_process(delta: float) -> void:
-	#set shop variables constantly (Player specific ones)
-	FLY_CRUISE_SPEED = Global.base_flight_speed
+	#update shop variables
+	var speed_mult := QUEST2_SPEED_MULT if Global.has_necklace else 1.0
+	SPEED = BASE_SPEED * speed_mult
+	FLY_CRUISE_SPEED = Global.base_flight_speed * speed_mult
+	FLY_MAX_SPEED = BASE_FLY_MAX_SPEED * speed_mult
 	FLY_TURN_RATE = Global.base_turn_speed
-	FLY_BRAKE_DECEL = BASE_FLY_BRAKE_DECEL * Global.brake_decel_scale
-	FLY_BRAKE_TURN_MULT = Global.brake_turn_bonus
-	FLY_TURN_ACCEL = BASE_FLY_TURN_ACCEL * Global.turn_accel_scale
 	_update_magnet(delta)
 
 	if autopilot:
@@ -951,3 +956,6 @@ func _update_magnet(delta: float) -> void:
 	for area in magnet_area.get_overlapping_areas():
 		if area.has_method("magnet_pull"):
 			area.magnet_pull(global_position, radius, MAGNET_PULL_SPEED, delta)
+
+func _on_quest2_finished() -> void:
+	Global.has_necklace = true

@@ -20,12 +20,13 @@ signal give_quest(quest_id, title, description, target_count)
 @export var player_font: Font
 @export_range(0, 200) var player_font_size: int = 0
 @export_range(0, 200) var player_name_font_size: int = 0
+
 #quest settings (leave gives_quest off for plain tutorial NPCs)
 @export var gives_quest: bool = false
-@export var quest_id: String = "collect_coins"
-@export var quest_title: String = "Coin Collector"
-@export var quest_description: String = "Collect coins"
-@export var quest_target: int = 500
+@export var quest_id: String = "travel_distance" # must be unique per quest (the parrot uses "collect_coins")
+@export var quest_title: String = "Long Distance Traveler"
+@export var quest_description: String = "Travel 100,000ft"
+@export var quest_target: int = 100000
 
 
 @onready var wise_sprite: AnimatedSprite2D = $"../AnimatedSprite2D"
@@ -40,10 +41,10 @@ var d_active = false
 var tween: Tween
 var _base_box_pos_y: float
 var _base_box_height: float
+var end_action := "none" #what finishing this conversation does: "give", "turn_in" or "none"
 
 
 func _ready():
-	add_to_group("dialogue_ui")
 	$NinePatchRect.visible = false
 	_base_box_pos_y = $NinePatchRect.position.y
 	_base_box_height = $NinePatchRect.size.y
@@ -64,6 +65,8 @@ func start():
 
 
 func load_dialogue() -> Array:
+	end_action = "none"
+
 	if not FileAccess.file_exists(d_file):
 		push_error("Dialogue file not found: " + d_file)
 		return []
@@ -76,13 +79,24 @@ func load_dialogue() -> Array:
 
 	#simplest format: the file is just an array of lines
 	if content is Array:
+		if gives_quest and not QuestManager.active_quests.has(quest_id):
+			end_action = "give"
 		return content
 
-	#also accepts an object, e.g. {"first_encounter": [...], "completed_dialogue": [...]}
+	#also accepts an object, e.g. {"initial_dialogue": [...], "completed_dialogue": [...]}
 	if content is Dictionary and not content.is_empty():
-		var quest_done: bool = gives_quest and QuestManager.active_quests.has(quest_id) and QuestManager.active_quests[quest_id].get("completed", false)
-		if quest_done and content.has("completed_dialogue"):
+		var quest: Dictionary = {}
+		if gives_quest:
+			quest = QuestManager.active_quests.get(quest_id, {})
+
+		#quest finished: the first talk turns it in, later talks do nothing special
+		if quest.get("completed", false) and content.has("completed_dialogue"):
+			end_action = "none" if quest.get("turned_in", false) else "turn_in"
 			return content["completed_dialogue"]
+
+		#quest not given yet: finishing the intro gives it; if it is already active, don't give it again
+		if gives_quest and quest.is_empty():
+			end_action = "give"
 		return content.values()[0]
 
 	push_error("Dialogue file is empty or has an unexpected format: " + d_file)
@@ -109,8 +123,14 @@ func next_script():
 		$NinePatchRect.visible = false
 		stop_sound()
 		emit_signal("dialogue_finished")
-		if gives_quest:
-			emit_signal("give_quest", quest_id, quest_title, quest_description, quest_target)
+
+		match end_action:
+			"give":
+				emit_signal("give_quest", quest_id, quest_title, quest_description, quest_target)
+			"turn_in":
+				if QuestManager.active_quests.has(quest_id):
+					QuestManager.active_quests[quest_id]["turned_in"] = true
+				SignalBus.finishquest2.emit()
 		return
 
 	var current_data = dialogue[current_dialogue_id]
@@ -186,9 +206,8 @@ func animate_text(text: String):
 		tween.tween_callback(stop_sound)
 		if letter == ",":
 			tween.tween_interval(PUNCTUATION_TIME / 2.0)
-		elif letter in [".", "?", "!", "-"]:
+		elif letter in [".", "?", "!"]:
 			tween.tween_interval(PUNCTUATION_TIME)
-
 
 		last_punct_index = index
 
@@ -200,16 +219,16 @@ func _fit_box_to_text() -> void:
 	var chat_area = $NinePatchRect/Chatarea
 	if not chat_area is RichTextLabel:
 		return
-	
+
 	#wait a frame so the label has laid out the new text
 	await get_tree().process_frame
-	
+
 	var needed: float = chat_area.position.y + chat_area.get_content_height() + box_padding_bottom
 	var new_height := maxf(_base_box_height, needed)
 	if grow_upward:
 		box.position.y = _base_box_pos_y - (new_height - _base_box_height)
 	box.size.y = new_height
-	
+
 	#the label has to grow too, or it clips the extra lines at its old bottom edge
 	chat_area.clip_contents = false
 	chat_area.size.y = chat_area.get_content_height()
@@ -246,10 +265,10 @@ func close():
 	$NinePatchRect.size.y = _base_box_height
 
 
-
-
 func change_sprite(anim_name: String):
 	if anim_name == "" or not wise_sprite:
 		return
 	if wise_sprite.sprite_frames.has_animation(anim_name):
 		wise_sprite.play(anim_name)
+	else:
+		push_warning("No animation named '" + anim_name + "'. Available: " + str(wise_sprite.sprite_frames.get_animation_names()))

@@ -12,7 +12,7 @@ func _process(delta: float) -> void:
 	if playernear == true:
 		$Label.text = "Press C to open the shop!"
 	else:
-		$Label.text = "Shopkeeper"
+		$Label.text = ""
 		
 	if Input.is_action_just_pressed("augment") and playernear == true:
 		if current_shop == null:

@@ -17,12 +17,11 @@ texture = ExtResource("2_y54bd")
 
 [node name="Label" type="Label" parent="." unique_id=268590427]
 offset_left = -96.0
-offset_top = -68.0
+offset_top = -138.0
 offset_right = 96.0
-offset_bottom = -40.0
+offset_bottom = -106.0
 theme_override_fonts/font = ExtResource("3_t3gtr")
 theme_override_font_sizes/font_size = 24
-text = "SHOPKEEPER"
 horizontal_alignment = 1
 
 [node name="Area2D" type="Area2D" parent="." unique_id=1736434251]

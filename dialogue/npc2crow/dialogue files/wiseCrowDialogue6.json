@@ -1,5 +1,5 @@
-
-[
+{
+	"initial_dialogue": [
 		{"name": "You", "text": "Hey! You're back!", "anim": "happy"},
 		{"name": "Wise Crow", "text": "Yeah, I thought I could use a little break", "anim": "happy"},
 		{"name": "You", "text": "Have you gone into the portals yet?", "anim": "sleepy"},
@@ -26,4 +26,15 @@
 		{"name": "You", "text": "okay fine", "anim": "sleepy"},
 		{"name": "You", "text": "I'll do it!", "anim": "happy"},
 		{"name": "Wise Crow", "text": "Great!", "anim": "Happy"},
-]
+	],
+	"completed_dialogue": [
+		{"name": "Wise Crow", "text": "Oh wow, I didn't actually expect you to do it...", "anim": "Happy"},
+		{"name": "You", "text": "Well yeah, I really wanna see what you have", "anim": "sleepy"},
+		{"name": "Wise Crow", "text": "Oh yeah, it's just this necklace I found", "anim": "Happy"},
+		{"name": "You", "text": "This is all I get?", "anim": "sleepy"},
+		{"name": "Wise Crow", "text": "Just put it on dude", "anim": "Happy"},
+		{"name": "You", "text": "Okay fine", "anim": "happy"},
+		{"name": "You", "text": "It's on", "anim": "happy"},
+		{"name": "You", "text": "Great, try walking around", "anim": "happy"},
+	]
+}

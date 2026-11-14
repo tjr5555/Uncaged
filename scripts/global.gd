@@ -22,6 +22,7 @@ var max_dashes: int = 2
 var dashes: int = 2
 var dash_target: int 
 var has_medallion := false
+var has_necklace := false
 var in_transition := false
 var return_portal_id := ""
 

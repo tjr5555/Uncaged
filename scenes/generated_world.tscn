@@ -22,7 +22,7 @@
 script = ExtResource("1_dlhb1")
 island_scenes = Array[PackedScene]([ExtResource("2_og635"), ExtResource("3_msmpk"), ExtResource("4_eamn2"), ExtResource("5_2a22c"), ExtResource("6_b3ooo"), ExtResource("7_plrht"), ExtResource("8_hmfh3"), ExtResource("9_ituiu"), ExtResource("10_flhq7"), ExtResource("11_r0wce"), ExtResource("12_5yv0q"), ExtResource("13_bex7j")])
 chunk_size = 4000.0
-safe_radius = 2500.0
+safe_radius = 100.0
 region_size = 32000.0
 sparse_empty_chance = 0.92
 dense_empty_chance = 0.35

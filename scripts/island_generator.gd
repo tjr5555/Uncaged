@@ -6,7 +6,7 @@ extends Node2D
 @export var chunk_size := 3000.0
 @export var load_radius := 2        # chunks loaded around the player
 @export var unload_radius := 3      # chunks farther than this get unloaded
-@export var safe_radius := 5000.0   # no islands within this distance of world origin
+@export var safe_radius := 100   # no islands within this distance of world origin
 
 @export_group("Streaming")
 @export var prefetch_time := 1.2

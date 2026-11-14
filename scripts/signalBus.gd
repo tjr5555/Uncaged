@@ -4,3 +4,4 @@ extends Node
 
 
 signal finishquest1
+signal finishquest2

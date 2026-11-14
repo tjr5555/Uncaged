@@ -58,6 +58,7 @@ const UPGRADES = [
 ]
 
 const BLUR_SHADER = preload("res://shaders/ui_blur.gdshader")
+const TALK_SCENE = preload("res://shopkeepertalk.tscn")
 const COIN_COLOR = Color(1.0, 0.82, 0.3)
 const CARD_COLOR = Color(0.07, 0.1, 0.17, 0.92)
 const TEXT = Color(0.95, 0.97, 1.0)
@@ -76,6 +77,10 @@ var _coin_texture_small: ImageTexture
 var _coins_target := -1.0
 var _coins_shown := 0.0
 var _coin_tween: Tween
+
+# shopkeeper conversation (instanced on top of the shop)
+var _talk: Node
+var _hidden_for_talk: Array[CanvasItem] = []
 
 func _ready() -> void:
 	add_child(_audio)
@@ -99,6 +104,7 @@ func _ready() -> void:
 	for u in UPGRADES:
 		_refresh(u)
 	_set_coins_instant()
+
 func _process(delta: float) -> void:
 	var coins := float(Global.total_coins)
 	if is_equal_approx(coins, _coins_target):
@@ -116,6 +122,12 @@ func _input(event: InputEvent) -> void:
 		return
 	var layer := get_parent() as CanvasLayer
 	if layer and not layer.visible:
+		return
+	# while the shopkeeper is talking, Esc leaves the conversation instead of closing the shop
+	if _talk:
+		if event.is_action_pressed("ui_cancel"):
+			get_viewport().set_input_as_handled()
+			_close_talk()
 		return
 	if event.is_action_pressed("ui_cancel"):
 		get_viewport().set_input_as_handled()
@@ -546,3 +558,28 @@ func _value(u: Dictionary) -> float:
 		push_error("Shop: Global has no variable named '%s' (used by upgrade '%s')." % [u["var"], u["id"]])
 		return 0.0
 	return float(v)
+
+# Opens the shopkeeper conversation on top of the shop (the shop and main scene stay loaded)
+func _on_button_pressed() -> void:
+	if _talk:
+		return
+	# hide the shop's UI but keep the background image
+	_hidden_for_talk.clear()
+	for child in get_children():
+		if child is CanvasItem and child.name != "back" and child.visible:
+			child.visible = false
+			_hidden_for_talk.append(child)
+
+	_talk = TALK_SCENE.instantiate()
+	add_child(_talk)
+	print(_talk.name, " | script: ", _talk.get_script())
+	_talk.dialogue_finished.connect(_close_talk)
+
+func _close_talk() -> void:
+	if _talk:
+		_talk.queue_free()
+		_talk = null
+	for child in _hidden_for_talk:
+		if is_instance_valid(child):
+			child.visible = true
+	_hidden_for_talk.clear()

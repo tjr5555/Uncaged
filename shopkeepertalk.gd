@@ -358,3 +358,8 @@ func get_ending_pitch(sentence: String) -> float:
 	if t.ends_with("!"):
 		return exclamation_sentence_pitch
 	return normal_sentence_pitch
+
+
+func _on_button_2_pressed() -> void:
+	print("return pressed")
+	end_dialogue()

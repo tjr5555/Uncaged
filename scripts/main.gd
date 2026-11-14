@@ -26,7 +26,6 @@ var cooldown_until := 0.0
 func _ready() -> void:
 	add_to_group("world_manager")
 	player.boost_changed.connect(ui.set_boost)
-
 	if world_root.get_child_count() > 0:
 		hub = world_root.get_child(0) as Node2D
 	current_world = hub
