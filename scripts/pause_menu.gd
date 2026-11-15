@@ -31,6 +31,8 @@ func _ready() -> void:
 	menu_button.pressed.connect(_return_to_menu)
 	quit_button.pressed.connect(_quit)
 	settings_panel.closed.connect(_on_settings_closed)
+	resume_button.set_meta("sfx_press", "")
+	settings_button.set_meta("sfx_press", "")
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not event.is_action_pressed("pause"):
@@ -46,6 +48,7 @@ func _unhandled_input(event: InputEvent) -> void:
 func open() -> void:
 	if is_open or Global.in_transition or SceneFader.busy:
 		return
+	Sfx.play("pause_open")
 	is_open = true
 	get_tree().paused = true
 	visible = true
@@ -62,6 +65,7 @@ func open() -> void:
 func close() -> void:
 	if not is_open:
 		return
+	Sfx.play("pause_close")
 	is_open = false
 	get_tree().paused = false
 	if settings_panel.visible:

@@ -47,34 +47,31 @@ func _process(delta: float) -> void:
 	var player := get_tree().get_first_node_in_group("player") as CharacterBody2D
 	var raw_velocity := player.velocity if player != null else Vector2.ZERO
 	smoothed_velocity = smoothed_velocity.lerp(raw_velocity, 1.0 - exp(-VELOCITY_SMOOTH * delta))
-	
+
 	var speed := smoothed_velocity.length()
-	var speed_t := smoothstep(SPEED_START, SPEED_FULL, speed)
-	var fall_t := smoothstep(FALL_START, FALL_FULL, smoothed_velocity.y)
-	var target_intensity := maxf(speed_t, fall_t)
-	
-	var rate := INTENSITY_RISE if target_intensity > intensity else INTENSITY_FALL
-	intensity = lerpf(intensity, target_intensity, 1.0 - exp(-rate * delta))
-	
+	if player != null and "wind_level" in player:
+		intensity = float(player.get("wind_level"))
+	else:
+		var speed_t := smoothstep(SPEED_START, SPEED_FULL, speed)
+		var fall_t := smoothstep(FALL_START, FALL_FULL, smoothed_velocity.y)
+		var target_intensity := maxf(speed_t, fall_t)
+		var rate := INTENSITY_RISE if target_intensity > intensity else INTENSITY_FALL
+		intensity = lerpf(intensity, target_intensity, 1.0 - exp(-rate * delta))
+
 	if speed > 50.0:
 		var target_angle := (-smoothed_velocity).angle()
 		var diff := angle_difference(flow_angle, target_angle)
 		flow_turn_speed += (diff * TURN_STIFFNESS - flow_turn_speed * TURN_DAMPING) * delta
 	else:
 		flow_turn_speed *= exp(-TURN_DAMPING * delta)
-	
+
 	flow_angle = wrapf(flow_angle + flow_turn_speed * delta, -PI, PI)
 	flow_dir = Vector2.from_angle(flow_angle)
 	flow_speed = FLOW_SPEED * lerpf(0.6, 1.6, intensity)
-	
+
 	_spawn_streaks(delta)
 	_move_streaks(delta)
 	queue_redraw()
-
-
-
-
-
 
 func _spawn_streaks(delta: float) -> void:
 	if intensity < 0.02:

@@ -269,6 +269,7 @@ func _enter_without_manager(player: Node) -> void:
 	entering = true
 	Global.in_transition = true
 	play_enter_effect()
+	Sfx.play("portal_enter")
 	player.begin_portal_entry(get_entry_point(player.global_position))
 	await player.portal_reached
 

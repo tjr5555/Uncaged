@@ -35,6 +35,7 @@ func change_scene(path: String) -> void:
 	if busy:
 		return
 	busy = true
+	Sfx.play("transition")
 	fog.mouse_filter = Control.MOUSE_FILTER_STOP
 	preload_scene(path)
 	

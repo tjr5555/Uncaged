@@ -30,6 +30,9 @@ func _ready() -> void:
 		_apply_palette(0.0, SKY_PALETTES[0], SKY_PALETTES[0])
 		_cycle_sky()
 	_setup_save_buttons()
+	for b in [continue_button, enter_button, find_child("settingsButton", true, false)]:
+		if b:
+			b.set_meta("sfx_press", "")
 	SceneFader.preload_scene(GAME_SCENE)
 
 func _setup_save_buttons() -> void:
@@ -63,6 +66,7 @@ func _apply_palette(t: float, from: Dictionary, to: Dictionary) -> void:
 		menu_world.haze_color = horizon.lerp(Color.WHITE, 0.25)
 
 func _on_continue_button_pressed() -> void:
+	Sfx.play("ui_confirm")
 	if not SaveManager.load_game():
 		SaveManager.new_game()
 	SceneFader.change_scene(GAME_SCENE)
@@ -71,8 +75,10 @@ func _on_enter_button_pressed() -> void:
 	if SaveManager.has_save() and not confirm_new_game:
 		confirm_new_game = true
 		enter_button.text = "Overwrite save?"
+		Sfx.play("ui_warning")
 		get_tree().create_timer(CONFIRM_TIME).timeout.connect(_reset_new_game_confirm)
 		return
+	Sfx.play("ui_confirm")
 	SaveManager.new_game()
 	SceneFader.change_scene(GAME_SCENE)
 
@@ -82,6 +88,7 @@ func _reset_new_game_confirm() -> void:
 		enter_button.text = "New Game"
 
 func _on_settings_button_pressed() -> void:
+	$Overlay.show()
 	$Overlay/SettingsPanel.open()
 
 func _on_quit_button_pressed() -> void:

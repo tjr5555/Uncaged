@@ -81,11 +81,14 @@ func _on_body_entered(body: Node2D) -> void:
 	
 	var reward := Combo.register_pop(coin_value * Global.base_coin_mult)
 	Global.total_coins += reward
+	Global.coins_gained.emit(reward, tint, global_position)
 	Global.dashes += 1
 	
 	var sound: AudioStreamPlayer2D = $AudioStreamPlayer2D
 	sound.pitch_scale = 1.0 + maxi(tier_index, 0) * 0.06 + minf(Combo.count, 20) * 0.025 + randf_range(-0.03, 0.03)
 	sound.play()
+	if tier_index >= 3:
+		Sfx.play("balloon_rare", 1.0 + (tier_index - 3) * 0.12)
 	
 	_spawn_pop_effect(reward)
 

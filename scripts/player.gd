@@ -102,6 +102,25 @@ const MOUSE_DEADZONE = 40.0
 const MOUSE_TURN_GAIN = 6.0
 const MOUSE_SWITCH_THRESHOLD = 3.0
 
+const WIND_SOUND_PATH = "res://audio/windLoop.wav"
+@export var wind_sound: AudioStream
+
+const WIND_AUDIO_START = 1000.0
+const WIND_AUDIO_FULL = 1700.0
+const FALL_AUDIO_START = 700.0
+const FALL_AUDIO_FULL = 2000.0
+const WIND_AUDIO_MAX_DB = -16.0
+const WIND_AUDIO_RISE = 2.5
+const WIND_AUDIO_FALL = 1.2
+const WIND_BASE_PITCH = 0.794
+const WIND_PITCH_RANGE = 0.06
+const WIND_CUTOFF_SLOW = 8500.0
+const WIND_CUTOFF_FAST = 16500.0
+
+var wind_player: AudioStreamPlayer
+var wind_filter: AudioEffectLowPassFilter
+var wind_level := 0.0
+
 enum SteerSource { KEYBOARD, MOUSE }
 
 var steer_source := SteerSource.KEYBOARD
@@ -128,10 +147,18 @@ const WIND_FADE_SPEED = 3.0
 
 const WIND_BODY_HALF = Vector2(26.0, 30.0)
 const WIND_BODY_CENTER = Vector2.ZERO
-const WIND_INSET = 0.55
-var WIND_LANE_FRACTIONS: PackedFloat32Array = PackedFloat32Array([-0.8, -0.4, 0.0, 0.4, 0.8])
-var WIND_LANE_LENGTHS: PackedInt32Array = PackedInt32Array([8, 12, 18, 12, 8])
-var WIND_LANE_WIDTHS: PackedFloat32Array = PackedFloat32Array([6.0, 9.0, 12.0, 9.0, 6.0])
+#each trail: back = how far behind the body center, side = how far out to the side (in body sizes)
+#from = how much wind is needed before it appears (0 to 1)
+const WIND_LANES = [
+	{"back": 0.35, "side": -0.95, "length": 7, "width": 4.0, "from": 0.5},
+	{"back": 0.75, "side": -0.5, "length": 11, "width": 7.0, "from": 0.25},
+	{"back": 1.05, "side": 0.0, "length": 16, "width": 10.0, "from": 0.0},
+	{"back": 0.75, "side": 0.5, "length": 11, "width": 7.0, "from": 0.25},
+	{"back": 0.35, "side": 0.95, "length": 7, "width": 4.0, "from": 0.5},
+]
+var wall_free_time := 1.0
+const WALL_SOUND_GAP = 0.5
+const WALL_SOUND_MIN_SPEED = 800.0
 
 var wind_lines: Array[Line2D] = []
 var wind_amount: float = 0.0
@@ -190,6 +217,21 @@ const EMERGE_TIME = 0.5
 
 const QUEST2_SPEED_MULT = 2.0
 
+const RESPAWN_ON_HAZARD_SCENES = ["tutorial"]
+const SPIKE_DAMAGE = 20.0
+const SPIKE_KNOCKBACK = 520.0
+const WALL_DAMAGE_START = 1000.0
+const WALL_DAMAGE_FULL = 1700.0
+const WALL_DAMAGE_MIN = 8.0
+const WALL_DAMAGE_MAX = 35.0
+const FALL_DAMAGE_START = 1500.0
+const FALL_DAMAGE_FULL = 2600.0
+const FALL_DAMAGE_MIN = 10.0
+const FALL_DAMAGE_MAX = 65.0
+
+@onready var health: Health = get_node_or_null("Health")
+var hurt_tween: Tween
+
 func _ready() -> void:
 	SignalBus.finishquest2.connect(_on_quest2_finished)
 	last_grounded_pos = global_position
@@ -207,9 +249,9 @@ func _ready() -> void:
 	gradient.add_point(0.15, WIND_COLOR)
 	gradient.add_point(0.45, Color(WIND_COLOR, WIND_COLOR.a * 0.5))
 
-	for i in WIND_LANE_FRACTIONS.size():
+	for lane in WIND_LANES:
 		var line := Line2D.new()
-		line.width = WIND_LANE_WIDTHS[i]
+		line.width = lane["width"]
 		line.width_curve = width_curve
 		line.gradient = gradient
 		line.begin_cap_mode = Line2D.LINE_CAP_ROUND
@@ -220,9 +262,15 @@ func _ready() -> void:
 		line.show_behind_parent = true
 		add_child(line)
 		wind_lines.append(line)
-
+	
 	_build_magnet()
-
+	_build_wind_audio()
+	
+	if health:
+		health.damaged.connect(_on_damaged)
+	else:
+		push_error("Player: no node named health")
+	
 	SignalBus.finishquest1.connect(_give_medallion)
 	if Global.has_medallion:
 		_give_medallion()
@@ -235,6 +283,7 @@ func _physics_process(delta: float) -> void:
 	FLY_MAX_SPEED = BASE_FLY_MAX_SPEED * speed_mult
 	FLY_TURN_RATE = Global.base_turn_speed
 	_update_magnet(delta)
+	_update_wind_audio(delta)
 
 	if autopilot:
 		_autopilot_physics(delta)
@@ -246,7 +295,9 @@ func _physics_process(delta: float) -> void:
 		return
 
 	if Input.is_action_just_pressed("toggle_fly") and not Global.INPUT_LOCKED:
-		_set_mode(Global.Mode.GROUND if Global.mode == Global.Mode.FLY else Global.Mode.FLY)
+		var to_fly := Global.mode != Global.Mode.FLY
+		Sfx.play("fly_on" if to_fly else "fly_off")
+		_set_mode(Global.Mode.FLY if to_fly else Global.Mode.GROUND)
 
 	is_boosting = false
 
@@ -363,6 +414,7 @@ func _ground_physics(delta: float) -> void:
 			jump_buffer_timer = 0.0
 			jumped = true
 			hop_airborne = false
+			Sfx.play("wall_jump")
 		elif coyote_timer <= COYOTE_TIME and flaps > 0:
 			flaps -= 1
 			coyote_timer = COYOTE_TIME
@@ -371,6 +423,7 @@ func _ground_physics(delta: float) -> void:
 			jump_buffer_timer = 0.0
 			jumped = true
 			hop_airborne = false
+			Sfx.play("jump")
 	
 	if velocity.y >= 0.0:
 		jump_cut_available = false
@@ -422,15 +475,18 @@ func _ground_physics(delta: float) -> void:
 		hop_airborne = false
 		jump_cut_available = false
 		velocity = dash_dir * (DASH_POWER if on_floor else DASH_POWER * 1.4)
+		Sfx.play("dash", 1.15)
 	
 	var incoming_speed_y := velocity.y
 	
 	move_and_slide()
 	
-	#touching a hazard tile sends you back to the last safe ground
-	if _touching_hazard():
-		respawn()
-		return
+	var hazard_normal := _hazard_normal()
+	if hazard_normal != Vector2.ZERO:
+		if _hazards_respawn():
+			respawn()
+			return
+		_hit_hazard(hazard_normal)
 	
 	#remember the last safe ground (a hazard touch returned above, so this is never a hazard)
 	if is_on_floor():
@@ -528,14 +584,14 @@ func _ledge_near(direction: float) -> bool:
 	return false
 
 func _fly_physics(delta: float) -> void:
-	var braking := Input.is_action_pressed(FLY_BRAKE_ACTION) 
+	var braking := Input.is_action_pressed(FLY_BRAKE_ACTION)
 	
 	if boost <= 0.0:
 		boost_exhausted = true
 	elif boost >= BOOST_RESTART_AMOUNT:
 		boost_exhausted = false
 	
-	var boosting := Input.is_action_pressed(FLY_BOOST_ACTION) and not boost_exhausted 
+	var boosting := Input.is_action_pressed(FLY_BOOST_ACTION) and not boost_exhausted
 	is_boosting = boosting
 	
 	speed_floor = move_toward(speed_floor, FLY_MIN_SPEED, FLY_BOUNCE_RECOVERY * delta)
@@ -598,11 +654,18 @@ func _fly_physics(delta: float) -> void:
 	
 	move_and_slide()
 	
-	if _touching_hazard():
-		respawn()
-		return
+	var hazard_normal := _hazard_normal()
+	if hazard_normal != Vector2.ZERO:
+		if _hazards_respawn():
+			respawn()
+			return
+		_hit_hazard(hazard_normal)
+		heading_vec = Vector2.from_angle(heading)
 	
-	if get_slide_collision_count() > 0:
+	var touching := get_slide_collision_count() > 0
+	var free_before := wall_free_time
+	wall_free_time = 0.0 if touching else wall_free_time + delta
+	if touching:
 		var normal := get_last_slide_collision().get_normal()
 		var impact := -heading_vec.dot(normal)
 		if impact > 0.0:
@@ -613,7 +676,13 @@ func _fly_physics(delta: float) -> void:
 			speed_floor = FLY_BOUNCE_MIN_SPEED
 			velocity = heading_vec * speed
 			if impact_speed > WALL_SHAKE_MIN_SPEED:
-				add_shake(WALL_SHAKE * impact * clampf(impact_speed / FLY_MAX_SPEED, 0.0, 1.0))
+				var hit := clampf(impact_speed / FLY_MAX_SPEED, 0.0, 1.0)
+				add_shake(WALL_SHAKE * impact * hit)
+				if free_before >= WALL_SOUND_GAP and impact > 0.3 and impact_speed > WALL_SOUND_MIN_SPEED:
+					Sfx.play("wall_bounce", lerpf(1.2, 0.85, hit), lerpf(-14.0, 0.0, impact))
+			if health and not _hazards_respawn() and free_before >= WALL_SOUND_GAP and impact > 0.55 and impact_speed > WALL_DAMAGE_START:
+				var t := clampf(inverse_lerp(WALL_DAMAGE_START, WALL_DAMAGE_FULL, impact_speed) * impact, 0.0, 1.0)
+				health.damage(lerpf(WALL_DAMAGE_MIN, WALL_DAMAGE_MAX, t), "impact")
 	
 	var facing := 1.0 if cos(heading) >= 0.0 else -1.0
 	flip_amount = move_toward(flip_amount, facing, FLY_FLIP_SPEED * delta)
@@ -624,7 +693,7 @@ func _fly_physics(delta: float) -> void:
 	
 	_update_camera(delta, (velocity * FLY_CAMERA_LOOK).limit_length(FLY_CAMERA_MAX_OFFSET))
 
-func _touching_hazard() -> bool:
+func _hazard_normal() -> Vector2:
 	for i in get_slide_collision_count():
 		var col := get_slide_collision(i)
 		var layer := col.get_collider() as TileMapLayer
@@ -648,8 +717,8 @@ func _touching_hazard() -> bool:
 			if DEBUG_HAZARDS:
 				print("hazard check: ", layer.name, " tile ", coords, " ", data_name, " = ", data.get_custom_data(data_name) if data else "no tile")
 			if data and data.get_custom_data(data_name):
-				return true
-	return false
+				return col.get_normal()
+	return Vector2.ZERO
 
 func respawn() -> void:
 	if Global.mode == Global.Mode.FLY:
@@ -680,40 +749,35 @@ func respawn() -> void:
 		camera.offset = Vector2.ZERO
 		camera.reset_smoothing()
 
-
 func _update_wind(delta: float) -> void:
 	var target := 0.0
 	if Global.mode == Global.Mode.FLY:
 		target = smoothstep(WIND_START_SPEED, WIND_FULL_SPEED, speed)
 	wind_amount = move_toward(wind_amount, target, WIND_FADE_SPEED * delta)
 
-	var emitting := wind_amount > 0.02
 	var forward := Vector2.from_angle(heading)
 	var side := forward.orthogonal()
-	var time := Time.get_ticks_msec() * 0.008
+	var time := Time.get_ticks_msec() / 1000.0
 	var body := WIND_BODY_HALF * base_scale.abs()
-	var flip := 1.0 if flip_amount >= 0.0 else -1.0
-	var center := global_position + Vector2(WIND_BODY_CENTER.x, WIND_BODY_CENTER.y * flip).rotated(heading)
+	var center := global_position + WIND_BODY_CENTER.rotated(heading)
 
 	for i in wind_lines.size():
-		var line: Line2D = wind_lines[i]
+		var line := wind_lines[i]
+		var lane: Dictionary = WIND_LANES[i]
 		line.global_transform = Transform2D.IDENTITY
-		line.modulate.a = wind_amount
 
-		if not emitting:
+		var lane_from: float = lane["from"]
+		var lane_alpha := smoothstep(lane_from, lane_from + 0.25, wind_amount)
+		line.modulate.a = lane_alpha
+		if lane_alpha <= 0.02:
 			line.clear_points()
 			continue
 
-		var fraction: float = WIND_LANE_FRACTIONS[i]
-		var lane_length: int = WIND_LANE_LENGTHS[i]
-		var spread: float = lerpf(0.55, 1.0, wind_amount)
-		var wobble: float = sin(time + i * 1.7) * 2.5 * wind_amount
-		var back := body.x * sqrt(maxf(1.0 - fraction * fraction, 0.0)) * WIND_INSET
-		var lateral := fraction * body.y * spread + wobble
-		var head: Vector2 = center - forward * back + side * lateral
+		var wobble := sin(time * (5.0 + i * 1.3) + i * 2.1) * 2.0 * lane_alpha
+		var head := center - forward * (body.x * float(lane["back"])) + side * (body.y * float(lane["side"]) + wobble)
 		line.add_point(head, 0)
 
-		var allowed: int = int(lane_length * lerpf(0.4, 1.0, wind_amount))
+		var allowed := int(float(lane["length"]) * lerpf(0.4, 1.0, lane_alpha))
 		while line.get_point_count() > allowed:
 			line.remove_point(line.get_point_count() - 1)
 
@@ -819,20 +883,21 @@ func _emerge_physics(delta: float) -> void:
 	_update_camera(delta, (velocity * FLY_CAMERA_LOOK).limit_length(FLY_CAMERA_MAX_OFFSET))
 
 func _on_landed(impact: float) -> void:
+	_apply_fall_damage(impact)
+	
 	var t := clampf(inverse_lerp(LAND_MIN_IMPACT, LAND_MAX_IMPACT, impact), 0.0, 1.0)
 	var squash := lerpf(0.08, LAND_SQUASH, t)
-
+	
 	if land_tween and land_tween.is_valid():
 		land_tween.kill()
 	bird.scale = Vector2(base_scale.x * (1.0 + squash), base_scale.y * (1.0 - squash))
 	land_tween = create_tween()
 	land_tween.tween_property(bird, "scale", base_scale, 0.28).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
-
+	
 	camera_look.y += LAND_CAMERA_DIP * t * Settings.screen_shake
 	add_shake(0.25 * t)
-
+	
 	_spawn_dust(_floor_contact_point(), t)
-
 	var sound := get_node_or_null("LandSound") as AudioStreamPlayer2D
 	if sound:
 		sound.pitch_scale = lerpf(1.15, 0.85, t)
@@ -959,3 +1024,106 @@ func _update_magnet(delta: float) -> void:
 
 func _on_quest2_finished() -> void:
 	Global.has_necklace = true
+
+func _hazards_respawn() -> bool:
+	var scene := get_tree().current_scene
+	if scene == null:
+		return false
+	return RESPAWN_ON_HAZARD_SCENES.has(scene.scene_file_path.get_file().get_basename().to_lower())
+
+func _hit_hazard(normal: Vector2) -> void:
+	if health and not health.is_invulnerable():
+		health.damage(SPIKE_DAMAGE, "spikes")
+	var push := (normal + Vector2(0.0, -0.35)).normalized()
+	if Global.mode == Global.Mode.FLY:
+		heading = push.angle()
+		speed = maxf(speed * 0.6, FLY_MIN_SPEED)
+		velocity = push * speed
+	else:
+		velocity = push * SPIKE_KNOCKBACK
+		hop_airborne = false
+		jump_cut_available = false
+
+func _apply_fall_damage(impact: float) -> void:
+	if health == null or _hazards_respawn() or impact < FALL_DAMAGE_START:
+		return
+	if Input.is_action_pressed("ui_down") and Input.is_action_pressed("augment"):
+		return
+	var t := clampf(inverse_lerp(FALL_DAMAGE_START, FALL_DAMAGE_FULL, impact), 0.0, 1.0)
+	health.damage(lerpf(FALL_DAMAGE_MIN, FALL_DAMAGE_MAX, t), "fall")
+
+func _on_damaged(amount: float, source: String, continous: bool) -> void:
+	if continous:
+		return
+	if source == "fall":
+		Sfx.play("hurt_fall")
+	elif source != "impact":
+		Sfx.play("hurt")
+	add_shake(clampf(amount / 40.0, 0.15, 0.6))
+	if hurt_tween and hurt_tween.is_valid():
+		hurt_tween.kill()
+	bird.modulate = Color(1.0, 0.35, 0.35)
+	hurt_tween = create_tween()
+	hurt_tween.tween_property(bird, "modulate", Color.WHITE, 0.15)
+	for i in int(health.invulnerable_time / 0.12):
+		hurt_tween.tween_property(bird, "modulate:a", 0.35, 0.06)
+		hurt_tween.tween_property(bird, "modulate:a", 1.0, 0.06)
+
+func respawn_at(pos: Vector2) -> void:
+	autopilot = false
+	absorbing = false
+	emerge_timer = 0.0
+	last_grounded_pos = pos
+	respawn()
+	if hurt_tween and hurt_tween.is_valid():
+		hurt_tween.kill()
+	bird.modulate = Color.WHITE
+	if health:
+		health.heal_full()
+
+func _build_wind_audio() -> void:
+	if wind_sound == null and ResourceLoader.exists(WIND_SOUND_PATH):
+		wind_sound = load(WIND_SOUND_PATH)
+	if wind_sound == null:
+		push_warning("Player: no Wind Sound found at %s or in the Inspector, so there's no flying wind." % WIND_SOUND_PATH)
+		return
+	var idx := AudioServer.get_bus_index("Wind")
+	if idx < 0:
+		AudioServer.add_bus()
+		idx = AudioServer.bus_count - 1
+		AudioServer.set_bus_name(idx, "Wind")
+		AudioServer.set_bus_send(idx, "SFX" if AudioServer.get_bus_index("SFX") >= 0 else "Master")
+		AudioServer.add_bus_effect(idx, AudioEffectLowPassFilter.new())
+	wind_filter = AudioServer.get_bus_effect(idx, 0) as AudioEffectLowPassFilter
+
+	wind_player = AudioStreamPlayer.new()
+	wind_player.stream = wind_sound
+	wind_player.bus = "Wind"
+	wind_player.volume_db = -80.0
+	add_child(wind_player)
+
+
+func _update_wind_audio(delta: float) -> void:
+	var target := 0.0
+	if not absorbing and not autopilot:
+		if Global.mode == Global.Mode.FLY:
+			target = smoothstep(WIND_AUDIO_START, WIND_AUDIO_FULL, velocity.length())
+		else:
+			target = smoothstep(FALL_AUDIO_START, FALL_AUDIO_FULL, velocity.y)
+
+	var rate := WIND_AUDIO_RISE if target > wind_level else WIND_AUDIO_FALL
+	wind_level = move_toward(wind_level, target, rate * delta)
+
+	if wind_player == null:
+		return
+	if wind_level <= 0.001:
+		if wind_player.playing:
+			wind_player.stop()
+		return
+	if not wind_player.playing:
+		wind_player.play(randf() * wind_sound.get_length())
+
+	wind_player.volume_db = linear_to_db(wind_level) + WIND_AUDIO_MAX_DB
+	wind_player.pitch_scale = WIND_BASE_PITCH * (1.0 + WIND_PITCH_RANGE * wind_level)
+	if wind_filter:
+		wind_filter.cutoff_hz = lerpf(WIND_CUTOFF_SLOW, WIND_CUTOFF_FAST, wind_level)

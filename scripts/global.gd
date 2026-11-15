@@ -1,6 +1,7 @@
 extends Node
 
 enum Mode { GROUND, FLY }
+signal coins_gained(amount: int, color: Color, world_pos: Vector2)
 
 var mode: Mode = Mode.GROUND
 var INPUT_LOCKED = false 

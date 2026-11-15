@@ -3,11 +3,12 @@
 [ext_resource type="Script" uid="uid://d20fvsnmyx1rs" path="res://scripts/ui.gd" id="1_nt7q6"]
 [ext_resource type="Script" uid="uid://bvjbg3mwvckqq" path="res://scripts/speed_lines.gd" id="2_8dubc"]
 [ext_resource type="FontFile" uid="uid://b18ofjevqi05d" path="res://fonts/Elms_Sans/static/ElmsSans-SemiBold.ttf" id="2_x4jx1"]
-[ext_resource type="FontFile" uid="uid://c0xbdpffii5b4" path="res://fonts/Play/Play-Regular.ttf" id="3_yev5y"]
 [ext_resource type="FontFile" uid="uid://c0gtcxikyfdmx" path="res://fonts/Elms_Sans/static/ElmsSans-Bold.ttf" id="4_gdt2y"]
 [ext_resource type="Script" uid="uid://bvcsogoxwa0cx" path="res://scripts/quest_area.gd" id="5_p7vwb"]
 [ext_resource type="Script" uid="uid://cmm4v7amb1ar2" path="res://scripts/hint_manager.gd" id="5_wm3ai"]
+[ext_resource type="Script" uid="uid://cjfd1oe348cw5" path="res://scripts/coin_counter.gd" id="8_cgfq5"]
 [ext_resource type="Script" uid="uid://b236l82knjgjg" path="res://scripts/combo_display.gd" id="8_ktti3"]
+[ext_resource type="Script" uid="uid://bx8wvlkdp40l7" path="res://scripts/health_bar.gd" id="9_cgfq5"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_85g3d"]
 bg_color = Color(0.86898494, 0.86898494, 0.8689847, 1)
@@ -83,13 +84,6 @@ theme_override_font_sizes/font_size = 29
 text = "Dash(X)"
 horizontal_alignment = 1
 vertical_alignment = 2
-
-[node name="coinsLabel" type="Label" parent="." unique_id=1045050609]
-offset_right = 320.0
-offset_bottom = 65.0
-theme_override_fonts/font = ExtResource("3_yev5y")
-theme_override_font_sizes/font_size = 55
-text = "Coins: 0"
 
 [node name="questArea" type="Panel" parent="." unique_id=26446695]
 offset_left = 1664.0
@@ -193,3 +187,21 @@ layout_mode = 2
 mouse_filter = 2
 theme_override_constants/outline_size = 4
 theme_override_fonts/font = ExtResource("2_x4jx1")
+
+[node name="CoinCounter" type="Control" parent="." unique_id=4305859]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = 440.0
+offset_bottom = 200.0
+script = ExtResource("8_cgfq5")
+
+[node name="HealthBar" type="Control" parent="." unique_id=1092767617]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("9_cgfq5")
+low_health = 0.45
+vignette_strength = 1.5

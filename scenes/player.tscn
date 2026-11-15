@@ -8,6 +8,7 @@
 [ext_resource type="Texture2D" uid="uid://b7n5k5kwru7wh" path="res://assets/animations/maincrowidle.png" id="4_tuyoq"]
 [ext_resource type="AudioStream" uid="uid://bjp0p6x8rokfl" path="res://audio/fallThud.wav" id="5_qlg0r"]
 [ext_resource type="Texture2D" uid="uid://bb3u1vfr81aqi" path="res://assets/animations/maincrowfloating.png" id="5_ur7pv"]
+[ext_resource type="Script" uid="uid://c6ernsgv63pd0" path="res://scripts/health.gd" id="9_ur7pv"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_lnspb"]
 radius = 35.555553
@@ -133,7 +134,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_fulsm")
 }],
-"loop": 1,
+"loop": true,
 "name": &"fall",
 "speed": 12.0
 }, {
@@ -165,7 +166,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_31cv2")
 }],
-"loop": 1,
+"loop": true,
 "name": &"fly",
 "speed": 40.0
 }, {
@@ -185,7 +186,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_gl8cc")
 }],
-"loop": 1,
+"loop": true,
 "name": &"glide",
 "speed": 20.0
 }, {
@@ -208,7 +209,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_jej6c")
 }],
-"loop": 1,
+"loop": true,
 "name": &"hop",
 "speed": 12.0
 }, {
@@ -225,7 +226,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_qfm1y")
 }],
-"loop": 1,
+"loop": true,
 "name": &"idle",
 "speed": 6.0
 }]
@@ -258,3 +259,6 @@ bus = &"SFX"
 
 [node name="Marker2D" type="Marker2D" parent="." unique_id=282217300]
 position = Vector2(-4, 0)
+
+[node name="Health" type="Node" parent="." unique_id=1436268340]
+script = ExtResource("9_ur7pv")

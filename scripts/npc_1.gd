@@ -18,7 +18,6 @@ enum {
 }
 
 func _ready() -> void:
-	
 	$".".connect("give_quest", Callable(QuestManager, "add_quest"))
 	$Label.visible = false
 	randomize()
