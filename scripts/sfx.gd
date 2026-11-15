@@ -86,7 +86,6 @@ func _ready() -> void:
 
 
 func play(sound: String, pitch: float = 1.0, volume_db: float = 0.0) -> void:
-	print("Sfx: ", sound)
 	var cfg: Dictionary = SOUNDS.get(sound, {})
 	if cfg.is_empty():
 		push_error("Sfx: no sound named '%s' in SOUNDS." % sound)
@@ -128,14 +127,32 @@ func _make_soft_bus() -> void:
 
 func _load_sounds() -> void:
 	for sound in SOUNDS:
+		var cfg: Dictionary = SOUNDS[sound]
+		if not cfg.has("files"):
+			push_error("Sfx: sound '%s' has no \"files\" entry." % sound)
+			_streams[sound] = []
+			continue
 		var list: Array = []
-		for file in SOUNDS[sound]["files"]:
+		for file in cfg["files"]:
 			var path: String = file if String(file).begins_with("res://") else KENNEY + file + ".ogg"
 			if ResourceLoader.exists(path):
-				list.append(load(path))
+				var stream: AudioStream = load(path)
+				_disable_loop(stream)
+				list.append(stream)
 			else:
 				push_error("Sfx: missing sound file '%s' (used by '%s')." % [path, sound])
 		_streams[sound] = list
+
+
+# sound effects are one-shots, so a stream that is set to loop in its Import tab
+# would play forever on its pooled player; force looping off
+func _disable_loop(stream: AudioStream) -> void:
+	if stream is AudioStreamWAV:
+		(stream as AudioStreamWAV).loop_mode = AudioStreamWAV.LOOP_DISABLED
+	elif stream is AudioStreamOggVorbis:
+		(stream as AudioStreamOggVorbis).loop = false
+	elif stream is AudioStreamMP3:
+		(stream as AudioStreamMP3).loop = false
 
 
 func _free_player() -> AudioStreamPlayer:

@@ -58,7 +58,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_j2uw4")
 }],
-"loop": true,
+"loop": 1,
 "name": &"happy",
 "speed": 0.0
 }, {
@@ -66,7 +66,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_xqc7n")
 }],
-"loop": true,
+"loop": 1,
 "name": &"long_legs",
 "speed": 0.0
 }, {
@@ -74,7 +74,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_c6msw")
 }],
-"loop": true,
+"loop": 1,
 "name": &"miffed",
 "speed": 0.0
 }, {
@@ -82,7 +82,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_j5uoi")
 }],
-"loop": true,
+"loop": 1,
 "name": &"normal",
 "speed": 0.0
 }, {
@@ -90,7 +90,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_71elp")
 }],
-"loop": true,
+"loop": 1,
 "name": &"rotated",
 "speed": 0.0
 }, {
@@ -98,7 +98,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_ec6cj")
 }],
-"loop": true,
+"loop": 1,
 "name": &"scared",
 "speed": 5.0
 }, {
@@ -106,7 +106,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_6i5rd")
 }],
-"loop": true,
+"loop": 1,
 "name": &"shaded",
 "speed": 0.0
 }, {
@@ -114,7 +114,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_niwqa")
 }],
-"loop": true,
+"loop": 1,
 "name": &"tophat",
 "speed": 0.0
 }]

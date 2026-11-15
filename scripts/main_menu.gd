@@ -22,6 +22,7 @@ var palette_index := 0
 var confirm_new_game := false
 
 func _ready() -> void:
+	$music_player.play()
 	sky_rect.position = Vector2.ZERO
 	sky_rect.size = get_viewport_rect().size
 	sky_material = sky_rect.material as ShaderMaterial

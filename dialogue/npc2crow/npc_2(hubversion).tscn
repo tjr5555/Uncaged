@@ -75,7 +75,6 @@ d_file = "res://dialogue/npc2crow/dialogue files/wiseCrowDialogue6.json"
 gives_quest = true
 quest_title = "a lot of french fries"
 quest_description = "Explore the world for Wise Crow!"
-quest_target = 10
 metadata/_edit_lock_ = true
 
 [connection signal="body_entered" from="detectionArea" to="." method="_on_detection_area_body_entered"]

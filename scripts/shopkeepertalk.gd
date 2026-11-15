@@ -1,15 +1,16 @@
 extends Control
 
 signal dialogue_finished
-signal line_shown(line_data)   # fires for every line, so you can react to extra keys like "hush_money"
+signal line_shown(line_data)   #fires for every line, so you can react to extra keys like "hush_money"
 
 @export_file("*.json") var d_file: String = "res://dialogue/shop/shopDialogue.json"
-@export var npc_name: String = "Shop Keeper"   # speaker name that uses npc_font (spaces/case are ignored)
+@export var npc_name: String = "Shop Keeper"   #speaker name that uses npc_font (spaces/case are ignored)
 
-@export var auto_start: bool = true            # start talking as soon as the scene loads (turn off if something else calls start())
+@export var auto_start: bool = true            #start talking as soon as the scene loads (turn off if something else calls start())
 @export var lock_choices_until_text_done: bool = true   # buttons are visible the whole time, but can only be clicked after the last line finishes typing
-@export var audio_stream_player: AudioStreamPlayer
-@export var npc_sprite: AnimatedSprite2D       # the shopkeeper's AnimatedSprite2D (drag it in)
+@export var audio_stream_player: AudioStreamPlayer      #only used as a template (stream, bus, volume); blips play on a private player made in code
+@export var npc_sprite: AnimatedSprite2D       #the shopkeeper's AnimatedSprite2D (drag it in)
+@export var max_blip_length: float = 0.1       #a letter blip never plays longer than this (seconds)
 
 #the speaker name uses the node called "Name" (Label or RichTextLabel). If there is none, the name is put in front of the text ("You: Cool!")
 @export var show_name_in_text: bool = true
@@ -29,6 +30,7 @@ signal line_shown(line_data)   # fires for every line, so you can react to extra
 
 const LETTER_TIME: float = 0.04
 const PUNCTUATION_TIME: float = 0.3
+const BLIP_VOICES: int = 4   # blips rotate through this many players, so each letter gets a fresh one
 
 var dialogues: Dictionary = {}
 var current_node: Dictionary = {}
@@ -38,6 +40,9 @@ var line_index: int = -1
 var d_active: bool = false
 var waiting_for_choice: bool = false
 var tween: Tween
+var _blip_pool: Array[AudioStreamPlayer] = []
+var _blip_next: int = 0
+var _blip_timer: Timer
 
 @onready var chat_area = $Chatarea
 @onready var name_label: Control = get_node_or_null("Name")
@@ -49,6 +54,13 @@ var tween: Tween
 
 
 func _ready():
+	# hard cap on blip length, so a blip can never run on
+	_blip_timer = Timer.new()
+	_blip_timer.one_shot = true
+	_blip_timer.timeout.connect(stop_sound)
+	add_child(_blip_timer)
+	_setup_blip_player()
+
 	add_to_group("dialogue_ui")
 	_set_ui_visible(false)
 	for i in choice_buttons.size():
@@ -58,6 +70,37 @@ func _ready():
 		start_button.pressed.connect(start)
 	if auto_start:
 		start.call_deferred()
+
+
+func _exit_tree() -> void:
+	stop_sound()
+
+
+# Blips play on a small pool of private, non-looping players that this script owns.
+# The exported player is only read for its stream/bus/volume and is silenced, so
+# Autoplay, Max Polyphony or sharing that node with other scripts can't cause stacking.
+func _setup_blip_player() -> void:
+	if not audio_stream_player:
+		push_warning("Dialogue: no audio_stream_player assigned, so there will be no letter sounds.")
+		return
+	var s: AudioStream = audio_stream_player.stream
+	if s:
+		if s is AudioStreamWAV:
+			(s as AudioStreamWAV).loop_mode = AudioStreamWAV.LOOP_DISABLED
+		elif s is AudioStreamOggVorbis:
+			(s as AudioStreamOggVorbis).loop = false
+		elif s is AudioStreamMP3:
+			(s as AudioStreamMP3).loop = false
+	for i in BLIP_VOICES:
+		var p := AudioStreamPlayer.new()
+		p.stream = s
+		p.bus = audio_stream_player.bus
+		p.volume_db = audio_stream_player.volume_db
+		p.autoplay = false
+		add_child(p)
+		_blip_pool.append(p)
+	audio_stream_player.autoplay = false
+	audio_stream_player.stop()
 
 
 #only the text (and name) show/hide, so the sprite and the rest of the shop stay visible
@@ -183,6 +226,7 @@ func _finish_lines():
 
 #called when the current line finished typing (naturally or skipped)
 func _on_line_typed():
+	stop_sound()
 	if _is_last_line() and not choices.is_empty():
 		_show_choices()
 
@@ -254,64 +298,62 @@ func animate_text(text: String):
 	stop_sound()
 	if tween:
 		tween.kill()
-	tween = create_tween()
 
 	chat_area.text = text
 	chat_area.visible_characters = 0
 	if chat_area is RichTextLabel:
 		chat_area.visible_characters_behavior = TextServer.VC_CHARS_AFTER_SHAPING
 
-	var index: int = 0
-	var last_punct_index: int = 0
-	var text_length: int = text.length()
-	var pitches := sentence_inflection(text)   #one pitch per character
+	if text.is_empty():
+		chat_area.visible_characters = -1
+		_on_line_typed()
+		return
 
-	if text_length > 0:
-		play_sound(pitches[0])   #first chunk uses the pitch of the first character
+	tween = create_tween()
+	var pitches := sentence_inflection(text)   # one pitch per character
+	var text_length := text.length()
 
-	for letter in text:
-		index += 1
+	for i in text_length:
+		var letter := text[i]
+		tween.tween_callback(_type_letter.bind(i + 1, pitches[i], letter))
 
-		if not (letter in [".", "?", "!", ","] or index == text_length):
-			continue
-
-		#don't end a chunk in the middle of "..." or "?!" - wait for the last mark
-		if letter in [".", "?", "!"] and index < text_length and text[index] in [".", "?", "!"]:
-			continue
-
-		var duration = (index - last_punct_index) * LETTER_TIME
-		var chunk_pitch: float = pitches[index - 1]   # pitch of the character that ends this chunk
-
-		tween.tween_callback(play_sound.bind(chunk_pitch))
-		tween.tween_method(_reveal_char, last_punct_index, index, duration)
-
-		tween.tween_callback(stop_sound)
+		var wait := LETTER_TIME
+		var next_is_punct := i + 1 < text_length and text[i + 1] in [".", "?", "!"]
 		if letter == ",":
-			tween.tween_interval(PUNCTUATION_TIME / 2.0)
-		elif letter in [".", "?", "!"]:
-			tween.tween_interval(PUNCTUATION_TIME)
+			wait += PUNCTUATION_TIME / 2.0
+		elif letter in [".", "?", "!"] and not next_is_punct:
+			wait += PUNCTUATION_TIME   # pause only after the last mark of "..." or "?!"
+		tween.tween_interval(wait)
+		if wait > LETTER_TIME:
+			tween.tween_callback(stop_sound)
 
-		last_punct_index = index
-
-	tween.tween_callback(stop_sound)
 	tween.finished.connect(_on_line_typed)
 
 
-func _reveal_char(v: int):
-	if chat_area.visible_characters == v:
+# reveals one more letter and plays a blip for it (no blip for spaces/punctuation)
+func _type_letter(count: int, pitch: float, letter: String) -> void:
+	chat_area.visible_characters = count
+	if letter.strip_edges() == "" or letter in [".", "?", "!", ","]:
 		return
-	chat_area.visible_characters = v
+	play_blip(pitch)
 
 
-func play_sound(pitch: float = 1.0):
-	if audio_stream_player and not audio_stream_player.playing:
-		audio_stream_player.pitch_scale = pitch * randf_range(0.97, 1.03)
-		audio_stream_player.play()
+# restarts the sound every letter, so each one gets its own blip
+func play_blip(pitch: float = 1.0) -> void:
+	if _blip_pool.is_empty() or not d_active:
+		return
+	_blip_next = (_blip_next + 1) % _blip_pool.size()
+	var p := _blip_pool[_blip_next]
+	p.pitch_scale = pitch * randf_range(0.97, 1.03)
+	p.play()
+	_blip_timer.start(max_blip_length)
 
 
-func stop_sound():
-	if audio_stream_player and audio_stream_player.playing:
-		audio_stream_player.stop()
+func stop_sound() -> void:
+	if _blip_timer:
+		_blip_timer.stop()
+	for p in _blip_pool:
+		p.stop()
 
 
 func change_sprite(anim_name: String):

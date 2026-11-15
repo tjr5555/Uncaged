@@ -215,7 +215,7 @@ const ABSORB_SCALE = 0.15
 const ABSORB_SPIN = 9.0
 const EMERGE_TIME = 0.5
 
-const QUEST2_SPEED_MULT = 2.0
+const QUEST2_SPEED_MULT = 1.5
 
 const RESPAWN_ON_HAZARD_SCENES = ["tutorial"]
 const SPIKE_DAMAGE = 20.0

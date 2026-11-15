@@ -65,12 +65,13 @@ theme_override_font_sizes/font_size = 25
 text = "Press C to talk"
 metadata/_edit_lock_ = true
 
-[node name="npc2DialougeUI" parent="." unique_id=544451575 instance=ExtResource("4_2dwi7")]
+[node name="npc2DialougeUI" parent="." unique_id=544451575 node_paths=PackedStringArray("audio_stream_player") instance=ExtResource("4_2dwi7")]
 offset_left = 6.0
 offset_top = -7.0
 offset_right = 6.0
 offset_bottom = -7.0
 scale = Vector2(0.71, 0.71)
+audio_stream_player = NodePath("")
 metadata/_edit_lock_ = true
 
 [connection signal="body_entered" from="detectionArea" to="." method="_on_detection_area_body_entered"]

@@ -1,23 +1,7 @@
-{
-	"start": "shopkeeper_intro",
-	"dialogues": {
-		"shopkeeper_intro": {
-			"lines": [
-				{"name": "Shopkeeper", "text": "Welcome to my shop!", "sprite": "happy"},
-				{"name": "Shopkeeper", "text": "Feel free to buy anything you want", "sprite": "normal"},
-				{"name": "You", "text": "Cool!", "sprite": "happy"}
-			],
-			"choices": [
-				{"text": "What's your name?", "next": "shopkeeper_name"},
-				{"text": "Goodbye", "next": "shopkeeper_name"}
-			]
-		},
 
-		"shopkeeper_name": {
-			"lines": [
-				{"name": "Shopkeeper", "text": "The name is shop.", "sprite": "cool_hat"}
-			],
-			"next": null
-		}
-	}
-}
+[
+		{"name": "Wise Crow", "text": "Great job! I am so proud of you", "anim": "happy"},
+		{"name": "You", "text": "Really? Thanks...", "anim": "happy"},
+		{"name": "Wise Crow", "text": "If you press (X), you can dash in the direction you are facing in", "anim": "happy"},
+		{"name": "Wise Crow", "text": "Give it a try!", "anim": "happy"},
+]
