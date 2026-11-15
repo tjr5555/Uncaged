@@ -49,6 +49,7 @@ func enter_portal(portal: Portal) -> void:
 
 	_set_fog_tint(portal.fog_tint)
 	portal.play_enter_effect()
+	Sfx.play("portal_enter")
 	player.begin_portal_entry(portal.get_entry_point(player.global_position))
 
 	var fog_in := _fog_to(1.0, fog_in_time)
@@ -71,6 +72,7 @@ func enter_portal(portal: Portal) -> void:
 	if arrival != null:
 		arrival.play_exit_effect()
 	player.emerge(arrival_pos, exit_dir, arrival_speed)
+	Sfx.play("portal_exit")
 	cooldown_until = _now() + arrival_cooldown
 
 	await _fog_to(0.0, fog_out_time).finished
@@ -186,3 +188,33 @@ func is_world_ready() -> bool:
 
 func set_world_burst(enabled: bool) -> void:
 	_set_burst(enabled)
+
+func respawn_player() -> void:
+	if transitioning:
+		return
+	transitioning = true
+	Global.in_transition = true
+	_set_fog_tint(Color(0.93, 0.95, 1.0))
+	await _fog_to(1.0, fog_in_time).finished
+	if current_world != hub:
+		if current_world != null:
+			current_world.queue_free()
+		if hub.get_parent() == null:
+			world_root.add_child(hub)
+		current_world = hub
+
+	player.respawn_at(_hub_spawn_position())
+	Sfx.play("respawn")
+	await get_tree().create_timer(min_fog_hold).timeout
+	await _fog_to(0.0, fog_out_time).finished
+	Global.in_transition = false
+	transitioning = false
+
+func _hub_spawn_position() -> Vector2:
+	var spawn: Node2D = null
+	if hub: 
+		spawn = hub.find_child("PlayerSpawn", true, false) as Node2D
+	if spawn:
+		return spawn.global_position
+	push_warning("main: the hub has no PlayerSpawn marker node")
+	return Vector2(633, -278)

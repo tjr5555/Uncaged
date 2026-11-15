@@ -85,6 +85,7 @@ func start():
 	dialogues = data["dialogues"]
 	var start_id: String = data.get("start", dialogues.keys()[0])
 	d_active = true
+	Sfx.play("dialogue_open")
 	_set_ui_visible(true)
 	go_to_dialogue(start_id)
 
@@ -140,6 +141,7 @@ func _input(event):
 			chat_area.visible_characters = -1
 			_on_line_typed()
 		elif not (_is_last_line() and not choices.is_empty()):
+			Sfx.play("dialogue_next")
 			next_script()
 
 

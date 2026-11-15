@@ -50,5 +50,6 @@ text = "Chatting..."
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=220062012]
 stream = ExtResource("4_kgfkv")
+bus = &"SFX"
 
 [connection signal="give_quest" from="." to="." method="_on_give_quest"]

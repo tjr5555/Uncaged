@@ -31,6 +31,7 @@ func start():
 	if d_active:
 		return
 	d_active = true
+	Sfx.play("dialogue_open")
 	$NinePatchRect.visible = true
 	dialogue = load_dialogue()
 	current_dialogue_id = -1
@@ -51,7 +52,6 @@ func load_dialogue():
 	end_action = "give"
 	return content["initial_dialogue"]
 
-
 func _input(event):
 	if not d_active:
 		return
@@ -62,8 +62,8 @@ func _input(event):
 			tween.kill()
 			$NinePatchRect/Chatarea.visible_characters = -1
 		else:
+			Sfx.play("dialogue_next")
 			next_script()
-
 
 func next_script():
 	current_dialogue_id += 1

@@ -59,3 +59,4 @@ scroll_active = false
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=220062012]
 stream = ExtResource("5_s5luh")
+bus = &"SFX"

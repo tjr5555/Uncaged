@@ -29,8 +29,10 @@ const STEER_TOGGLES = {
 
 var tween: Tween
 
-
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS
+	visible = false
+
 	visible = false
 	set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_STOP
@@ -39,9 +41,12 @@ func _ready() -> void:
 	_setup_layout()
 	_connect_controls()
 	_sync_from_settings()
-
+	back_button.set_meta("sfx_press", "")
+	if reset_button:
+		reset_button.set_meta("sfx_press", "ui_reset")
 
 func open() -> void:
+	Sfx.play("ui_open")
 	_sync_from_settings()
 	visible = true
 	panel.pivot_offset = panel.size * 0.5
@@ -52,9 +57,10 @@ func open() -> void:
 	tween.tween_property(panel, "scale", Vector2.ONE, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	tween.tween_method(_set_backdrop, 0.0, 1.0, 0.25)
 	back_button.grab_focus()
-
+	
 
 func close() -> void:
+	Sfx.play("ui_back")
 	Settings.save_settings()
 	_restart_tween()
 	tween.tween_property(self, "modulate:a", 0.0, 0.15)

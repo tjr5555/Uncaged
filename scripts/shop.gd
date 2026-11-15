@@ -5,6 +5,10 @@ extends Control
 @export var buy_sound: AudioStream
 @export var deny_sound: AudioStream
 @export var blur_background := true
+@onready var music := get_node_or_null("MusicPlayer") as AudioStreamPlayer
+var music_volume_db := 0.0
+var music_tween: Tween
+var _is_open := false
 
 # Every upgrade is 1 entry in this list, to add a new one:
 # 1. Add a variable for it to Global (e.g. var gravity_scale := 1.0)
@@ -58,7 +62,7 @@ const UPGRADES = [
 ]
 
 const BLUR_SHADER = preload("res://shaders/ui_blur.gdshader")
-const TALK_SCENE = preload("res://shopkeepertalk.tscn")
+const TALK_SCENE = preload("res://scenes/shopkeepertalk.tscn")
 const COIN_COLOR = Color(1.0, 0.82, 0.3)
 const CARD_COLOR = Color(0.07, 0.1, 0.17, 0.92)
 const TEXT = Color(0.95, 0.97, 1.0)
@@ -84,6 +88,7 @@ var _hidden_for_talk: Array[CanvasItem] = []
 
 func _ready() -> void:
 	add_child(_audio)
+	_audio.bus = "SFX"
 	theme = UiTheme.build()
 	_coin_texture_big = _make_coin_texture(30)
 	_coin_texture_small = _make_coin_texture(24)
@@ -97,15 +102,22 @@ func _ready() -> void:
 		_setup(b)
 	get_tree().node_added.connect(_on_node_added)
 
-	var layer := get_parent() as CanvasLayer
-	if layer:
-		layer.visibility_changed.connect(_on_layer_visibility_changed)
-
 	for u in UPGRADES:
 		_refresh(u)
 	_set_coins_instant()
 
-func _process(delta: float) -> void:
+	if music:
+		music_volume_db = music.volume_db
+		music.stop()
+	else:
+		push_warning("Shop: no MusicPlayer node found")
+
+	_is_open = _is_shop_open()
+	if _is_open:
+		_start_music()
+
+func _process(_delta: float) -> void:
+	_update_open_state()
 	var coins := float(Global.total_coins)
 	if is_equal_approx(coins, _coins_target):
 		return
@@ -118,10 +130,7 @@ func _process(delta: float) -> void:
 		_refresh_button(u)
 
 func _input(event: InputEvent) -> void:
-	if not is_visible_in_tree():
-		return
-	var layer := get_parent() as CanvasLayer
-	if layer and not layer.visible:
+	if not _is_open:
 		return
 	# while the shopkeeper is talking, Esc leaves the conversation instead of closing the shop
 	if _talk:
@@ -153,13 +162,13 @@ func _build_ui() -> void:
 	add_child(root)
 	
 	var column := VBoxContainer.new()
-	column.add_theme_constant_override("seperation", 36)
+	column.add_theme_constant_override("separation", 36)
 	root.add_child(column)
 	
 	var header := HBoxContainer.new()
 	column.add_child(header)
 	var titles := VBoxContainer.new()
-	titles.add_theme_constant_override("seperation", 2)
+	titles.add_theme_constant_override("separation", 2)
 	header.add_child(titles)
 	var title := _label("Shop", 52, TEXT)
 	title.theme_type_variation = &"HeaderLarge"
@@ -175,14 +184,14 @@ func _build_ui() -> void:
 	column.add_child(center)
 	var grid := GridContainer.new()
 	grid.columns = 3
-	grid.add_theme_constant_override("h_seperation", 28)
-	grid.add_theme_constant_override("v_seperation", 28)
+	grid.add_theme_constant_override("h_separation", 28)
+	grid.add_theme_constant_override("v_separation", 28)
 	center.add_child(grid)
 	for u in UPGRADES:
 		grid.add_child(_build_card(u))
 	
 	var footer := HBoxContainer.new()
-	footer.add_theme_constant_override("seperation", 20)
+	footer.add_theme_constant_override("separation", 20)
 	column.add_child(footer)
 	var back := Button.new()
 	back.text = "Back"
@@ -206,7 +215,7 @@ func _build_coin_pill() -> PanelContainer:
 	pill.add_theme_stylebox_override("panel", style)
 	pill.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	var row := HBoxContainer.new()
-	row.add_theme_constant_override("seperation", 12)
+	row.add_theme_constant_override("separation", 12)
 	pill.add_child(row)
 	
 	var coin := TextureRect.new()
@@ -235,7 +244,7 @@ func _build_card(u: Dictionary) -> PanelContainer:
 	card.custom_minimum_size = CARD_SIZE
 	
 	var box := VBoxContainer.new()
-	box.add_theme_constant_override("seperation", 14)
+	box.add_theme_constant_override("separation", 14)
 	card.add_child(box)
 	
 	var top := HBoxContainer.new()
@@ -252,7 +261,7 @@ func _build_card(u: Dictionary) -> PanelContainer:
 	box.add_child(desc)
 	
 	var pips := HBoxContainer.new()
-	pips.add_theme_constant_override("seperation", int(PIP_GAP))
+	pips.add_theme_constant_override("separation", int(PIP_GAP))
 	box.add_child(pips)
 	
 	var spacer := Control.new()
@@ -260,7 +269,7 @@ func _build_card(u: Dictionary) -> PanelContainer:
 	box.add_child(spacer)
 	
 	var stat := HBoxContainer.new()
-	stat.add_theme_constant_override("seperation", 12)
+	stat.add_theme_constant_override("separation", 12)
 	box.add_child(stat)
 	var now := _label("", 34, TEXT)
 	var arrow := _label("->", 26, TEXT_DIM)
@@ -272,6 +281,7 @@ func _build_card(u: Dictionary) -> PanelContainer:
 	var buy := Button.new()
 	buy.custom_minimum_size.y = 64
 	buy.pressed.connect(_buy.bind(u))
+	buy.set_meta("sfx_press", "")
 	box.add_child(buy)
 	
 	_cards[u["id"]] = {
@@ -289,11 +299,11 @@ func _label(text: String, font_size: int, color: Color) -> Label:
 	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return label
 
-func _make_coin_texture(size: int) -> ImageTexture:
-	var img := Image.create_empty(size, size, false, Image.FORMAT_RGBA8)
-	var r := size * 0.5
-	for y in size:
-		for x in size:
+func _make_coin_texture(size_px: int) -> ImageTexture:
+	var img := Image.create_empty(size_px, size_px, false, Image.FORMAT_RGBA8)
+	var r := size_px * 0.5
+	for y in size_px:
+		for x in size_px:
 			var d := Vector2(x + 0.5 - r, y + 0.5 - r).length()
 			var col := COIN_COLOR
 			if d > r - 3.0:
@@ -310,18 +320,23 @@ func _on_node_added(node: Node) -> void:
 func _setup(b: BaseButton) -> void:
 	b.pivot_offset = b.size / 2.0
 	b.resized.connect(func(): b.pivot_offset = b.size / 2.0)
-	b.mouse_entered.connect(_grow.bind(b, 1.05, hover_sound))
-	b.mouse_exited.connect(_grow.bind(b, 1.0, null))
-	b.button_down.connect(_grow.bind(b, 0.95, click_sound))
-	b.button_up.connect(_grow.bind(b, 1.05, null))
+	b.mouse_entered.connect(_grow.bind(b, 1.05))
+	b.mouse_exited.connect(_grow.bind(b, 1.0))
+	b.button_down.connect(_grow.bind(b, 0.95))
+	b.button_up.connect(_grow.bind(b, 1.05))
 
-func _grow(b: BaseButton, amount: float, sound: AudioStream) -> void:
+func _grow(b: BaseButton, amount: float) -> void:
 	if b.disabled:
 		return
 	var t := b.create_tween().set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	t.tween_property(b, "scale", Vector2.ONE * amount, 0.1)
-	if sound:
-		_play(sound)
+
+func _value(u: Dictionary) -> float:
+	var v: Variant = Global.get(u["var"])
+	if v == null:
+		push_error("Shop: Global has no variable named '%s' (used by upgrade '%s')." % [u["var"], u["id"]])
+		return 0.0
+	return float(v)
 
 func _level(u: Dictionary) -> int:
 	return int(Global.upgrade_levels.get(u["id"], 0))
@@ -353,13 +368,16 @@ func _buy(u: Dictionary) -> void:
 	_refresh(u)
 	_roll(u, old, next)
 	_celebrate(u)
-	_play(buy_sound)
+	if _is_maxed(u):
+		Sfx.play("shop_maxed")
+	else:
+		_play_sfx(buy_sound, "shop_buy")
 	SaveManager.save_game()
 
 func _next_value(u: Dictionary, current: float) -> float:
 	var next: float = current * u["step"] if u["mode"] == "mult" else current + u["step"]
 	if u.has("limit"):
-		next = minf(next, u["limit"] if u["step"] > 0.0 else maxf(next, u["limit"]))
+		next = minf(next, u["limit"]) if u["step"] > 0.0 else maxf(next, u["limit"])
 	return next
 
 func _is_maxed(u: Dictionary) -> bool:
@@ -493,7 +511,7 @@ func _deny(u: Dictionary) -> void:
 		t.tween_property(card, "rotation", 0.025 * dir * (1.0 - float(i) / 4.0), 0.04)
 	t.tween_property(card, "rotation", 0.0, 0.05)
 	_flash_coins(DENY_COLOR)
-	_play(deny_sound)
+	_play_sfx(deny_sound, "shop_deny")
 
 func _set_coins_instant() -> void:
 	_coins_target = float(Global.total_coins)
@@ -515,10 +533,28 @@ func _format_number(n: int) -> String:
 		digits = digits.substr(0, digits.length() - 3)
 	return ("-" if n < 0 else "") + digits + out
 
-func _on_layer_visibility_changed() -> void:
+# ---------- opening and closing ----------
+
+func _is_shop_open() -> bool:
 	var layer := get_parent() as CanvasLayer
-	if layer and layer.visible:
+	if layer and not layer.visible:
+		return false
+	return is_visible_in_tree()
+
+func _update_open_state() -> void:
+	var open := _is_shop_open()
+	if open == _is_open:
+		return
+	_is_open = open
+	if open:
+		Sfx.play("shop_open")
 		_play_open()
+		_start_music()
+	else:
+		Sfx.play("shop_close")
+		if _talk:
+			_close_talk()
+		_stop_music()
 
 func _play_open() -> void:
 	for u in UPGRADES:
@@ -536,6 +572,26 @@ func _play_open() -> void:
 		t.parallel().tween_property(card, "scale", Vector2.ONE, 0.3).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 		i += 1
 
+func _start_music() -> void:
+	if music == null:
+		return
+	if music_tween and music_tween.is_valid():
+		music_tween.kill()
+	music.volume_db = -40.0
+	if not music.playing:
+		music.play()
+	music_tween = create_tween()
+	music_tween.tween_property(music, "volume_db", music_volume_db, 0.6)
+
+func _stop_music() -> void:
+	if music == null or not music.playing:
+		return
+	if music_tween and music_tween.is_valid():
+		music_tween.kill()
+	music_tween = create_tween()
+	music_tween.tween_property(music, "volume_db", -40.0, 0.4)
+	music_tween.tween_callback(music.stop)
+
 func _play(stream: AudioStream) -> void:
 	if stream == null:
 		return
@@ -546,18 +602,10 @@ func _on_back_button_pressed() -> void:
 	if get_parent() is CanvasLayer:
 		get_parent().hide()
 		Global.INPUT_LOCKED = false
-	var boost_bar = get_node_or_null("/root/main/UI/MarginContainer/BoostBar")
-	if boost_bar:
-		boost_bar.visible = true
-	else:
-		push_error("Shop: couldn't find /root/main/UI/MarginContainer/BoostBar")
+	for bar in get_tree().get_nodes_in_group("boost_bar"):
+		bar.visible = true
 
-func _value(u: Dictionary) -> float:
-	var v: Variant = Global.get(u["var"])
-	if v == null:
-		push_error("Shop: Global has no variable named '%s' (used by upgrade '%s')." % [u["var"], u["id"]])
-		return 0.0
-	return float(v)
+# ---------- shopkeeper conversation ----------
 
 # Opens the shopkeeper conversation on top of the shop (the shop and main scene stay loaded)
 func _on_button_pressed() -> void:
@@ -572,7 +620,6 @@ func _on_button_pressed() -> void:
 
 	_talk = TALK_SCENE.instantiate()
 	add_child(_talk)
-	print(_talk.name, " | script: ", _talk.get_script())
 	_talk.dialogue_finished.connect(_close_talk)
 
 func _close_talk() -> void:
@@ -583,3 +630,9 @@ func _close_talk() -> void:
 		if is_instance_valid(child):
 			child.visible = true
 	_hidden_for_talk.clear()
+
+func _play_sfx(stream: AudioStream, fallback: String) -> void:
+	if stream:
+		_play(stream)
+	else:
+		Sfx.play(fallback)

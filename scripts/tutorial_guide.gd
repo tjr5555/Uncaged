@@ -88,6 +88,7 @@ func _ready() -> void:
 	add_to_group("tutorial_guide")
 	level = _resolve_level()
 	add_child(audio)
+	audio.bus = "SFX"
 	_build_ui()
 	_set_stage(0)
 
@@ -144,8 +145,11 @@ func _set_stage(index: int) -> void:
 		if ui:
 			ui.connect("dialogue_finished", _on_watched_dialogue_finished)
 			watched_dialogue = ui
-	if index > 0 and stage_sound:
-		_play(stage_sound)
+	if index > 0:
+		if stage_sound:
+			_play(stage_sound)
+		else:
+			Sfx.play("objective_new")
 	stage_changed.emit(stage["id"])
 	_check_trigger.call_deferred()
 
@@ -158,6 +162,8 @@ func _complete_stage() -> void:
 	_flash_complete()
 	if complete_sound:
 		_play(complete_sound)
+	else:
+		Sfx.play("objective_done")
 	var t := create_tween()
 	t.tween_interval(COMPLETE_HOLD)
 	t.tween_callback(_advance_stage)

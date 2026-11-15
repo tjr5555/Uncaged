@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://ju7bsmp2g40e"]
 
-[ext_resource type="Script" uid="uid://vp8rjtmk0epn" path="res://shopkeepertalk.gd" id="1_2m64p"]
+[ext_resource type="Script" uid="uid://vp8rjtmk0epn" path="res://scripts/shopkeepertalk.gd" id="1_2m64p"]
 [ext_resource type="FontFile" uid="uid://donndj1us3mjo" path="res://fonts/richeze/Richeze.otf" id="1_nxrxn"]
 [ext_resource type="Texture2D" uid="uid://jr23jb33nqom" path="res://dialogue/shopkeeper/sprites/shopkeeper_happy.png" id="2_q1c2p"]
 [ext_resource type="Texture2D" uid="uid://dt246ptu3qmx" path="res://dialogue/shopkeeper/sprites/shopkeeper_long_legs.png" id="3_2m64p"]
@@ -58,7 +58,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_j2uw4")
 }],
-"loop": 1,
+"loop": true,
 "name": &"happy",
 "speed": 0.0
 }, {
@@ -66,7 +66,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_xqc7n")
 }],
-"loop": 1,
+"loop": true,
 "name": &"long_legs",
 "speed": 0.0
 }, {
@@ -74,7 +74,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_c6msw")
 }],
-"loop": 1,
+"loop": true,
 "name": &"miffed",
 "speed": 0.0
 }, {
@@ -82,7 +82,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_j5uoi")
 }],
-"loop": 1,
+"loop": true,
 "name": &"normal",
 "speed": 0.0
 }, {
@@ -90,7 +90,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_71elp")
 }],
-"loop": 1,
+"loop": true,
 "name": &"rotated",
 "speed": 0.0
 }, {
@@ -98,7 +98,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_ec6cj")
 }],
-"loop": 1,
+"loop": true,
 "name": &"scared",
 "speed": 5.0
 }, {
@@ -106,7 +106,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_6i5rd")
 }],
-"loop": 1,
+"loop": true,
 "name": &"shaded",
 "speed": 0.0
 }, {
@@ -114,7 +114,7 @@ animations = [{
 "duration": 1.0,
 "texture": SubResource("AtlasTexture_niwqa")
 }],
-"loop": 1,
+"loop": true,
 "name": &"tophat",
 "speed": 0.0
 }]
@@ -202,6 +202,7 @@ theme_override_font_sizes/font_size = 43
 text = "Return to shop"
 
 [node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="." unique_id=1386042283]
+bus = &"SFX"
 
 [connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
 [connection signal="pressed" from="Button2" to="." method="_on_button_2_pressed"]
