@@ -12,6 +12,7 @@
 [ext_resource type="Texture2D" uid="uid://cgbbqu5bt1dy" path="res://dialogue/shopkeeper/sprites/shopkeeper_SHADED.png" id="8_k1ox7"]
 [ext_resource type="Texture2D" uid="uid://b6rofs5co3oj6" path="res://dialogue/shopkeeper/sprites/shopkeeper_coolhat.png" id="9_kr3cm"]
 [ext_resource type="AudioStream" uid="uid://ir3c4ch6ieih" path="res://audio/denielcz-immersivecontrol-button-click-sound-463065.mp3" id="11_kr8ed"]
+[ext_resource type="AudioStream" uid="uid://cgjtl6yyauvvp" path="res://audio/music/scary_loop.mp3" id="13_68m7g"]
 
 [sub_resource type="Gradient" id="Gradient_wfx2d"]
 colors = PackedColorArray(0.5278267, 0.00050171494, 0.59879214, 1, 0, 0, 0, 1)
@@ -202,6 +203,7 @@ theme_override_font_sizes/font_size = 43
 text = "Return to shop"
 
 [node name="AudioStreamPlayer2D" type="AudioStreamPlayer2D" parent="." unique_id=1386042283]
+stream = ExtResource("13_68m7g")
 bus = &"SFX"
 
 [connection signal="pressed" from="Button" to="." method="_on_button_pressed"]

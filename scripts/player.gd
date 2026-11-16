@@ -222,12 +222,12 @@ const SPIKE_DAMAGE = 20.0
 const SPIKE_KNOCKBACK = 520.0
 const WALL_DAMAGE_START = 1000.0
 const WALL_DAMAGE_FULL = 1700.0
-const WALL_DAMAGE_MIN = 8.0
-const WALL_DAMAGE_MAX = 35.0
-const FALL_DAMAGE_START = 1500.0
-const FALL_DAMAGE_FULL = 2600.0
-const FALL_DAMAGE_MIN = 10.0
-const FALL_DAMAGE_MAX = 65.0
+const WALL_DAMAGE_MIN = 2.0
+const WALL_DAMAGE_MAX = 15.0
+const FALL_DAMAGE_START = 2000.0
+const FALL_DAMAGE_FULL = 3000.0
+const FALL_DAMAGE_MIN = 5.0
+const FALL_DAMAGE_MAX = 25.0
 
 @onready var health: Health = get_node_or_null("Health")
 var hurt_tween: Tween
